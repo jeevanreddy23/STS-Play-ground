@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GeoLogs | Automated Rock Logging</title>
+  <script async src="https://docs.opencv.org/4.x/opencv.js" onload="window.dispatchEvent(new Event('opencv-loaded'))"></script>
+  <style>
+    :root { --ink:#16373a; --muted:#647675; --cream:#f5f4ed; --paper:#fff; --green:#cbe58d; --teal:#1d5751; --line:#dfe5dc; --orange:#ef9d52; --red:#da5956; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--cream); font:15px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif; }
+    .shell { max-width:1420px; margin:0 auto; padding:28px 24px 48px; }
+    .hero { padding:30px 34px; border-radius:24px; color:#edf8ee; background:linear-gradient(130deg,#102c31,#27655d); box-shadow:0 18px 50px #173f3a18; }
+    .hero h1 { margin:12px 0 7px; font-size:clamp(2rem,4vw,3.35rem); line-height:1; letter-spacing:-.06em; }
+    .hero p { margin:0; max-width:850px; color:#cfe5d8; font-size:1.04rem; }
+    .eyebrow { display:flex; flex-wrap:wrap; gap:7px; }
+    .pill { padding:6px 10px; border-radius:99px; background:var(--green); color:#194136; font-size:11px; font-weight:800; letter-spacing:.06em; }
+    .grid { display:grid; grid-template-columns:1.08fr .92fr; gap:18px; margin-top:18px; }
+    .card { background:var(--paper); border:1px solid var(--line); border-radius:18px; padding:20px; box-shadow:0 8px 28px #1a45310c; }
+    h2,h3 { margin:0 0 12px; letter-spacing:-.025em; }
+    h2 { font-size:1.25rem; } h3 { font-size:1rem; }
+    .muted { color:var(--muted); font-size:.88rem; }
+    .notice { background:#fff8de; border:1px solid #efd991; color:#685017; border-radius:11px; padding:12px 14px; font-size:.88rem; }
+    .drop { display:flex; align-items:center; justify-content:center; min-height:145px; border:1.5px dashed #a8bbb1; border-radius:14px; background:#fbfcf8; text-align:center; padding:20px; cursor:pointer; transition:.2s; }
+    .drop:hover { border-color:var(--teal); background:#f4fbec; }
+    input[type=file] { display:none; }
+    .file-list { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+    .file-chip { border:1px solid var(--line); border-radius:99px; padding:5px 9px; color:var(--muted); font-size:.78rem; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    button { border:0; border-radius:10px; padding:11px 14px; font:inherit; font-weight:750; cursor:pointer; }
+    button.primary { margin-top:14px; width:100%; background:var(--teal); color:white; }
+    button.secondary { background:#eaf2e2; color:#205149; }
+    button:disabled { cursor:not-allowed; opacity:.45; }
+    .status { margin-top:10px; min-height:22px; color:var(--muted); font-size:.86rem; }
+    .view-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .canvas-wrap { min-height:220px; border-radius:13px; overflow:hidden; background:#e8ece5; border:1px solid var(--line); }
+    canvas { display:block; width:100%; height:auto; }
+    .caption { margin-top:7px; color:var(--muted); font-size:.8rem; }
+    .metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:16px 0 0; }
+    .metric { border:1px solid var(--line); border-radius:12px; padding:12px; background:#fbfcf8; }
+    .metric b { display:block; font-size:1.3rem; letter-spacing:-.04em; }
+    .metric span { color:var(--muted); font-size:.72rem; }
+    .table-wrap { overflow:auto; border:1px solid var(--line); border-radius:12px; }
+    table { width:100%; min-width:1120px; border-collapse:collapse; font-size:.82rem; }
+    th { text-align:left; color:var(--muted); background:#f5f7f1; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; }
+    th,td { border-bottom:1px solid var(--line); padding:10px 9px; vertical-align:top; }
+    tr:last-child td { border-bottom:0; }
+    select { max-width:165px; border:1px solid #cad7ca; border-radius:7px; background:white; padding:6px; color:var(--ink); font:inherit; }
+    .confidence { font-weight:800; } .high { color:#297452; } .medium { color:#bd791e; } .low { color:#bc4848; }
+    .toolbar { display:flex; gap:9px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-top:15px; }
+    .button-row { display:flex; gap:8px; flex-wrap:wrap; }
+    .empty { color:var(--muted); text-align:center; padding:28px; }
+    footer { margin-top:24px; color:var(--muted); font-size:.78rem; }
+    @media (max-width:860px) { .grid,.view-grid { grid-template-columns:1fr; } .metrics { grid-template-columns:repeat(2,1fr); } .shell { padding:16px 12px 30px; } .hero { padding:24px 22px; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="eyebrow"><span class="pill">IMAGE â†’ DRAFT LOG</span><span class="pill">AS 1726 VOCABULARY</span><span class="pill">BROWSER PROCESSING</span></div>
+      <h1>GeoLogs rock logging</h1>
+      <p>Upload core or face imagery. The browser creates a canonical view, surfaces candidate traces, and generates a reviewable defect register with evidence and confidence.</p>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>1 Â· Input imagery</h2>
+        <label class="drop" for="fileInput">
+          <span><strong>Choose core photos or face scans</strong><br><span class="muted">JPG, PNG, WEBP or TIFF Â· one or more images</span></span>
+        </label>
+        <input id="fileInput" type="file" accept="image/*" multiple />
+        <div id="fileList" class="file-list"></div>
+      </div>
+      <div class="card">
+        <h2>2 Â· Run automated logging</h2>
+        <div class="notice">The detector produces draft candidates. Confirm defect type, weathering and strength before issuing an engineering log.</div>
+        <button id="processButton" class="primary" disabled>Process images</button>
+        <div id="status" class="status">Loading browser computer-vision engineâ€¦</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px">
+          <input id="project" placeholder="Project" value="Sydney sandstone pilot" style="padding:10px;border:1px solid #cad7ca;border-radius:9px;font:inherit" />
+          <input id="location" placeholder="Borehole / face" value="BH-01 / Face A" style="padding:10px;border:1px solid #cad7ca;border-radius:9px;font:inherit" />
+        </div>
+      </div>
+    </section>
+
+    <section id="evidenceSection" class="card" style="margin-top:18px;display:none">
+      <h2>3 Â· Consolidated view and CV evidence</h2>
+      <div id="consolidationMessage" class="muted" style="margin-bottom:12px"></div>
+      <div class="view-grid">
+        <div><div class="canvas-wrap"><canvas id="canonicalCanvas"></canvas></div><div class="caption">Canonical same-view image</div></div>
+        <div><div class="canvas-wrap"><canvas id="overlayCanvas"></canvas></div><div class="caption">Green = joint Â· blue = bedding plane (BP) Â· orange = mechanical edge Â· red = fracture</div></div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><b id="candidateMetric">0</b><span>Candidates</span></div>
+        <div class="metric"><b id="sizeMetric">â€”</b><span>Image size</span></div>
+        <div class="metric"><b id="modeMetric">Browser</b><span>Processing mode</span></div>
+        <div class="metric"><b>Yes</b><span>Engineering review required</span></div>
+      </div>
+    </section>
+
+    <section id="registerSection" class="card" style="margin-top:18px;display:none">
+      <h2>4 Â· Review draft defect register</h2>
+      <div id="context" class="muted" style="margin-bottom:12px"></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Type</th><th>Orientation</th><th>Length</th><th>AI confidence</th><th>Weathering</th><th>Strength</th><th>Status</th><th>Evidence</th></tr></thead>
+          <tbody id="registerBody"></tbody>
+        </table>
+        <div id="emptyRegister" class="empty" style="display:none">No line candidates detected. Try a sharper image with stronger defect contrast, or submit the image for manual review.</div>
+      </div>
+      <div class="toolbar">
+        <div class="muted">Image analysis is a triage aid, not a certified geological interpretation.</div>
+        <div class="button-row"><button id="csvButton" class="secondary" disabled>Download CSV</button><button id="jsonButton" class="secondary" disabled>Download JSON evidence</button></div>
+      </div>
+    </section>
+    <footer>GeoLogs prototype Â· Image-only strength and weathering remain explicitly review fields. Confirm scale, orientation, structural continuity, field observations and test data before issue.</footer>
+  </main>
+
+  <script>
+    const DEFECT_TYPES = ['Joint','Bedding plane (BP)','Parting','Sheared surface','Sheared zone','Seam','Saw cut / mechanical edge','Blast / handling fracture','Dust / mud / occlusion'];
+    const WEATHERING = ['Residual Soil (RS)','Extremely Weathered (XW)','Highly Weathered (HW)','Moderately Weathered (MW)','Slightly Weathered (SW)','Distinctly Weathered (DW)','Fresh (FR)','Needs review'];
+    const STRENGTH = ['Very Low','Low','Medium','High','Very High','Not inferred from image'];
+    const REVIEW = ['AI draft','Reviewed','Rejected'];
+    let files = [], records = [], stats = {}, cvAvailable = false;
+    const $ = (id) => document.getElementById(id);
+
+    function setStatus(message, good = false) { $('status').textContent = message; $('status').style.color = good ? '#287452' : ''; }
+    function escapeHtml(value) { return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
+    function waitForCv() { if (window.cv && typeof window.cv.Mat === 'function') { cvAvailable = true; setStatus('Computer-vision engine ready.'); refreshButton(); } else { setTimeout(waitForCv, 250); } }
+    window.addEventListener('opencv-loaded', waitForCv); waitForCv();
+    function refreshButton() { $('processButton').disabled = !files.length || !cvAvailable; }
+
+    $('fileInput').addEventListener('change', (event) => { files = [...event.target.files]; $('fileList').innerHTML = files.map(f => `<span class="file-chip">${escapeHtml(f.name)}</span>`).join(''); setStatus(`${files.length} image(s) ready.`); refreshButton(); });
+    $('processButton').addEventListener('click', processImages);
+
+    function loadImage(file) { return new Promise((resolve, reject) => { const img = new Image(); img.onload = () => resolve(img); img.onerror = reject; img.src = URL.createObjectURL(file); }); }
+    function drawImageFit(canvas, img, maxSide = 1800) {
+      const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+      canvas.width = Math.max(1, Math.round(img.naturalWidth * scale)); canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+      const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height); return scale;
+    }
+    async function makeCanonical(images) {
+      const canvas = $('canonicalCanvas');
+      if (images.length === 1) { drawImageFit(canvas, images[0]); $('consolidationMessage').textContent = 'Single image used as canonical view.'; return; }
+      const maxWidth = 1500, gap = 18, cells = images.map(img => { const scale = Math.min(1, maxWidth / img.naturalWidth); return { img, w: Math.round(img.naturalWidth * scale), h: Math.round(img.naturalHeight * scale) }; });
+      canvas.width = Math.max(...cells.map(c => c.w)); canvas.height = cells.reduce((sum,c) => sum + c.h, 0) + gap * (cells.length - 1);
+      const ctx = canvas.getContext('2d'); ctx.fillStyle = '#f5f7f1'; ctx.fillRect(0,0,canvas.width,canvas.height); let y = 0;
+      cells.forEach((cell, i) => { ctx.drawImage(cell.img, 0, y, cell.w, cell.h); if (i < cells.length - 1) { ctx.fillStyle='#ffffff'; ctx.fillRect(0,y+cell.h,canvas.width,gap); } y += cell.h + gap; });
+      $('consolidationMessage').textContent = 'Multiple images consolidated into a same-view contact sheet in the browser. Feature-based panorama stitching can be added when calibrated overlap metadata is available.';
+    }
+    function angle(x1,y1,x2,y2) { return Math.round(((Math.atan2(y2-y1,x2-x1)*180/Math.PI)%180+180)%180*10)/10; }
+    function length(x1,y1,x2,y2) { return Math.hypot(x2-x1,y2-y1); }
+    function classify(line, w, h, straightness, parallelCount) {
+      const [x1,y1,x2,y2] = line, diagonal = Math.hypot(w,h), len = length(...line), touches = Math.min(x1,y1,x2,y2) <= 6 || Math.max(x1,x2) >= w-7 || Math.max(y1,y2) >= h-7;
+      if (parallelCount >= 2 && len > .18*diagonal && !touches) return ['Bedding plane (BP)', Math.min(.88,.56+.08*Math.min(parallelCount,4)+.24*straightness), 'Repeated subparallel traces suggest bedding/lamination; review against saw cuts and foliation'];
+      if (len > .42*diagonal && straightness > .28 && (parallelCount >= 2 || touches)) return ['Saw cut / mechanical edge', Math.min(.93,.58+.18*straightness+.05*Math.min(parallelCount,3)), 'Long, straight, repeatedly aligned edge candidate; review capture geometry'];
+      if (len < .13*diagonal && straightness < .25) return ['Blast / handling fracture', .52, 'Short, discontinuous fracture-like candidate; review core ends and blast damage'];
+      return ['Joint', Math.min(.88,.46+.34*straightness+.08*Math.min(len/diagonal,.7)), 'Planar trace candidate from connected edge evidence; confirm structural continuity'];
+    }
+    function lineStraightness(edge, line) { const [x1,y1,x2,y2]=line, n=Math.max(20,Math.round(length(...line)), samples=[]); for(let i=0;i<n;i++){ const x=Math.max(0,Math.min(edge.cols-1,Math.round(x1+(x2-x1)*i/(n-1)))), y=Math.max(0,Math.min(edge.rows-1,Math.round(y1+(y2-y1)*i/(n-1)))); samples.push(edge.ucharPtr(y,x)[0]>0); } return samples.filter(Boolean).length/samples.length; }
+    function analyse() {
+      const canvas = $('canonicalCanvas'), overlay = $('overlayCanvas'); overlay.width=canvas.width; overlay.height=canvas.height; overlay.getContext('2d').drawImage(canvas,0,0);
+      const src=cv.imread(canvas), gray=new cv.Mat(), blur=new cv.Mat(), edges=new cv.Mat(), lines=new cv.Mat();
+      cv.cvtColor(src,gray,cv.COLOR_RGBA2GRAY); cv.GaussianBlur(gray,blur,new cv.Size(5,5),0,0,cv.BORDER_DEFAULT); cv.Canny(blur,edges,45,135); cv.HoughLinesP(edges,lines,1,Math.PI/180,Math.max(25,Math.round(Math.hypot(canvas.width,canvas.height)*.025)),Math.max(38,Math.round(Math.hypot(canvas.width,canvas.height)*.055)),18);
+      const raw=[]; for(let i=0;i<lines.rows;i++){ const line=[lines.data32S[i*4],lines.data32S[i*4+1],lines.data32S[i*4+2],lines.data32S[i*4+3]], a=angle(...line), mid=[(line[0]+line[2])/2,(line[1]+line[3])/2]; if(raw.some(o=>Math.abs(a-angle(...o))<4 && Math.hypot(mid[0]-(o[0]+o[2])/2,mid[1]-(o[1]+o[3])/2)<.035*Math.hypot(canvas.width,canvas.height))) continue; raw.push(line); }
+      raw.sort((a,b)=>length(...b)-length(...a)); const ctx=overlay.getContext('2d'); records=[];
+      raw.slice(0,36).forEach((line,i)=>{ const a=angle(...line), straight=lineStraightness(edges,line), parallel=raw.filter(other=>other!==line&&Math.abs(a-angle(...other))<8).length, [type,confidence,evidence]=classify(line,canvas.width,canvas.height,straight,parallel); const color=type==='Joint'?'#1ebd64':type.includes('Bedding')?'#4f83cc':type.includes('Saw')?'#f57e42':'#df4848'; ctx.strokeStyle=color;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(line[0],line[1]);ctx.lineTo(line[2],line[3]);ctx.stroke();ctx.fillStyle=color;ctx.font='bold 14px system-ui';ctx.fillText(`D-${String(i+1).padStart(3,'0')}`,line[0]+5,Math.max(16,line[1]-6)); records.push({defect_id:`D-${String(i+1).padStart(3,'0')}`,source_image:files.map(f=>f.name).join('; '),defect_type:type,start_x_px:line[0],start_y_px:line[1],end_x_px:line[2],end_y_px:line[3],trace_length_px:Math.round(length(...line)*10)/10,orientation_deg:a,confidence:Math.round(confidence*1000)/1000,weathering:'Needs review',rock_strength:'Not inferred from image',aperture:'Needs review',review_status:'AI draft',evidence}); });
+      stats={image_width_px:canvas.width,image_height_px:canvas.height,candidate_count:records.length,processing_mode:'Browser OpenCV.js edge + Hough-line prototype',review_required:true}; [src,gray,blur,edges,lines].forEach(m=>m.delete());
+    }
+    async function processImages() { try { setStatus('Loading and consolidating imageryâ€¦'); const images=await Promise.all(files.map(loadImage)); await makeCanonical(images); setStatus('Extracting candidate tracesâ€¦'); analyse(); renderResults(); setStatus(`Draft log created: ${records.length} candidate(s).`,true); } catch(error) { console.error(error); setStatus('Processing failed. Try a sharper image or a smaller set of files.'); } }
+    function selectHtml(options, value, kind, id) { return `<select data-id="${id}" data-kind="${kind}">${options.map(o=>`<option ${o===value?'selected':''}>${escapeHtml(o)}</option>`).join('')}</select>`; }
+    function renderResults() { $('evidenceSection').style.display='block'; $('registerSection').style.display='block'; $('candidateMetric').textContent=stats.candidate_count; $('sizeMetric').textContent=`${stats.image_width_px.toLocaleString()} Ã— ${stats.image_height_px.toLocaleString()}`; $('context').textContent=`${$('project').value} Â· ${$('location').value}`; $('emptyRegister').style.display=records.length?'none':'block'; $('csvButton').disabled=!records.length; $('jsonButton').disabled=!records.length; $('registerBody').innerHTML=records.map((r,i)=>`<tr><td><strong>${r.defect_id}</strong></td><td>${selectHtml(DEFECT_TYPES,r.defect_type,'defect_type',i)}</td><td>${r.orientation_deg}Â°</td><td>${r.trace_length_px}px</td><td class="confidence ${r.confidence>=.75?'high':r.confidence>=.55?'medium':'low'}">${(r.confidence*100).toFixed(1)}%</td><td>${selectHtml(WEATHERING,r.weathering,'weathering',i)}</td><td>${selectHtml(STRENGTH,r.rock_strength,'rock_strength',i)}</td><td>${selectHtml(REVIEW,r.review_status,'review_status',i)}</td><td class="muted">${escapeHtml(r.evidence)}</td></tr>`).join(''); document.querySelectorAll('select[data-id]').forEach(el=>el.addEventListener('change',e=>{ records[Number(e.target.dataset.id)][e.target.dataset.kind]=e.target.value; })); }
+    function csvEscape(v) { return `"${String(v??'').replaceAll('"','""')}"`; }
+    function download(name, content, type) { const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500); }
+    $('csvButton').addEventListener('click',()=>{ if(!records.length)return; const keys=Object.keys(records[0]); download('geologs-draft-log.csv',[keys.join(','),...records.map(r=>keys.map(k=>csvEscape(r[k])).join(','))].join('\n'),'text/csv'); });
+    $('jsonButton').addEventListener('click',()=>{ if(records.length) download('geologs-evidence.json',JSON.stringify({records,stats},null,2),'application/json'); });
+  </script>
+</body>
+</html>
+
