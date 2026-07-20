@@ -1,0 +1,15 @@
+.playwright-cli/
+.playwright-mcp/
+.wrangler/
+__pycache__/
+*.pyc
+tmp/
+output/
+local-state.json
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.tif
+*.tiff
+
