@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "sts-play-ground",
+  "main": "./src/worker.js",
+  "compatibility_date": "2026-07-18",
+  "assets": {
+    "directory": "./cloudflare_site",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  }
+}
+
