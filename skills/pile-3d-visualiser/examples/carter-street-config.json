@@ -1,0 +1,280 @@
+{
+ "title": "Bored Pier Inspection \u2014 3D Visualisation",
+ "subtitle": "24\u201326 Carter Street, Lidcombe NSW \u00b7 Report 26/0988 \u00b7 inspected 27 Jul 2026 \u00b7 client: Asset Building Systems",
+ "img_w": 876,
+ "img_h": 793,
+ "px_per_m": 16,
+ "cx": 400,
+ "cy": 440,
+ "clay_thickness": 1.2,
+ "ghost_depth": 2.0,
+ "termination": "weathered siltstone",
+ "termination_short": "Siltstone",
+ "footer": "All 18 inspected bored piers founded in competent weathered siltstone (AS 2159:2009). Residual high-plasticity silty clay 0.0\u20131.2 m over weathered siltstone. Depths in metres below existing ground level. Vertical scale exaggerated \u2014 see slider.",
+ "table_note": "Rockhead approximated as total pier depth minus achieved socket length. Diameters assumed 600 mm internal / 450 mm perimeter (structural drawings nominate 450\u2013600 mm by location). Positions digitised from the Slab & Foundation Layout (Olivotto Consulting, Job 23463 Rev C).",
+ "footprint_px": [
+  92,
+  118,
+  712,
+  772
+ ],
+ "piles": [
+  {
+   "id": "P1",
+   "group": "internal",
+   "dia": 0.6,
+   "px": 118,
+   "py": 177,
+   "depth": 2.7,
+   "socket": 1.7,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P2",
+   "group": "internal",
+   "dia": 0.6,
+   "px": 262,
+   "py": 140
+  },
+  {
+   "id": "P3",
+   "group": "internal",
+   "dia": 0.6,
+   "px": 410,
+   "py": 140,
+   "depth": 2.7,
+   "socket": 1.4,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P4",
+   "group": "internal",
+   "dia": 0.6,
+   "px": 555,
+   "py": 140
+  },
+  {
+   "id": "P5",
+   "group": "internal",
+   "dia": 0.6,
+   "px": 675,
+   "py": 137,
+   "depth": 2.5,
+   "socket": 0.9,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P6",
+   "group": "internal",
+   "dia": 0.6,
+   "px": 122,
+   "py": 742,
+   "depth": 2.2,
+   "socket": 1.8,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P7",
+   "group": "internal",
+   "dia": 0.6,
+   "px": 262,
+   "py": 723
+  },
+  {
+   "id": "P8",
+   "group": "internal",
+   "dia": 0.6,
+   "px": 408,
+   "py": 723,
+   "depth": 2.4,
+   "socket": 2.0,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P9",
+   "group": "internal",
+   "dia": 0.6,
+   "px": 553,
+   "py": 722,
+   "depth": 2.4,
+   "socket": 2.0,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P10",
+   "group": "internal",
+   "dia": 0.6,
+   "px": 678,
+   "py": 690,
+   "depth": 2.7,
+   "socket": 1.4,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P11",
+   "group": "internal",
+   "dia": 0.6,
+   "px": 245,
+   "py": 435,
+   "depth": 3.3,
+   "socket": 1.8,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P12",
+   "group": "internal",
+   "dia": 0.6,
+   "px": 390,
+   "py": 435
+  },
+  {
+   "id": "P13",
+   "group": "internal",
+   "dia": 0.6,
+   "px": 533,
+   "py": 435,
+   "depth": 3.3,
+   "socket": 1.8,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P14",
+   "group": "perimeter",
+   "dia": 0.45,
+   "px": 218,
+   "py": 136
+  },
+  {
+   "id": "P15",
+   "group": "perimeter",
+   "dia": 0.45,
+   "px": 203,
+   "py": 158
+  },
+  {
+   "id": "P16",
+   "group": "perimeter",
+   "dia": 0.45,
+   "px": 125,
+   "py": 253,
+   "depth": 2.2,
+   "socket": 1.2,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P17",
+   "group": "perimeter",
+   "dia": 0.45,
+   "px": 122,
+   "py": 362,
+   "depth": 2.2,
+   "socket": 1.2,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P18",
+   "group": "perimeter",
+   "dia": 0.45,
+   "px": 112,
+   "py": 437,
+   "depth": 2.2,
+   "socket": 1.7,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P19",
+   "group": "perimeter",
+   "dia": 0.45,
+   "px": 122,
+   "py": 530,
+   "depth": 2.3,
+   "socket": 1.6,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P20",
+   "group": "perimeter",
+   "dia": 0.45,
+   "px": 122,
+   "py": 648,
+   "depth": 2.3,
+   "socket": 1.6,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P21",
+   "group": "perimeter",
+   "dia": 0.45,
+   "px": 675,
+   "py": 250
+  },
+  {
+   "id": "P22",
+   "group": "perimeter",
+   "dia": 0.45,
+   "px": 675,
+   "py": 355,
+   "depth": 1.8,
+   "socket": 0.6,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P23",
+   "group": "perimeter",
+   "dia": 0.45,
+   "px": 670,
+   "py": 440
+  },
+  {
+   "id": "P24",
+   "group": "perimeter",
+   "dia": 0.45,
+   "px": 672,
+   "py": 530,
+   "depth": 1.9,
+   "socket": 0.7,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P25",
+   "group": "perimeter",
+   "dia": 0.45,
+   "px": 675,
+   "py": 656
+  },
+  {
+   "id": "P26",
+   "group": "perimeter",
+   "dia": 0.45,
+   "px": 628,
+   "py": 702,
+   "depth": 1.9,
+   "socket": 0.7,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P27",
+   "group": "perimeter",
+   "dia": 0.45,
+   "px": 648,
+   "py": 752,
+   "depth": 1.9,
+   "socket": 0.7,
+   "terminated": "weathered siltstone"
+  },
+  {
+   "id": "P28",
+   "group": "perimeter",
+   "dia": 0.45,
+   "px": 135,
+   "py": 158
+  },
+  {
+   "id": "P29",
+   "group": "perimeter",
+   "dia": 0.45,
+   "px": 112,
+   "py": 566
+  }
+ ]
+}
