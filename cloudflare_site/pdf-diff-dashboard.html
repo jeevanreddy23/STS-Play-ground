@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Diff Dashboard — STS GeoFlow QA</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --page-plane: #f9f9f7;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --hairline: #e1e0d9;
+    --border-ring: rgba(11,11,11,0.10);
+    --accent: #2a78d6;
+    --status-good: #0ca30c;
+    --status-good-text: #006300;
+    --status-critical: #d03b3b;
+    --status-warning: #fab219;
+    --diff-px: #d03b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --surface-1: #1a1a19;
+      --page-plane: #0d0d0d;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted: #898781;
+      --hairline: #2c2c2a;
+      --border-ring: rgba(255,255,255,0.10);
+      --accent: #3987e5;
+      --status-good: #0ca30c;
+      --status-good-text: #0ca30c;
+      --status-critical: #d03b3b;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --page-plane: #0d0d0d;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --hairline: #2c2c2a;
+    --border-ring: rgba(255,255,255,0.10);
+    --accent: #3987e5;
+    --status-good-text: #0ca30c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-size: 14px;
+  }
+  header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 10px 20px;
+    background: var(--surface-1);
+    border-bottom: 1px solid var(--hairline);
+    flex-wrap: wrap;
+  }
+  header h1 { font-size: 16px; font-weight: 650; margin: 0; }
+  header .sub { color: var(--text-muted); font-size: 12px; }
+  .spacer { flex: 1; }
+
+  /* Drop zones */
+  .dropzone {
+    display: flex; align-items: center; gap: 8px;
+    border: 1.5px dashed var(--hairline);
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    min-width: 210px;
+    background: transparent;
+    transition: border-color .15s, background .15s;
+  }
+  .dropzone:hover, .dropzone.dragover { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, transparent); }
+  .dropzone .dz-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    padding: 2px 6px; border-radius: 4px; color: #fff;
+  }
+  .dropzone .dz-name { font-size: 12px; color: var(--text-secondary); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #dz-ref .dz-tag { background: #52514e; }
+  #dz-cand .dz-tag { background: var(--accent); }
+  .dropzone input { display: none; }
+
+  /* Controls bar */
+  .controls {
+    display: flex; align-items: center; gap: 20px;
+    padding: 8px 20px;
+    background: var(--surface-1);
+    border-bottom: 1px solid var(--hairline);
+    flex-wrap: wrap;
+  }
+  .ctl { display: flex; align-items: center; gap: 8px; }
+  .ctl label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+  .ctl .val { font-size: 12px; color: var(--text-primary); font-weight: 600; min-width: 30px; font-variant-numeric: tabular-nums; }
+  input[type="range"] { accent-color: var(--accent); width: 140px; }
+  input[type="number"] {
+    width: 64px; padding: 3px 6px; font-size: 12px;
+    border: 1px solid var(--hairline); border-radius: 6px;
+    background: var(--page-plane); color: var(--text-primary);
+  }
+  .seg { display: flex; border: 1px solid var(--hairline); border-radius: 8px; overflow: hidden; }
+  .seg button {
+    border: none; background: transparent; color: var(--text-secondary);
+    padding: 5px 12px; font-size: 12px; cursor: pointer; font-family: inherit;
+  }
+  .seg button.active { background: var(--accent); color: #fff; }
+  .seg button:not(:last-child) { border-right: 1px solid var(--hairline); }
+  button.icon-btn {
+    border: 1px solid var(--hairline); background: transparent; color: var(--text-primary);
+    border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 13px; font-family: inherit;
+  }
+  button.icon-btn:disabled { opacity: .35; cursor: default; }
+
+  /* Stat tiles */
+  .stats {
+    display: flex; gap: 12px; padding: 12px 20px; flex-wrap: wrap;
+  }
+  .tile {
+    background: var(--surface-1);
+    border: 1px solid var(--border-ring);
+    border-radius: 10px;
+    padding: 10px 16px;
+    min-width: 130px;
+  }
+  .tile .t-label { font-size: 11px; color: var(--text-muted); letter-spacing: .04em; text-transform: uppercase; font-weight: 600; }
+  .tile .t-value { font-size: 22px; font-weight: 650; margin-top: 2px; }
+  .tile .t-sub { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 999px;
+  }
+  .badge.pass { color: var(--status-good-text); background: color-mix(in srgb, var(--status-good) 14%, transparent); }
+  .badge.fail { color: var(--status-critical); background: color-mix(in srgb, var(--status-critical) 12%, transparent); }
+  .badge.na   { color: var(--text-muted); background: color-mix(in srgb, var(--text-muted) 12%, transparent); }
+
+  /* Page chips */
+  .pagebar {
+    display: flex; gap: 6px; padding: 0 20px 10px; flex-wrap: wrap; align-items: center;
+  }
+  .pagebar .pb-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; margin-right: 4px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    border: 1px solid var(--hairline); border-radius: 999px;
+    background: var(--surface-1);
+    padding: 3px 10px; font-size: 12px; cursor: pointer; font-family: inherit;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+  .chip.current { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .chip .dot.pass { background: var(--status-good); }
+  .chip .dot.fail { background: var(--status-critical); }
+  .chip .dot.pend { background: var(--text-muted); }
+  .chip .glyph { font-weight: 700; font-size: 11px; }
+  .chip .glyph.pass { color: var(--status-good-text); }
+  .chip .glyph.fail { color: var(--status-critical); }
+
+  /* Panes */
+  .panes {
+    display: grid; gap: 12px; padding: 0 20px 20px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+  .pane {
+    background: var(--surface-1);
+    border: 1px solid var(--border-ring);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    min-height: 300px;
+  }
+  .pane .pane-head {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 12px; border-bottom: 1px solid var(--hairline);
+    font-size: 12px; font-weight: 650; color: var(--text-secondary);
+  }
+  .pane .pane-body {
+    overflow: auto; flex: 1; background: var(--page-plane);
+    max-height: 72vh;
+    position: relative;
+  }
+  .pane canvas { display: block; margin: 10px auto; box-shadow: 0 1px 4px rgba(0,0,0,.18); background: #fff; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+  /* Overlay mode */
+  #overlay-wrap { position: relative; margin: 10px auto; width: fit-content; }
+  #overlay-wrap canvas { position: absolute; top: 0; left: 0; margin: 0; background: transparent; box-shadow: none; }
+  #overlay-wrap canvas:first-child { position: relative; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.18); }
+
+  .empty-hint {
+    padding: 60px 30px; text-align: center; color: var(--text-muted); font-size: 13px;
+  }
+  .progress { font-size: 12px; color: var(--text-secondary); }
+  footer { padding: 8px 20px 20px; font-size: 11px; color: var(--text-muted); }
+  .theme-toggle { margin-left: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>PDF Diff Dashboard</h1>
+    <div class="sub">Candidate vs reference · pixel-level visual regression</div>
+  </div>
+  <label class="dropzone" id="dz-ref">
+    <span class="dz-tag">Reference</span>
+    <span class="dz-name" id="name-ref">drop or click to load…</span>
+    <input type="file" id="file-ref" accept="application/pdf">
+  </label>
+  <label class="dropzone" id="dz-cand">
+    <span class="dz-tag">Candidate</span>
+    <span class="dz-name" id="name-cand">drop or click to load…</span>
+    <input type="file" id="file-cand" accept="application/pdf">
+  </label>
+  <div class="spacer"></div>
+  <button class="icon-btn" id="swap-btn" title="Swap candidate and reference">⇄ Swap</button>
+  <button class="icon-btn theme-toggle" id="theme-btn" title="Toggle dark mode">◐</button>
+</header>
+
+<div class="controls">
+  <div class="ctl">
+    <label for="threshold">Pixel tolerance</label>
+    <input type="range" id="threshold" min="0" max="128" value="32">
+    <span class="val" id="threshold-val">32</span>
+  </div>
+  <div class="ctl">
+    <label for="pass-pct">Pass if diff ≤</label>
+    <input type="number" id="pass-pct" min="0" max="100" step="0.05" value="0.10">
+    <label>% px</label>
+  </div>
+  <div class="ctl">
+    <label>View</label>
+    <div class="seg" id="mode-seg">
+      <button data-mode="side" class="active">Side-by-side</button>
+      <button data-mode="overlay">Overlay</button>
+      <button data-mode="diff">Diff only</button>
+    </div>
+  </div>
+  <div class="ctl" id="onion-ctl" style="display:none">
+    <label for="onion">Candidate opacity</label>
+    <input type="range" id="onion" min="0" max="100" value="50">
+    <span class="val" id="onion-val">50%</span>
+  </div>
+  <div class="ctl">
+    <label for="zoom">Zoom</label>
+    <input type="range" id="zoom" min="30" max="200" value="60">
+    <span class="val" id="zoom-val">60%</span>
+  </div>
+  <div class="ctl">
+    <button class="icon-btn" id="prev-btn">‹</button>
+    <span class="val" id="page-ind" style="min-width:70px;text-align:center">– / –</span>
+    <button class="icon-btn" id="next-btn">›</button>
+  </div>
+  <div class="spacer"></div>
+  <span class="progress" id="progress"></span>
+</div>
+
+<div class="stats">
+  <div class="tile">
+    <div class="t-label">Overall</div>
+    <div class="t-value"><span class="badge na" id="overall-badge">— no files</span></div>
+    <div class="t-sub" id="overall-sub">load both PDFs to compare</div>
+  </div>
+  <div class="tile">
+    <div class="t-label">This page — diff</div>
+    <div class="t-value" id="page-diff-pct">–</div>
+    <div class="t-sub" id="page-diff-px">– px differ</div>
+  </div>
+  <div class="tile">
+    <div class="t-label">Pages failing</div>
+    <div class="t-value" id="pages-failing">–</div>
+    <div class="t-sub" id="pages-total">of – pages</div>
+  </div>
+  <div class="tile">
+    <div class="t-label">Worst page</div>
+    <div class="t-value" id="worst-page">–</div>
+    <div class="t-sub" id="worst-page-pct">–</div>
+  </div>
+</div>
+
+<div class="pagebar" id="pagebar"></div>
+
+<div class="panes" id="panes">
+  <div class="pane" id="pane-ref">
+    <div class="pane-head"><span class="legend-dot" style="background:#52514e"></span> Reference</div>
+    <div class="pane-body" data-sync="1"><div class="empty-hint">Load a reference PDF above</div></div>
+  </div>
+  <div class="pane" id="pane-cand">
+    <div class="pane-head"><span class="legend-dot" style="background:var(--accent)"></span> Candidate</div>
+    <div class="pane-body" data-sync="1"><div class="empty-hint">Load a candidate PDF above</div></div>
+  </div>
+  <div class="pane" id="pane-diff">
+    <div class="pane-head"><span class="legend-dot" style="background:var(--diff-px)"></span> Diff overlay <span style="font-weight:400;color:var(--text-muted)">· red = pixels beyond tolerance</span></div>
+    <div class="pane-body" data-sync="1"><div class="empty-hint">Diff appears when both PDFs are loaded</div></div>
+  </div>
+  <div class="pane" id="pane-overlay" style="display:none">
+    <div class="pane-head">Overlay · reference under candidate</div>
+    <div class="pane-body"><div id="overlay-wrap"></div></div>
+  </div>
+</div>
+
+<footer>
+  Rendering at 1200&thinsp;px page width via pdf.js · diff = any RGB channel differing by more than the pixel tolerance · pages missing from one document count as 100% diff · page chips are computed at reduced resolution, so their percentages are approximate — the "this page" tile is the full-resolution number.
+</footer>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const RENDER_W = 1200;   // full-res compare width (current page)
+const SUMMARY_W = 260;   // low-res width for all-pages summary
+
+const state = {
+  ref:  { doc: null, name: null, cacheFull: new Map(), cacheSmall: new Map() },
+  cand: { doc: null, name: null, cacheFull: new Map(), cacheSmall: new Map() },
+  page: 1,
+  threshold: 32,
+  passPct: 0.10,
+  mode: 'side',
+  zoom: 60,
+  summary: [],        // [{page, diffPct, missing}]
+  summaryRun: 0,      // token to cancel stale summary runs
+  renderRun: 0,
+};
+
+const $ = id => document.getElementById(id);
+
+/* ---------- file loading ---------- */
+function wireDropzone(dzId, inputId, key) {
+  const dz = $(dzId), input = $(inputId);
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (f) loadFile(key, f);
+  });
+  input.addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (f) loadFile(key, f);
+  });
+}
+wireDropzone('dz-ref', 'file-ref', 'ref');
+wireDropzone('dz-cand', 'file-cand', 'cand');
+
+async function loadFile(key, file) {
+  try {
+    const buf = await file.arrayBuffer();
+    const doc = await pdfjsLib.getDocument({ data: buf }).promise;
+    state[key].doc = doc;
+    state[key].name = file.name;
+    state[key].cacheFull.clear();
+    state[key].cacheSmall.clear();
+    $(key === 'ref' ? 'name-ref' : 'name-cand').textContent =
+      `${file.name} (${doc.numPages}p)`;
+    state.page = 1;
+    await refreshAll();
+  } catch (err) {
+    alertBox(`Could not read ${file.name}: ${err.message}`);
+  }
+}
+function alertBox(msg) { $('progress').textContent = '⚠ ' + msg; }
+
+$('swap-btn').addEventListener('click', async () => {
+  const t = state.ref; state.ref = state.cand; state.cand = t;
+  const tn = $('name-ref').textContent;
+  $('name-ref').textContent = $('name-cand').textContent;
+  $('name-cand').textContent = tn;
+  await refreshAll();
+});
+
+/* ---------- rendering ---------- */
+async function renderPageImageData(entry, pageNum, targetW) {
+  const cache = targetW === RENDER_W ? entry.cacheFull : entry.cacheSmall;
+  if (cache.has(pageNum)) return cache.get(pageNum);
+  if (!entry.doc || pageNum < 1 || pageNum > entry.doc.numPages) return null;
+  const page = await entry.doc.getPage(pageNum);
+  const vp1 = page.getViewport({ scale: 1 });
+  const scale = targetW / vp1.width;
+  const vp = page.getViewport({ scale });
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(vp.width);
+  canvas.height = Math.round(vp.height);
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  await page.render({ canvasContext: ctx, viewport: vp }).promise;
+  const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  // keep full-res cache tiny (current page workflow), small cache unbounded-ish
+  if (targetW === RENDER_W && cache.size > 4) cache.delete(cache.keys().next().value);
+  cache.set(pageNum, img);
+  return img;
+}
+
+/* diff two ImageData (may differ in size / be null). Returns {count, total, overlay} */
+function computeDiff(a, b, threshold, makeOverlay) {
+  const w = Math.max(a ? a.width : 0, b ? b.width : 0);
+  const h = Math.max(a ? a.height : 0, b ? b.height : 0);
+  if (!w || !h) return { count: 0, total: 0, overlay: null, w, h };
+  const total = w * h;
+  let count = 0;
+  let out = null, od = null;
+  if (makeOverlay) { out = new ImageData(w, h); od = out.data; }
+  const ad = a ? a.data : null, bd = b ? b.data : null;
+  const aw = a ? a.width : 0, ah = a ? a.height : 0;
+  const bw = b ? b.width : 0, bh = b ? b.height : 0;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const inA = x < aw && y < ah, inB = x < bw && y < bh;
+      let r1 = 255, g1 = 255, bl1 = 255, r2 = 255, g2 = 255, bl2 = 255;
+      if (inA) { const i = (y * aw + x) * 4; r1 = ad[i]; g1 = ad[i+1]; bl1 = ad[i+2]; }
+      if (inB) { const i = (y * bw + x) * 4; r2 = bd[i]; g2 = bd[i+1]; bl2 = bd[i+2]; }
+      const d = Math.max(Math.abs(r1 - r2), Math.abs(g1 - g2), Math.abs(bl1 - bl2));
+      const isDiff = d > threshold || (inA !== inB && d > 0);
+      if (isDiff) count++;
+      if (od) {
+        const o = (y * w + x) * 4;
+        if (isDiff) { od[o] = 208; od[o+1] = 59; od[o+2] = 59; od[o+3] = 255; } // #d03b3b
+        else {
+          // washed grayscale of reference (or candidate where ref missing)
+          const g = Math.round(0.299 * r1 + 0.587 * g1 + 0.114 * bl1);
+          const v = 215 + Math.round(g * 0.157); // 215..255
+          od[o] = v; od[o+1] = v; od[o+2] = v; od[o+3] = 255;
+        }
+      }
+    }
+  }
+  return { count, total, overlay: out, w, h };
+}
+
+function putCanvas(container, img, cssW) {
+  container.innerHTML = '';
+  if (!img) { container.innerHTML = '<div class="empty-hint">no page</div>'; return null; }
+  const c = document.createElement('canvas');
+  c.width = img.width; c.height = img.height;
+  c.getContext('2d').putImageData(img, 0, 0);
+  c.style.width = cssW + 'px';
+  container.appendChild(c);
+  return c;
+}
+
+/* ---------- main refresh ---------- */
+async function refreshCurrentPage() {
+  const run = ++state.renderRun;
+  const { ref, cand, page, threshold } = state;
+  const cssW = Math.round(RENDER_W * state.zoom / 100);
+
+  const [ri, ci] = await Promise.all([
+    ref.doc ? renderPageImageData(ref, page, RENDER_W) : null,
+    cand.doc ? renderPageImageData(cand, page, RENDER_W) : null,
+  ]);
+  if (run !== state.renderRun) return;
+
+  const bodies = {
+    ref: document.querySelector('#pane-ref .pane-body'),
+    cand: document.querySelector('#pane-cand .pane-body'),
+    diff: document.querySelector('#pane-diff .pane-body'),
+  };
+  putCanvas(bodies.ref, ri, cssW);
+  putCanvas(bodies.cand, ci, cssW);
+
+  if (ri || ci) {
+    const both = ri && ci;
+    const res = computeDiff(ri, ci, threshold, true);
+    putCanvas(bodies.diff, res.overlay, cssW);
+    const pct = res.total ? (100 * res.count / res.total) : 0;
+    $('page-diff-pct').textContent = both ? pct.toFixed(3) + '%' : '—';
+    $('page-diff-px').textContent = both
+      ? res.count.toLocaleString() + ' px differ'
+      : 'need both documents';
+    buildOverlayPane(ri, ci, res, cssW);
+  } else {
+    $('page-diff-pct').textContent = '–';
+    $('page-diff-px').textContent = '– px differ';
+  }
+
+  const maxPages = Math.max(ref.doc?.numPages || 0, cand.doc?.numPages || 0);
+  $('page-ind').textContent = maxPages ? `${page} / ${maxPages}` : '– / –';
+  $('prev-btn').disabled = page <= 1;
+  $('next-btn').disabled = page >= maxPages;
+}
+
+function buildOverlayPane(ri, ci, res, cssW) {
+  const wrap = $('overlay-wrap');
+  wrap.innerHTML = '';
+  if (!ri && !ci) return;
+  const mk = img => {
+    const c = document.createElement('canvas');
+    c.width = img.width; c.height = img.height;
+    c.getContext('2d').putImageData(img, 0, 0);
+    c.style.width = cssW + 'px';
+    return c;
+  };
+  if (ri) wrap.appendChild(mk(ri));
+  if (ci) {
+    const c = mk(ci);
+    if (ri) { c.style.opacity = $('onion').value / 100; c.id = 'onion-canvas'; }
+    wrap.appendChild(c);
+  }
+  // diff highlight layer (only diff px, semi-transparent)
+  if (res && res.overlay) {
+    const hl = new ImageData(res.w, res.h);
+    const src = res.overlay.data, dst = hl.data;
+    for (let i = 0; i < src.length; i += 4) {
+      if (src[i] === 208 && src[i+1] === 59 && src[i+2] === 59) {
+        dst[i] = 208; dst[i+1] = 59; dst[i+2] = 59; dst[i+3] = 150;
+      }
+    }
+    const c = document.createElement('canvas');
+    c.width = res.w; c.height = res.h;
+    c.getContext('2d').putImageData(hl, 0, 0);
+    c.style.width = cssW + 'px';
+    c.style.pointerEvents = 'none';
+    wrap.appendChild(c);
+  }
+}
+
+/* ---------- all-pages summary ---------- */
+async function refreshSummary() {
+  const run = ++state.summaryRun;
+  const { ref, cand } = state;
+  state.summary = [];
+  if (!ref.doc || !cand.doc) { renderSummary(); return; }
+  const maxPages = Math.max(ref.doc.numPages, cand.doc.numPages);
+  for (let p = 1; p <= maxPages; p++) {
+    if (run !== state.summaryRun) return;
+    $('progress').textContent = `Analyzing page ${p}/${maxPages}…`;
+    const [ri, ci] = await Promise.all([
+      renderPageImageData(ref, p, SUMMARY_W),
+      renderPageImageData(cand, p, SUMMARY_W),
+    ]);
+    if (run !== state.summaryRun) return;
+    const missing = !ri || !ci;
+    let diffPct = 100;
+    if (!missing) {
+      const res = computeDiff(ri, ci, state.threshold, false);
+      diffPct = res.total ? 100 * res.count / res.total : 0;
+    }
+    state.summary.push({ page: p, diffPct, missing });
+    renderSummary();
+  }
+  $('progress').textContent = '';
+}
+
+/* recompute summary percentages from cached small images (fast, on threshold change) */
+function recomputeSummaryFromCache() {
+  const { ref, cand } = state;
+  if (!ref.doc || !cand.doc) return;
+  state.summary = state.summary.map(s => {
+    const ri = ref.cacheSmall.get(s.page), ci = cand.cacheSmall.get(s.page);
+    if (!ri || !ci) return s;
+    const res = computeDiff(ri, ci, state.threshold, false);
+    return { ...s, diffPct: res.total ? 100 * res.count / res.total : 0 };
+  });
+  renderSummary();
+}
+
+function renderSummary() {
+  const bar = $('pagebar');
+  bar.innerHTML = '';
+  const { summary, passPct } = state;
+  const bothLoaded = state.ref.doc && state.cand.doc;
+
+  if (bothLoaded && summary.length) {
+    const lbl = document.createElement('span');
+    lbl.className = 'pb-label'; lbl.textContent = 'Pages';
+    bar.appendChild(lbl);
+    for (const s of summary) {
+      const pass = !s.missing && s.diffPct <= passPct;
+      const chip = document.createElement('button');
+      chip.className = 'chip' + (s.page === state.page ? ' current' : '');
+      chip.innerHTML =
+        `<span class="dot ${pass ? 'pass' : 'fail'}"></span>` +
+        `p${s.page} · ${s.missing ? 'missing' : s.diffPct.toFixed(2) + '%'} ` +
+        `<span class="glyph ${pass ? 'pass' : 'fail'}">${pass ? '✓' : '✕'}</span>`;
+      chip.addEventListener('click', () => { state.page = s.page; refreshCurrentPage().then(renderSummary); });
+      bar.appendChild(chip);
+    }
+  }
+
+  // tiles
+  const badge = $('overall-badge');
+  if (!bothLoaded) {
+    badge.className = 'badge na'; badge.textContent = '— no files';
+    $('overall-sub').textContent = 'load both PDFs to compare';
+    $('pages-failing').textContent = '–';
+    $('pages-total').textContent = 'of – pages';
+    $('worst-page').textContent = '–'; $('worst-page-pct').textContent = '–';
+    return;
+  }
+  const failing = summary.filter(s => s.missing || s.diffPct > passPct);
+  const done = summary.length;
+  const maxPages = Math.max(state.ref.doc.numPages, state.cand.doc.numPages);
+  if (done < maxPages) {
+    badge.className = 'badge na'; badge.textContent = '… analyzing';
+    $('overall-sub').textContent = `${done}/${maxPages} pages analyzed`;
+  } else if (failing.length === 0) {
+    badge.className = 'badge pass'; badge.textContent = '✓ PASS';
+    $('overall-sub').textContent = `all ${maxPages} pages ≤ ${passPct}% diff`;
+  } else {
+    badge.className = 'badge fail'; badge.textContent = '✕ FAIL';
+    $('overall-sub').textContent = `${failing.length} page${failing.length > 1 ? 's' : ''} over ${passPct}% diff`;
+  }
+  $('pages-failing').textContent = failing.length;
+  $('pages-total').textContent = `of ${maxPages} pages`;
+  if (summary.length) {
+    const worst = summary.reduce((m, s) => (s.diffPct > m.diffPct ? s : m), summary[0]);
+    $('worst-page').textContent = 'p' + worst.page;
+    $('worst-page-pct').textContent = worst.missing ? 'missing' : worst.diffPct.toFixed(2) + '% diff';
+  }
+}
+
+async function refreshAll() {
+  await refreshCurrentPage();
+  await refreshSummary();
+}
+
+/* ---------- controls ---------- */
+let thrTimer = null;
+$('threshold').addEventListener('input', e => {
+  state.threshold = +e.target.value;
+  $('threshold-val').textContent = state.threshold;
+  clearTimeout(thrTimer);
+  thrTimer = setTimeout(() => { refreshCurrentPage(); recomputeSummaryFromCache(); }, 120);
+});
+$('pass-pct').addEventListener('change', e => {
+  state.passPct = Math.max(0, +e.target.value || 0);
+  renderSummary();
+});
+$('zoom').addEventListener('input', e => {
+  state.zoom = +e.target.value;
+  $('zoom-val').textContent = state.zoom + '%';
+  const cssW = Math.round(RENDER_W * state.zoom / 100);
+  document.querySelectorAll('.pane-body canvas, #overlay-wrap canvas')
+    .forEach(c => c.style.width = cssW + 'px');
+});
+$('onion').addEventListener('input', e => {
+  $('onion-val').textContent = e.target.value + '%';
+  const c = $('onion-canvas');
+  if (c) c.style.opacity = e.target.value / 100;
+});
+$('mode-seg').addEventListener('click', e => {
+  const btn = e.target.closest('button'); if (!btn) return;
+  state.mode = btn.dataset.mode;
+  document.querySelectorAll('#mode-seg button').forEach(b => b.classList.toggle('active', b === btn));
+  applyMode();
+});
+function applyMode() {
+  const m = state.mode;
+  $('pane-ref').style.display = m === 'side' ? '' : 'none';
+  $('pane-cand').style.display = m === 'side' ? '' : 'none';
+  $('pane-diff').style.display = (m === 'side' || m === 'diff') ? '' : 'none';
+  $('pane-overlay').style.display = m === 'overlay' ? '' : 'none';
+  $('onion-ctl').style.display = m === 'overlay' ? '' : 'none';
+}
+$('prev-btn').addEventListener('click', () => { if (state.page > 1) { state.page--; refreshCurrentPage().then(renderSummary); } });
+$('next-btn').addEventListener('click', () => {
+  const maxPages = Math.max(state.ref.doc?.numPages || 0, state.cand.doc?.numPages || 0);
+  if (state.page < maxPages) { state.page++; refreshCurrentPage().then(renderSummary); }
+});
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowLeft') $('prev-btn').click();
+  if (e.key === 'ArrowRight') $('next-btn').click();
+});
+$('theme-btn').addEventListener('click', () => {
+  const r = document.documentElement;
+  const cur = r.getAttribute('data-theme');
+  const preferDark = matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = cur ? cur === 'dark' : preferDark;
+  r.setAttribute('data-theme', isDark ? 'light' : 'dark');
+});
+
+/* synced scrolling between panes */
+let syncing = false;
+document.querySelectorAll('.pane-body[data-sync]').forEach(el => {
+  el.addEventListener('scroll', () => {
+    if (syncing) return;
+    syncing = true;
+    const fx = el.scrollLeft / Math.max(1, el.scrollWidth - el.clientWidth);
+    const fy = el.scrollTop / Math.max(1, el.scrollHeight - el.clientHeight);
+    document.querySelectorAll('.pane-body[data-sync]').forEach(o => {
+      if (o === el) return;
+      o.scrollLeft = fx * Math.max(0, o.scrollWidth - o.clientWidth);
+      o.scrollTop = fy * Math.max(0, o.scrollHeight - o.clientHeight);
+    });
+    requestAnimationFrame(() => { syncing = false; });
+  });
+});
+</script>
+</body>
+</html>
