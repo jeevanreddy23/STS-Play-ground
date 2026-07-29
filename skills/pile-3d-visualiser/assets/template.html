@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pile Inspection 3D</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb; --page-plane: #f9f9f7;
+    --text-primary: #0b0b0b; --text-secondary: #52514e; --text-muted: #898781;
+    --hairline: #e1e0d9; --border-ring: rgba(11,11,11,0.10);
+    --accent: #2a78d6; --socket: #eb6834;
+    --status-good: #0ca30c; --status-good-text: #006300;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page-plane); color: var(--text-primary); font-size: 14px;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  header {
+    display: flex; align-items: center; gap: 14px; padding: 8px 18px;
+    background: var(--surface-1); border-bottom: 1px solid var(--hairline); flex-wrap: wrap;
+  }
+  header img.logo { height: 34px; }
+  header h1 { font-size: 15px; font-weight: 650; margin: 0; }
+  header .sub { font-size: 11.5px; color: var(--text-muted); }
+  .spacer { flex: 1; }
+  .tiles { display: flex; gap: 10px; flex-wrap: wrap; }
+  .tile {
+    background: var(--page-plane); border: 1px solid var(--border-ring);
+    border-radius: 8px; padding: 5px 12px; min-width: 92px;
+  }
+  .tile .t-label { font-size: 9.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; font-weight: 650; }
+  .tile .t-value { font-size: 15px; font-weight: 650; }
+  .tile .t-value .unit { font-size: 10px; color: var(--text-secondary); font-weight: 500; }
+
+  .controls {
+    display: flex; align-items: center; gap: 14px; padding: 6px 18px;
+    background: var(--surface-1); border-bottom: 1px solid var(--hairline); flex-wrap: wrap;
+  }
+  .ctl { display: flex; align-items: center; gap: 7px; }
+  .ctl label { font-size: 11.5px; color: var(--text-secondary); white-space: nowrap; }
+  .ctl .val { font-size: 11.5px; font-weight: 650; min-width: 26px; font-variant-numeric: tabular-nums; }
+  input[type="range"] { accent-color: var(--accent); width: 110px; }
+  .seg { display: flex; border: 1px solid var(--hairline); border-radius: 8px; overflow: hidden; }
+  .seg button {
+    border: none; background: transparent; color: var(--text-secondary);
+    padding: 4px 11px; font-size: 11.5px; cursor: pointer; font-family: inherit;
+  }
+  .seg button.active { background: var(--accent); color: #fff; }
+  .seg button:not(:last-child) { border-right: 1px solid var(--hairline); }
+  .chk { display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: var(--text-secondary); cursor: pointer; }
+  .chk input { accent-color: var(--accent); margin: 0; }
+
+  .main { flex: 1; display: flex; min-height: 0; }
+  #scene-wrap { flex: 1; position: relative; min-width: 0; }
+  #scene-wrap canvas { display: block; }
+  #tooltip {
+    position: absolute; pointer-events: none; display: none; z-index: 5;
+    background: rgba(11,11,11,0.88); color: #fff; border-radius: 8px;
+    padding: 8px 11px; font-size: 11.5px; line-height: 1.5; max-width: 230px;
+  }
+  #tooltip .tt-id { font-weight: 700; font-size: 13px; }
+  #tooltip .tt-dim { color: #c3c2b7; }
+  #legend {
+    position: absolute; left: 12px; bottom: 12px; z-index: 4;
+    background: color-mix(in srgb, var(--surface-1) 92%, transparent);
+    border: 1px solid var(--border-ring); border-radius: 10px; padding: 9px 12px;
+    font-size: 11px; color: var(--text-secondary); line-height: 1.7;
+  }
+  #legend .lg-row { display: flex; align-items: center; gap: 7px; }
+  #legend .sw { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+  #legend .ramp { width: 90px; height: 10px; border-radius: 3px; }
+  #viewhint {
+    position: absolute; right: 12px; bottom: 12px; z-index: 4;
+    font-size: 10.5px; color: var(--text-muted);
+    background: color-mix(in srgb, var(--surface-1) 88%, transparent);
+    border-radius: 8px; padding: 4px 9px;
+  }
+  aside {
+    width: 265px; flex: none; background: var(--surface-1);
+    border-left: 1px solid var(--hairline); display: flex; flex-direction: column; min-height: 0;
+  }
+  aside .p-head {
+    padding: 9px 14px 6px; font-size: 11px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: .05em;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  aside .p-head .seg button { padding: 2px 8px; font-size: 10.5px; }
+  #pile-list { overflow-y: auto; flex: 1; padding: 0 8px 12px; }
+  .prow {
+    display: grid; grid-template-columns: 40px 1fr 66px; align-items: center; gap: 8px;
+    padding: 5px 8px; border-radius: 8px; cursor: pointer; border: 1px solid transparent;
+  }
+  .prow:hover { background: var(--page-plane); }
+  .prow.sel { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 7%, transparent); }
+  .prow .pid { font-weight: 700; font-size: 12.5px; }
+  .prow .pid .grp { display: block; font-size: 9px; font-weight: 600; color: var(--text-muted); }
+  .prow .bar { height: 14px; position: relative; background: var(--page-plane); border-radius: 4px; overflow: hidden; border: 1px solid var(--hairline); }
+  .prow .bar .soil { position: absolute; top: 0; bottom: 0; left: 0; background: #d9c3ae; }
+  .prow .bar .sock { position: absolute; top: 0; bottom: 0; background: var(--socket); }
+  .prow .nums { font-size: 10.5px; color: var(--text-secondary); text-align: right; font-variant-numeric: tabular-nums; line-height: 1.35; }
+  .prow.ghost { opacity: .48; }
+  .prow.ghost .bar { background: repeating-linear-gradient(45deg, #f1f0ec, #f1f0ec 4px, #e6e5df 4px, #e6e5df 8px); }
+
+  #table-wrap { display: none; flex: 1; overflow: auto; padding: 14px 18px; }
+  table { border-collapse: collapse; font-size: 12.5px; background: var(--surface-1); }
+  th, td { border: 1px solid var(--hairline); padding: 5px 12px; text-align: left; font-variant-numeric: tabular-nums; }
+  th { background: var(--page-plane); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary); }
+  footer {
+    padding: 5px 18px; font-size: 10.5px; color: var(--text-muted);
+    background: var(--surface-1); border-top: 1px solid var(--hairline);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img class="logo" alt="STS Geotechnics" src="__LOGO_B64__">
+  <div>
+    <h1 id="hdr-title"></h1>
+    <div class="sub" id="hdr-sub"></div>
+  </div>
+  <div class="spacer"></div>
+  <div class="tiles">
+    <div class="tile"><div class="t-label">Piers inspected</div><div class="t-value" id="tile-count"></div></div>
+    <div class="tile"><div class="t-label">Pier depth</div><div class="t-value" id="tile-depth"></div></div>
+    <div class="tile"><div class="t-label">Rock socket</div><div class="t-value" id="tile-socket"></div></div>
+    <div class="tile"><div class="t-label">Founded on</div><div class="t-value" style="color:var(--status-good-text)" id="tile-term"></div></div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="ctl">
+    <label>View</label>
+    <div class="seg" id="view-seg">
+      <button data-v="orbit" class="active">3D orbit</button>
+      <button data-v="plan">Plan</button>
+      <button data-v="elev">Elevation</button>
+    </div>
+  </div>
+  <div class="ctl">
+    <label>Colour</label>
+    <div class="seg" id="color-seg">
+      <button data-c="seg" class="active">Shaft / socket</button>
+      <button data-c="socket">Socket length</button>
+    </div>
+  </div>
+  <div class="ctl">
+    <label for="vex">Depth exaggeration</label>
+    <input type="range" id="vex" min="1" max="6" step="0.5" value="3">
+    <span class="val" id="vex-val">3×</span>
+  </div>
+  <div class="ctl">
+    <label for="plan-op">Drawing</label>
+    <input type="range" id="plan-op" min="0" max="100" value="70">
+  </div>
+  <label class="chk"><input type="checkbox" id="tg-soil" checked> soil strata</label>
+  <label class="chk"><input type="checkbox" id="tg-rock" checked> rockhead surface</label>
+  <label class="chk"><input type="checkbox" id="tg-labels" checked> labels</label>
+  <label class="chk"><input type="checkbox" id="tg-ghost" checked> uninspected piers</label>
+  <div class="spacer"></div>
+  <div class="seg" id="panel-seg">
+    <button data-p="3d" class="active">Scene</button>
+    <button data-p="table">Data table</button>
+  </div>
+</div>
+
+<div class="main">
+  <div id="scene-wrap">
+    <div id="tooltip"></div>
+    <div id="legend"></div>
+    <div id="viewhint">drag rotate · shift-drag pan · scroll zoom</div>
+  </div>
+  <div id="table-wrap">
+    <table id="data-table">
+      <thead><tr><th>Pile</th><th>Group</th><th>Ø (mm)</th><th>Total depth (m BGL)</th><th>Rock socket (m)</th><th>Rockhead ≈ (m BGL)</th><th>Terminated on</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p style="font-size:11px;color:var(--text-muted);max-width:640px" id="table-note"></p>
+  </div>
+  <aside>
+    <div class="p-head"><span>Piers</span>
+      <div class="seg" id="sort-seg">
+        <button data-s="id" class="active">ID</button>
+        <button data-s="depth">Depth</button>
+        <button data-s="socket">Socket</button>
+      </div>
+    </div>
+    <div id="pile-list"></div>
+  </aside>
+</div>
+
+<footer id="footer-note"></footer>
+
+<script>
+/* ============ data ============ */
+const CFG = __CONFIG_JSON__;
+const IMG_W = CFG.img_w, IMG_H = CFG.img_h, PX_PER_M = CFG.px_per_m;
+const CX = CFG.cx ?? IMG_W / 2, CY = CFG.cy ?? IMG_H / 2;
+const CLAY_T = CFG.clay_thickness ?? 1.2;
+const piles = CFG.piles.map(p => ({
+  id: p.id, internal: p.group === 'internal', dia: p.dia,
+  x: (p.px - CX) / PX_PER_M, z: (p.py - CY) / PX_PER_M,
+  d: p.depth ?? null, s: p.socket ?? null,
+  terminated: p.terminated || CFG.termination || 'bedrock',
+  rockhead: p.depth != null ? +(p.depth - (p.socket ?? 0)).toFixed(2) : null,
+}));
+const inspPiles = piles.filter(p => p.d !== null);
+
+/* ============ three.js scene ============ */
+const wrap = document.getElementById('scene-wrap');
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+wrap.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xeef1f4);
+scene.fog = new THREE.Fog(0xeef1f4, 90, 220);
+
+const camera = new THREE.PerspectiveCamera(46, 1, 0.1, 600);
+
+const amb = new THREE.HemisphereLight(0xffffff, 0xb0a893, 0.85);
+scene.add(amb);
+const sun = new THREE.DirectionalLight(0xfff4e0, 0.9);
+sun.position.set(-35, 55, -25);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.left = -45; sun.shadow.camera.right = 45;
+sun.shadow.camera.top = 45; sun.shadow.camera.bottom = -45;
+scene.add(sun);
+
+/* ---- orbit control (compact) ---- */
+const ctrl = {
+  target: new THREE.Vector3(0, -1.5, 0),
+  sph: new THREE.Spherical(52, 1.05, -0.62), // r, phi(from +Y), theta
+  update() {
+    const o = new THREE.Vector3().setFromSpherical(this.sph).add(this.target);
+    camera.position.copy(o); camera.lookAt(this.target);
+  }
+};
+let dragging = false, panning = false, px0 = 0, py0 = 0;
+renderer.domElement.addEventListener('pointerdown', e => {
+  dragging = true; panning = e.shiftKey || e.button === 2; px0 = e.clientX; py0 = e.clientY;
+});
+addEventListener('pointerup', () => dragging = false);
+renderer.domElement.addEventListener('contextmenu', e => e.preventDefault());
+renderer.domElement.addEventListener('pointermove', e => {
+  onHover(e);
+  if (!dragging) return;
+  const dx = e.clientX - px0, dy = e.clientY - py0; px0 = e.clientX; py0 = e.clientY;
+  if (panning) {
+    const sc = ctrl.sph.radius / 700;
+    const fwd = new THREE.Vector3(); camera.getWorldDirection(fwd); fwd.y = 0; fwd.normalize();
+    const right = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0, 1, 0));
+    ctrl.target.addScaledVector(right, dx * sc).addScaledVector(fwd, dy * sc);
+  } else {
+    ctrl.sph.theta -= dx * 0.0055;
+    ctrl.sph.phi = Math.min(1.52, Math.max(0.05, ctrl.sph.phi - dy * 0.0055));
+  }
+  ctrl.update();
+});
+renderer.domElement.addEventListener('wheel', e => {
+  e.preventDefault();
+  ctrl.sph.radius = Math.min(180, Math.max(8, ctrl.sph.radius * (e.deltaY > 0 ? 1.1 : 0.9)));
+  ctrl.update();
+}, { passive: false });
+
+/* ---- ground: plan drawing + surround ---- */
+const groundGrp = new THREE.Group(); scene.add(groundGrp);
+const surround = new THREE.Mesh(
+  new THREE.PlaneGeometry(400, 400),
+  new THREE.MeshLambertMaterial({ color: 0xdcd8cd, transparent: true, opacity: 0.55, depthWrite: false })
+);
+surround.rotation.x = -Math.PI / 2; surround.position.y = -0.03; surround.receiveShadow = true;
+surround.renderOrder = 10;
+groundGrp.add(surround);
+
+const planTex = new THREE.TextureLoader().load('__PLAN_B64__', () => renderer.render(scene, camera));
+planTex.encoding = THREE.sRGBEncoding;
+planTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+const planMat = new THREE.MeshLambertMaterial({ map: planTex, transparent: true, opacity: 0.6, depthWrite: false });
+const planMesh = new THREE.Mesh(new THREE.PlaneGeometry(IMG_W / PX_PER_M, IMG_H / PX_PER_M), planMat);
+planMesh.rotation.x = -Math.PI / 2;
+planMesh.position.set((IMG_W / 2 - CX) / PX_PER_M, 0.02, (IMG_H / 2 - CY) / PX_PER_M);
+planMesh.receiveShadow = true;
+planMesh.renderOrder = 11;
+groundGrp.add(planMesh);
+
+/* ---- rebuildable geo group (depth-dependent) ---- */
+let VEX = 3;
+const geoGrp = new THREE.Group(); scene.add(geoGrp);
+const labelGrp = new THREE.Group(); scene.add(labelGrp);
+const pickables = [];
+const pileGroups = {};
+let colorMode = 'seg';
+let selected = null;
+let selMarker = null;
+function updateSelMarker() {
+  if (selMarker) { scene.remove(selMarker); selMarker = null; }
+  const p = selected && piles.find(q => q.id === selected);
+  if (!p) return;
+  const h = (p.d || 2) * VEX;
+  const g = new THREE.Group();
+  const halo = new THREE.Mesh(
+    new THREE.CylinderGeometry(p.dia * 0.85, p.dia * 0.85, h, 24, 1, true),
+    new THREE.MeshBasicMaterial({ color: 0x2a78d6, transparent: true, opacity: 0.30,
+      depthTest: false, side: THREE.DoubleSide }));
+  halo.position.y = -h / 2; halo.renderOrder = 15;
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(p.dia * 0.95, 0.05, 8, 40),
+    new THREE.MeshBasicMaterial({ color: 0x2a78d6, depthTest: false }));
+  ring.rotation.x = Math.PI / 2; ring.position.y = 0.04; ring.renderOrder = 16;
+  g.add(halo, ring);
+  g.position.set(p.x, 0, p.z);
+  scene.add(g); selMarker = g;
+}
+
+const matConcrete = () => new THREE.MeshStandardMaterial({ color: 0xd8d6cf, roughness: 0.75 });
+const matSocket = () => new THREE.MeshStandardMaterial({ color: 0xeb6834, roughness: 0.6 });
+const CLAY = 0xc9a08a, SILT = 0x8a8578;
+/* sequential blue ramp (palette steps 150→650) for socket length */
+const RAMP = ['#b7d3f6','#9ec5f4','#86b6ef','#6da7ec','#5598e7','#3987e5','#2a78d6','#256abf','#1c5cab','#104281'];
+const sockCol = s => new THREE.Color(RAMP[Math.min(RAMP.length - 1, Math.floor((s - 0.6) / (2.0 - 0.6) * (RAMP.length - 1)))]);
+
+function textSprite(text, opts = {}) {
+  const c = document.createElement('canvas'); const ctx = c.getContext('2d');
+  const fs = opts.fs || 44;
+  ctx.font = `700 ${fs}px system-ui, sans-serif`;
+  const w = Math.ceil(ctx.measureText(text).width) + 26;
+  c.width = w; c.height = fs + 22;
+  const g = c.getContext('2d');
+  g.font = `700 ${fs}px system-ui, sans-serif`;
+  if (opts.bg !== false) {
+    g.fillStyle = opts.bgc || 'rgba(252,252,251,0.92)';
+    g.strokeStyle = 'rgba(11,11,11,0.18)'; g.lineWidth = 2;
+    const r = 14; g.beginPath();
+    g.moveTo(r,0); g.arcTo(w,0,w,c.height,r); g.arcTo(w,c.height,0,c.height,r);
+    g.arcTo(0,c.height,0,0,r); g.arcTo(0,0,w,0,r); g.closePath(); g.fill(); g.stroke();
+  }
+  g.fillStyle = opts.color || '#0b0b0b';
+  g.textBaseline = 'middle'; g.font = `700 ${fs}px system-ui, sans-serif`;
+  g.fillText(text, 13, c.height / 2 + 2);
+  const tex = new THREE.CanvasTexture(c); tex.encoding = THREE.sRGBEncoding;
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: tex, depthTest: false, transparent: true, sizeAttenuation: false }));
+  /* constant screen size: scale.y ≈ fraction of viewport height */
+  const hFrac = opts.hFrac || 0.052;
+  sp.scale.set(hFrac * (c.width / c.height), hFrac, 1);
+  sp.renderOrder = 20;
+  return sp;
+}
+
+/* IDW rockhead */
+function rockheadAt(x, z) {
+  let num = 0, den = 0;
+  for (const p of inspPiles) {
+    const d2 = (p.x - x) ** 2 + (p.z - z) ** 2;
+    if (d2 < 1e-6) return p.rockhead;
+    const w = 1 / (d2 ** 1.2);
+    num += w * p.rockhead; den += w;
+  }
+  return num / den;
+}
+
+function buildGeo() {
+  while (geoGrp.children.length) geoGrp.remove(geoGrp.children[0]);
+  while (labelGrp.children.length) labelGrp.remove(labelGrp.children[0]);
+  pickables.length = 0;
+  for (const k in pileGroups) delete pileGroups[k];
+
+  const FP = CFG.footprint_px || [
+    Math.min(...CFG.piles.map(p => p.px)) - 20, Math.min(...CFG.piles.map(p => p.py)) - 20,
+    Math.max(...CFG.piles.map(p => p.px)) + 20, Math.max(...CFG.piles.map(p => p.py)) + 20];
+  const fx0 = (FP[0] - CX) / PX_PER_M, fx1 = (FP[2] - CX) / PX_PER_M;
+  const fz0 = (FP[1] - CY) / PX_PER_M, fz1 = (FP[3] - CY) / PX_PER_M;
+  const fw = fx1 - fx0, fd = fz1 - fz0, fcx = (fx0 + fx1) / 2, fcz = (fz0 + fz1) / 2;
+
+  /* soil strata (translucent) */
+  const soil = new THREE.Group(); soil.name = 'soil';
+  const deepest = Math.max(2.5, ...piles.filter(p => p.d != null).map(p => p.d));
+  const clayT = CLAY_T * VEX, rockT = (deepest + 0.9 - CLAY_T) * VEX;
+  const clay = new THREE.Mesh(new THREE.BoxGeometry(fw, clayT, fd),
+    new THREE.MeshLambertMaterial({ color: CLAY, transparent: true, opacity: 0.16, depthWrite: false }));
+  clay.position.set(fcx, -clayT / 2, fcz);
+  const rock = new THREE.Mesh(new THREE.BoxGeometry(fw, rockT, fd),
+    new THREE.MeshLambertMaterial({ color: SILT, transparent: true, opacity: 0.20, depthWrite: false }));
+  rock.position.set(fcx, -clayT - rockT / 2, fcz);
+  const edges = new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.BoxGeometry(fw, clayT + rockT, fd)),
+    new THREE.LineBasicMaterial({ color: 0x898781, transparent: true, opacity: 0.6 }));
+  edges.position.set(fcx, -(clayT + rockT) / 2, fcz);
+  soil.add(clay, rock, edges);
+  geoGrp.add(soil);
+
+  /* rockhead surface (IDW) */
+  const segs = 46;
+  const rh = new THREE.PlaneGeometry(fw, fd, segs, segs);
+  rh.rotateX(-Math.PI / 2);
+  const pos = rh.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i) + fcx, z = pos.getZ(i) + fcz;
+    pos.setY(i, -rockheadAt(x, z) * VEX);
+  }
+  rh.computeVertexNormals();
+  const rockheadMesh = new THREE.Mesh(rh, new THREE.MeshStandardMaterial({
+    color: 0x7d7568, transparent: true, opacity: 0.45, side: THREE.DoubleSide,
+    roughness: 0.9, metalness: 0,
+  }));
+  rockheadMesh.position.set(fcx - fcx, 0, fcz - fcz); rockheadMesh.name = 'rockhead';
+  const rhGrp = new THREE.Group(); rhGrp.name = 'rockheadG';
+  const rhWire = new THREE.Mesh(rh.clone(), new THREE.MeshBasicMaterial({
+    color: 0x52514e, wireframe: true, transparent: true, opacity: 0.10 }));
+  rhGrp.add(rockheadMesh, rhWire);
+  rhGrp.position.set(0, 0, 0);
+  rockheadMesh.position.set(fcx, 0, fcz); rhWire.position.set(fcx, 0, fcz);
+  geoGrp.add(rhGrp);
+
+  /* piles */
+  for (const p of piles) {
+    const grp = new THREE.Group();
+    grp.position.set(p.x, 0, p.z);
+    const r = p.dia / 2;
+    if (p.d !== null) {
+      const shaftLen = (p.d - p.s) * VEX, sockLen = p.s * VEX;
+      const bySeg = colorMode === 'seg';
+      const shaftMat = bySeg ? matConcrete()
+        : new THREE.MeshStandardMaterial({ color: sockCol(p.s), roughness: 0.7 });
+      const sockMat = bySeg ? matSocket()
+        : new THREE.MeshStandardMaterial({ color: sockCol(p.s), roughness: 0.55 });
+      grp.userData.meshes = [];
+      if (shaftLen > 0.001) {
+        const shaft = new THREE.Mesh(new THREE.CylinderGeometry(r, r, shaftLen, 28), shaftMat);
+        shaft.position.y = -shaftLen / 2; shaft.castShadow = true;
+        shaft.userData.pile = p; grp.add(shaft); pickables.push(shaft); grp.userData.meshes.push(shaft);
+      }
+      const sock = new THREE.Mesh(new THREE.CylinderGeometry(r * 1.001, r * 1.001, sockLen, 28), sockMat);
+      sock.position.y = -shaftLen - sockLen / 2; sock.castShadow = true;
+      sock.userData.pile = p; grp.add(sock); pickables.push(sock); grp.userData.meshes.push(sock);
+      pileGroups[p.id] = grp;
+      /* rockhead collar ring */
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(r * 1.15, 0.035, 8, 32),
+        new THREE.MeshBasicMaterial({ color: 0x52514e }));
+      ring.rotation.x = Math.PI / 2; ring.position.y = -shaftLen; grp.add(ring);
+      /* toe disc */
+      const toe = new THREE.Mesh(new THREE.CylinderGeometry(r * 1.12, r * 1.12, 0.03, 24),
+        new THREE.MeshBasicMaterial({ color: colorMode === 'seg' ? 0xb44f22 : 0x104281 }));
+      toe.position.y = -(shaftLen + sockLen); grp.add(toe);
+      /* cap */
+      const cap = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.22, 0.9),
+        new THREE.MeshStandardMaterial({ color: p.internal ? 0x2a78d6 : 0x8a8a84, roughness: 0.6 }));
+      cap.position.y = 0.11; cap.castShadow = true; cap.userData.pile = p;
+      grp.add(cap); pickables.push(cap);
+      const lab = textSprite(p.id, {});
+      lab.position.set(p.x, 1.15, p.z); lab.userData.pileId = p.id; labelGrp.add(lab);
+    } else {
+      /* uninspected ghost */
+      const gh = new THREE.Mesh(new THREE.CylinderGeometry(r, r, (CFG.ghost_depth ?? 2.0) * VEX, 20),
+        new THREE.MeshLambertMaterial({ color: 0x898781, transparent: true, opacity: 0.13 }));
+      gh.position.y = -(CFG.ghost_depth ?? 2.0) / 2 * VEX; gh.userData.pile = p; gh.name = 'ghost';
+      grp.add(gh); pickables.push(gh);
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(r * 1.2, 0.03, 6, 28),
+        new THREE.MeshBasicMaterial({ color: 0x898781, transparent: true, opacity: 0.5 }));
+      ring.rotation.x = Math.PI / 2; ring.position.y = 0.02; grp.add(ring); grp.name = 'ghostG';
+      const lab = textSprite(p.id, { color: '#898781', hFrac: 0.036, bgc: 'rgba(252,252,251,0.75)' });
+      lab.position.set(p.x, 0.7, p.z); lab.userData.pileId = p.id; lab.userData.ghost = true; labelGrp.add(lab);
+    }
+    geoGrp.add(grp);
+  }
+
+  /* depth ruler at SW corner */
+  const rx = fx0 - 1.6, rz = fz1 + 1.6, maxD = Math.ceil(deepest + 0.7);
+  const rulerMat = new THREE.LineBasicMaterial({ color: 0x52514e });
+  const rpts = [new THREE.Vector3(rx, 0, rz), new THREE.Vector3(rx, -maxD * VEX, rz)];
+  geoGrp.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(rpts), rulerMat));
+  for (let d = 0; d <= maxD + 0.001; d += 0.5) {
+    const tick = [new THREE.Vector3(rx - 0.35, -d * VEX, rz), new THREE.Vector3(rx, -d * VEX, rz)];
+    geoGrp.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(tick), rulerMat));
+    if (d % 1 === 0) {
+      const t = textSprite(d.toFixed(0) + ' m', { fs: 34, hFrac: 0.034 });
+      t.position.set(rx - 1.5, -d * VEX, rz); geoGrp.add(t);
+    }
+  }
+  applyToggles();
+  updateSelMarker();
+  renderer.render(scene, camera);
+}
+
+/* ---- toggles / modes ---- */
+const $ = id => document.getElementById(id);
+function applyToggles() {
+  const soilOn = $('tg-soil').checked, rockOn = $('tg-rock').checked,
+        labOn = $('tg-labels').checked, ghOn = $('tg-ghost').checked;
+  geoGrp.traverse(o => {
+    if (o.name === 'soil') o.visible = soilOn;
+    if (o.name === 'rockheadG') o.visible = rockOn;
+    if (o.name === 'ghostG' || o.name === 'ghost') o.visible = ghOn;
+  });
+  labelGrp.children.forEach(l => l.visible = labOn && (ghOn || !l.userData.ghost));
+}
+['tg-soil','tg-rock','tg-labels','tg-ghost'].forEach(id =>
+  $(id).addEventListener('change', () => { applyToggles(); renderer.render(scene, camera); }));
+$('vex').addEventListener('input', e => {
+  VEX = +e.target.value; $('vex-val').textContent = VEX + '×'; buildGeo();
+});
+$('plan-op').addEventListener('input', e => {
+  planMat.opacity = e.target.value / 100; renderer.render(scene, camera);
+});
+$('color-seg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  colorMode = b.dataset.c;
+  document.querySelectorAll('#color-seg button').forEach(x => x.classList.toggle('active', x === b));
+  buildGeo(); drawLegend();
+});
+$('view-seg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#view-seg button').forEach(x => x.classList.toggle('active', x === b));
+  const v = b.dataset.v;
+  if (v === 'orbit') { ctrl.sph.set(52, 1.05, -0.62); ctrl.target.set(0, -1.5, 0); }
+  if (v === 'plan')  { ctrl.sph.set(58, 0.06, 0);     ctrl.target.set(0, 0, 0); }
+  if (v === 'elev')  { ctrl.sph.set(46, 1.42, 0);     ctrl.target.set(0, -VEX * 1.2, 0); }
+  ctrl.update(); renderer.render(scene, camera);
+});
+$('panel-seg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#panel-seg button').forEach(x => x.classList.toggle('active', x === b));
+  const t = b.dataset.p === 'table';
+  $('table-wrap').style.display = t ? 'block' : 'none';
+  $('scene-wrap').style.display = t ? 'none' : 'block';
+  if (!t) onResize();
+});
+
+function drawLegend() {
+  const lg = $('legend');
+  if (colorMode === 'seg') {
+    lg.innerHTML =
+      `<div class="lg-row"><span class="sw" style="background:#d8d6cf"></span> shaft through residual clay</div>
+       <div class="lg-row"><span class="sw" style="background:#eb6834"></span> rock socket (weathered siltstone)</div>
+       <div class="lg-row"><span class="sw" style="background:#2a78d6"></span> internal pier cap (P1–P13)</div>
+       <div class="lg-row"><span class="sw" style="background:#8a8a84"></span> perimeter pier cap (P14–P27)</div>
+       <div class="lg-row"><span class="sw" style="background:repeating-linear-gradient(45deg,#eee,#eee 3px,#ddd 3px,#ddd 6px)"></span> not inspected this visit</div>
+       <div class="lg-row"><span class="sw" style="background:#7d7568;opacity:.6"></span> interpolated rockhead surface</div>`;
+  } else {
+    lg.innerHTML =
+      `<div class="lg-row"><span>socket length</span></div>
+       <div class="lg-row"><span style="font-variant-numeric:tabular-nums">0.6 m</span>
+       <span class="ramp" style="background:linear-gradient(90deg,${RAMP.join(',')})"></span>
+       <span style="font-variant-numeric:tabular-nums">2.0 m</span></div>
+       <div class="lg-row"><span class="sw" style="background:repeating-linear-gradient(45deg,#eee,#eee 3px,#ddd 3px,#ddd 6px)"></span> not inspected</div>`;
+  }
+}
+
+/* ---- hover / pick ---- */
+const ray = new THREE.Raycaster();
+const tooltip = $('tooltip');
+let hovered = null;
+function onHover(e) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  const m = new THREE.Vector2(
+    ((e.clientX - rect.left) / rect.width) * 2 - 1,
+    -((e.clientY - rect.top) / rect.height) * 2 + 1);
+  ray.setFromCamera(m, camera);
+  const hit = ray.intersectObjects(pickables.filter(o => o.visible !== false), false)[0];
+  const p = hit?.object.userData.pile;
+  if (p) {
+    tooltip.style.display = 'block';
+    tooltip.style.left = (e.clientX - rect.left + 16) + 'px';
+    tooltip.style.top = (e.clientY - rect.top + 8) + 'px';
+    tooltip.innerHTML = p.d !== null
+      ? `<div class="tt-id">${p.id} <span style="font-weight:400;font-size:11px">· ${p.internal ? 'internal' : 'perimeter'} · Ø${p.dia * 1000} mm</span></div>
+         <div>Total depth <b>${p.d.toFixed(1)} m</b> BGL</div>
+         <div>Rock socket <b style="color:#f4a072">${p.s.toFixed(1)} m</b></div>
+         <div>Rockhead ≈ <b>${p.rockhead.toFixed(1)} m</b> BGL</div>
+         <div class="tt-dim">Terminated on ${p.terminated} ✓</div>`
+      : `<div class="tt-id">${p.id}</div><div class="tt-dim">Not inspected this visit (${p.internal ? 'internal' : 'perimeter'}, Ø${p.dia * 1000} mm)</div>`;
+    renderer.domElement.style.cursor = 'pointer';
+    hovered = p;
+  } else {
+    tooltip.style.display = 'none';
+    renderer.domElement.style.cursor = '';
+    hovered = null;
+  }
+}
+renderer.domElement.addEventListener('click', () => { if (hovered) selectPile(hovered.id, true); });
+
+function selectPile(id, fromScene) {
+  /* clear previous highlight */
+  if (selected && pileGroups[selected])
+    pileGroups[selected].userData.meshes.forEach(m => m.material.emissive?.set(0x000000));
+  selected = id;
+  document.querySelectorAll('.prow').forEach(r => r.classList.toggle('sel', r.dataset.id === id));
+  const p = piles.find(q => q.id === id);
+  if (p) {
+    if (pileGroups[id])
+      pileGroups[id].userData.meshes.forEach(m => m.material.emissive?.set(0x1c5cab));
+    updateSelMarker();
+    ctrl.target.set(p.x, -(p.d || 2) * VEX / 2, p.z);
+    ctrl.sph.radius = 22;
+    ctrl.sph.phi = Math.min(ctrl.sph.phi, 0.85);
+    ctrl.update(); renderer.render(scene, camera);
+    if (!fromScene) document.querySelector(`.prow[data-id="${id}"]`)?.scrollIntoView({ block: 'nearest' });
+  }
+}
+
+/* ---- side list + table ---- */
+function renderList(sortBy = 'id') {
+  const list = $('pile-list'); list.innerHTML = '';
+  const arr = [...piles].sort((a, b) => {
+    if (sortBy === 'depth') return (b.d || 0) - (a.d || 0);
+    if (sortBy === 'socket') return (b.s || 0) - (a.s || 0);
+    return +a.id.slice(1) - +b.id.slice(1);
+  });
+  const maxD = Math.max(...piles.filter(p => p.d != null).map(p => p.d));
+  for (const p of arr) {
+    const row = document.createElement('div');
+    row.className = 'prow' + (p.d === null ? ' ghost' : '') + (selected === p.id ? ' sel' : '');
+    row.dataset.id = p.id;
+    if (p.d !== null) {
+      const wTot = p.d / maxD * 100, wSoil = (p.d - p.s) / maxD * 100;
+      row.innerHTML =
+        `<div class="pid">${p.id}<span class="grp">${p.internal ? 'INT' : 'PER'}</span></div>
+         <div class="bar"><div class="soil" style="width:${wSoil}%"></div>
+           <div class="sock" style="left:${wSoil}%;width:${wTot - wSoil}%"></div></div>
+         <div class="nums">${p.d.toFixed(1)} m deep<br>${p.s.toFixed(1)} m socket</div>`;
+    } else {
+      row.innerHTML =
+        `<div class="pid">${p.id}<span class="grp">${p.internal ? 'INT' : 'PER'}</span></div>
+         <div class="bar"></div><div class="nums">not<br>inspected</div>`;
+    }
+    row.addEventListener('click', () => selectPile(p.id, false));
+    list.appendChild(row);
+  }
+}
+$('sort-seg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  document.querySelectorAll('#sort-seg button').forEach(x => x.classList.toggle('active', x === b));
+  renderList(b.dataset.s);
+});
+const tbody = document.querySelector('#data-table tbody');
+for (const p of piles) {
+  const tr = document.createElement('tr');
+  tr.innerHTML = p.d !== null
+    ? `<td><b>${p.id}</b></td><td>${p.internal ? 'Internal' : 'Perimeter'}</td><td>${p.dia * 1000}</td>
+       <td>${p.d.toFixed(1)}</td><td>${p.s.toFixed(1)}</td><td>${p.rockhead.toFixed(1)}</td><td>${p.terminated}</td>`
+    : `<td>${p.id}</td><td>${p.internal ? 'Internal' : 'Perimeter'}</td><td>${p.dia * 1000}</td>
+       <td colspan="4" style="color:var(--text-muted)">not inspected this visit</td>`;
+  tbody.appendChild(tr);
+}
+
+/* ---- resize & loop ---- */
+function onResize() {
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  if (!w || !h) return;
+  renderer.setSize(w, h);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  renderer.render(scene, camera);
+}
+addEventListener('resize', onResize);
+new ResizeObserver(onResize).observe(wrap);
+
+(function fillChrome() {
+  document.title = CFG.title || 'Pile Inspection 3D';
+  document.getElementById('hdr-title').textContent = CFG.title || 'Pile Inspection — 3D Visualisation';
+  document.getElementById('hdr-sub').textContent = CFG.subtitle || '';
+  const insp = piles.filter(p => p.d != null);
+  const ds = insp.map(p => p.d), ss = insp.map(p => p.s);
+  document.getElementById('tile-count').innerHTML =
+    `${insp.length} <span class="unit">of ${piles.length} shown</span>`;
+  document.getElementById('tile-depth').innerHTML =
+    `${Math.min(...ds).toFixed(1)}–${Math.max(...ds).toFixed(1)} <span class="unit">m BGL</span>`;
+  document.getElementById('tile-socket').innerHTML =
+    `${Math.min(...ss).toFixed(1)}–${Math.max(...ss).toFixed(1)} <span class="unit">m</span>`;
+  document.getElementById('tile-term').innerHTML =
+    `✓ ${CFG.termination_short || CFG.termination || 'bedrock'} <span class="unit">${insp.length}/${insp.length}</span>`;
+  document.getElementById('footer-note').textContent = CFG.footer || '';
+  document.getElementById('table-note').textContent = CFG.table_note || '';
+})();
+buildGeo(); drawLegend(); renderList(); ctrl.update(); onResize();
+(function loop() { requestAnimationFrame(loop); renderer.render(scene, camera); })();
+</script>
+</body>
+</html>
