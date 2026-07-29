@@ -12,4 +12,8 @@ local-state.json
 *.webp
 *.tif
 *.tiff
-
+
+# Node
+node_modules/
+dist/
+*.tsbuildinfo
