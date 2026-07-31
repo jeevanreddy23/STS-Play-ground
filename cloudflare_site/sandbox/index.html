@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>STS Sandbox</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23fcfcfb'/%3E%3Cpath d='M12 9 L6 16 L12 23' stroke='%232a78d6' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M20 9 L26 16 L20 23' stroke='%23eb6834' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    color-scheme: light;
+    --surface: #fcfcfb; --plane: #f2f2ef; --ink: #0b0b0b; --ink2: #52514e;
+    --muted: #898781; --line: #e1e0d9; --accent: #2a78d6; --good: #0ca30c; --bad: #d03b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme=light]) {
+      color-scheme: dark;
+      --surface: #1a1a19; --plane: #0d0d0d; --ink: #ffffff; --ink2: #c3c2b7;
+      --muted: #898781; --line: #2c2c2a; --accent: #3987e5;
+    }
+  }
+  :root[data-theme=dark] {
+    color-scheme: dark;
+    --surface: #1a1a19; --plane: #0d0d0d; --ink: #ffffff; --ink2: #c3c2b7;
+    --muted: #898781; --line: #2c2c2a; --accent: #3987e5;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 14px;
+    color: var(--ink); background: var(--plane); display: flex; flex-direction: column; overflow: hidden;
+  }
+  header {
+    display: flex; align-items: center; gap: 10px; padding: 7px 14px; flex-wrap: wrap;
+    background: var(--surface); border-bottom: 1px solid var(--line);
+  }
+  header h1 { font-size: 14px; margin: 0; font-weight: 650; }
+  header .sub { font-size: 11px; color: var(--muted); }
+  .spacer { flex: 1; }
+  .btn {
+    font: inherit; font-size: 12px; padding: 4px 11px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--ink); border-radius: 7px; cursor: pointer;
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn:disabled { opacity: .45; cursor: default; }
+  select, input[type=text] {
+    font: inherit; font-size: 12px; padding: 4px 8px; border: 1px solid var(--line);
+    border-radius: 7px; background: var(--plane); color: var(--ink); max-width: 220px;
+  }
+  .chk { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink2); }
+  .chk input { accent-color: var(--accent); }
+
+  .tabs { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .tabs button { border: 0; background: transparent; font: inherit; font-size: 12px; padding: 4px 12px; cursor: pointer; color: var(--ink2); }
+  .tabs button.on { background: var(--accent); color: #fff; }
+  .tabs button + button { border-left: 1px solid var(--line); }
+
+  .main { flex: 1; display: flex; min-height: 0; }
+  .pane { display: flex; flex-direction: column; min-width: 0; }
+  .editors { width: 50%; border-right: 1px solid var(--line); background: var(--surface); }
+  .preview { flex: 1; background: #fff; }
+  .editwrap { flex: 1; position: relative; min-height: 0; }
+  textarea.code {
+    position: absolute; inset: 0; width: 100%; height: 100%; border: 0; resize: none; outline: none;
+    padding: 12px 14px; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px; line-height: 1.55; tab-size: 2;
+    background: var(--surface); color: var(--ink);
+  }
+  textarea.code[hidden] { display: none; }
+  iframe { width: 100%; height: 100%; border: 0; background: #fff; }
+
+  .console {
+    height: 150px; flex: none; border-top: 1px solid var(--line); background: var(--plane);
+    overflow-y: auto; font-family: ui-monospace, Menlo, monospace; font-size: 12px;
+  }
+  .console .row { padding: 3px 12px; border-bottom: 1px solid var(--line); white-space: pre-wrap; word-break: break-word; }
+  .console .row.error { color: var(--bad); }
+  .console .row.warn { color: #a07000; }
+  .console .row.info { color: var(--ink2); }
+  .console .empty { padding: 10px 12px; color: var(--muted); }
+  .conhead {
+    display: flex; align-items: center; gap: 8px; padding: 4px 12px;
+    font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted);
+    font-weight: 700; border-top: 1px solid var(--line); background: var(--surface);
+  }
+  footer { padding: 5px 14px; font-size: 10.5px; color: var(--muted); background: var(--surface); border-top: 1px solid var(--line); }
+  .saved { font-size: 11px; color: var(--good); }
+
+  @media (max-width: 880px) {
+    .main { flex-direction: column; }
+    .editors { width: 100%; height: 46%; border-right: 0; border-bottom: 1px solid var(--line); }
+    .console { height: 110px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>STS Sandbox</h1>
+    <div class="sub">scratchpad · runs in a sandboxed frame · nothing leaves your browser</div>
+  </div>
+  <div class="tabs" id="tabs">
+    <button data-t="html" class="on">HTML</button>
+    <button data-t="css">CSS</button>
+    <button data-t="js">JS</button>
+  </div>
+  <label class="chk"><input type="checkbox" id="autorun" checked> auto-run</label>
+  <button class="btn primary" id="run">Run ⏎</button>
+  <div class="spacer"></div>
+  <select id="snippets"><option value="">— snippets —</option></select>
+  <input type="text" id="name" placeholder="snippet name" size="14">
+  <button class="btn" id="save">Save</button>
+  <button class="btn" id="del" title="Delete selected snippet">🗑</button>
+  <button class="btn" id="export">Export</button>
+  <button class="btn" id="reset">Reset</button>
+  <button class="btn" id="theme">◐</button>
+</header>
+
+<div class="main">
+  <div class="pane editors">
+    <div class="editwrap">
+      <textarea class="code" id="ed-html" spellcheck="false"></textarea>
+      <textarea class="code" id="ed-css" spellcheck="false" hidden></textarea>
+      <textarea class="code" id="ed-js" spellcheck="false" hidden></textarea>
+    </div>
+  </div>
+  <div class="pane preview">
+    <iframe id="out" sandbox="allow-scripts allow-modals" title="Sandbox preview"></iframe>
+    <div class="conhead">Console <span class="spacer"></span><button class="btn" id="clearcon" style="padding:1px 8px">Clear</button></div>
+    <div class="console" id="console"><div class="empty">Console output from your snippet appears here.</div></div>
+  </div>
+</div>
+
+<footer>
+  The preview runs with <code>allow-scripts</code> only and no same-origin access, so a snippet cannot read this page, your storage, or your cookies. Snippets are saved to this browser's local storage — treat that as scratch, not as a backup.
+</footer>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const KEY = 'sts-sandbox';
+const eds = { html: $('ed-html'), css: $('ed-css'), js: $('ed-js') };
+let tab = 'html';
+let runTimer = null;
+
+const STARTER = {
+  html: `<h1>Sandbox</h1>
+<p>Edit HTML, CSS and JS. The preview reruns as you type.</p>
+<button id="calc">Work out a socket length</button>
+<pre id="out"></pre>`,
+  css: `body { font: 15px/1.5 system-ui, sans-serif; padding: 20px; color: #0b0b0b; }
+h1 { font-size: 20px; margin: 0 0 6px; }
+button { font: inherit; padding: 6px 12px; border: 1px solid #ccc; border-radius: 7px; cursor: pointer; }
+pre { background: #f2f2ef; padding: 10px; border-radius: 7px; }`,
+  js: `// Socket length = top-of-bedrock RL - toe RL.
+// Unknown inputs return null rather than 0 - the same rule the pile viewer uses,
+// because a pile with no toe level has no socket, not a socket of nought.
+function socketLength(rockheadRL, toeRL) {
+  if (rockheadRL == null || toeRL == null) return null;
+  return Math.max(0, Math.round((rockheadRL - toeRL) * 1000) / 1000);
+}
+
+const cases = [
+  { id: 'P1', rockhead: 23.5, toe: 21.8 },
+  { id: 'P5', rockhead: 23.6, toe: 22.0 },
+  { id: 'P9', rockhead: null, toe: 22.1 },   // rockhead never proved
+];
+
+document.getElementById('calc').onclick = () => {
+  const lines = cases.map(c => {
+    const s = socketLength(c.rockhead, c.toe);
+    return \`\${c.id}: \${s === null ? 'cannot be established' : s + ' m'}\`;
+  });
+  document.getElementById('out').textContent = lines.join('\\n');
+  console.log('computed', cases.length, 'piles');
+};`,
+};
+
+/* --------------------------------------------------------------- storage */
+function load() {
+  try { return JSON.parse(localStorage.getItem(KEY)) ?? { current: { ...STARTER }, snippets: {} }; }
+  catch { return { current: { ...STARTER }, snippets: {} }; }
+}
+function persist() {
+  store.current = { html: eds.html.value, css: eds.css.value, js: eds.js.value };
+  try { localStorage.setItem(KEY, JSON.stringify(store)); } catch {}
+}
+const store = load();
+for (const k of ['html', 'css', 'js']) eds[k].value = store.current?.[k] ?? STARTER[k];
+
+function refreshSnippetList(select) {
+  const sel = $('snippets');
+  const names = Object.keys(store.snippets).sort();
+  sel.innerHTML = '<option value="">— snippets —</option>' +
+    names.map((n) => `<option value="${n.replace(/"/g, '&quot;')}">${n}</option>`).join('');
+  if (select) sel.value = select;
+}
+refreshSnippetList();
+
+/* ------------------------------------------------------------------- run */
+function srcdoc() {
+  return `<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>${eds.css.value}</style></head><body>
+${eds.html.value}
+<script>
+(function () {
+  const send = (level, args) => {
+    try {
+      parent.postMessage({ __sandbox: true, level, text: args.map(a => {
+        if (a instanceof Error) return a.stack || a.message;
+        if (typeof a === 'object' && a !== null) { try { return JSON.stringify(a); } catch { return String(a); } }
+        return String(a);
+      }).join(' ') }, '*');
+    } catch (e) {}
+  };
+  for (const level of ['log', 'warn', 'error', 'info']) {
+    const orig = console[level].bind(console);
+    console[level] = (...a) => { send(level, a); orig(...a); };
+  }
+  addEventListener('error', (e) => send('error', [e.message + '  (line ' + e.lineno + ')']));
+  addEventListener('unhandledrejection', (e) => send('error', ['Unhandled promise rejection: ' + (e.reason?.message ?? e.reason)]));
+})();
+<\/script>
+<script>
+try {
+${eds.js.value}
+} catch (err) { console.error(err); }
+<\/script>
+</body></html>`;
+}
+
+function run() {
+  $('console').innerHTML = '<div class="empty">Running…</div>';
+  conRows = 0;
+  $('out').srcdoc = srcdoc();
+}
+
+let conRows = 0;
+addEventListener('message', (e) => {
+  if (!e.data || e.data.__sandbox !== true) return;
+  const box = $('console');
+  if (conRows === 0) box.innerHTML = '';
+  conRows++;
+  const row = document.createElement('div');
+  row.className = 'row ' + (e.data.level === 'log' ? '' : e.data.level);
+  row.textContent = e.data.text;
+  box.appendChild(row);
+  box.scrollTop = box.scrollHeight;
+});
+
+function scheduleRun() {
+  persist();
+  if (!$('autorun').checked) return;
+  clearTimeout(runTimer);
+  runTimer = setTimeout(run, 450);
+}
+
+for (const k of ['html', 'css', 'js']) {
+  eds[k].addEventListener('input', scheduleRun);
+  // Tab inserts two spaces instead of leaving the field.
+  eds[k].addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const t = e.target, s = t.selectionStart;
+      t.value = t.value.slice(0, s) + '  ' + t.value.slice(t.selectionEnd);
+      t.selectionStart = t.selectionEnd = s + 2;
+      scheduleRun();
+    }
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); run(); }
+  });
+}
+
+/* ------------------------------------------------------------------ wire */
+$('tabs').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  tab = b.dataset.t;
+  document.querySelectorAll('#tabs button').forEach((x) => x.classList.toggle('on', x === b));
+  for (const k of ['html', 'css', 'js']) eds[k].hidden = k !== tab;
+  eds[tab].focus();
+});
+
+$('run').onclick = run;
+$('clearcon').onclick = () => { $('console').innerHTML = '<div class="empty">Cleared.</div>'; conRows = 0; };
+
+$('save').onclick = () => {
+  const name = ($('name').value || $('snippets').value || '').trim();
+  if (!name) { $('name').focus(); return; }
+  store.snippets[name] = { html: eds.html.value, css: eds.css.value, js: eds.js.value };
+  persist();
+  refreshSnippetList(name);
+  $('name').value = '';
+  const s = $('save'); s.textContent = 'Saved'; s.classList.add('saved');
+  setTimeout(() => { s.textContent = 'Save'; s.classList.remove('saved'); }, 1200);
+};
+
+$('snippets').onchange = (e) => {
+  const s = store.snippets[e.target.value];
+  if (!s) return;
+  for (const k of ['html', 'css', 'js']) eds[k].value = s[k] ?? '';
+  persist();
+  run();
+};
+
+$('del').onclick = () => {
+  const n = $('snippets').value;
+  if (!n) return;
+  delete store.snippets[n];
+  persist();
+  refreshSnippetList();
+};
+
+$('export').onclick = () => {
+  const blob = new Blob([srcdoc()], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = ($('snippets').value || 'sandbox') + '.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+
+$('reset').onclick = () => {
+  for (const k of ['html', 'css', 'js']) eds[k].value = STARTER[k];
+  persist();
+  run();
+};
+
+$('theme').onclick = () => {
+  const r = document.documentElement;
+  const dark = r.getAttribute('data-theme')
+    ? r.getAttribute('data-theme') === 'dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  r.setAttribute('data-theme', dark ? 'light' : 'dark');
+};
+
+run();
+</script>
+</body>
+</html>
