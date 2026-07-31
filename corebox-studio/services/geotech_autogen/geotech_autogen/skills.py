@@ -5,11 +5,60 @@ from .models import (
     CoreRunEvidence,
     DiscontinuityEvidence,
     GeologicalInterval,
+    MultimodalConditions,
     StageResult,
+    VisionEvidence,
 )
 
 
-def assess_capture_quality(evidence: CaptureEvidence) -> StageResult:
+REQUIRED_AUTOMATIC_MODALITIES = {
+    "overview_photo",
+    "closeup_photo",
+    "ocr",
+    "depth_labels",
+    "core_run_lengths",
+    "tray_dimensions",
+}
+
+
+def assess_multimodal_conditions(
+    conditions: MultimodalConditions,
+    confidence_threshold: float,
+) -> StageResult:
+    """Bind image, measured and contextual inputs without letting context create observations."""
+    kinds = {item.kind for item in conditions.evidence}
+    missing = sorted(REQUIRED_AUTOMATIC_MODALITIES - kinds)
+    low_confidence = [
+        item.ref_id for item in conditions.evidence
+        if item.kind in REQUIRED_AUTOMATIC_MODALITIES and item.confidence < confidence_threshold
+    ]
+    contextual = [item.ref_id for item in conditions.evidence if item.provenance == "contextual"]
+    findings: list[str] = []
+    if missing:
+        findings.append(f"Request additional evidence for automatic logging: {', '.join(missing)}.")
+    if low_confidence:
+        findings.append(
+            f"Evidence below {confidence_threshold:.0%} confidence: {', '.join(low_confidence)}; request another photograph or verified measurement."
+        )
+    findings.append(
+        "Previous logs, geology and structural drawings are contextual constraints only and cannot create observed defects or lengths."
+    )
+    return StageResult(
+        stage="multimodal_conditioning",
+        status="fail" if missing or low_confidence else "pass",
+        action="bind_multimodal_evidence",
+        findings=findings,
+        metrics={
+            "modalities_present": sorted(kinds),
+            "required_modalities": sorted(REQUIRED_AUTOMATIC_MODALITIES),
+            "contextual_reference_count": len(contextual),
+            "confidence_threshold": confidence_threshold,
+        },
+        evidence_refs=[item.path for item in conditions.evidence],
+    )
+
+
+def assess_capture_quality(evidence: CaptureEvidence, confidence_threshold: float = 0.95) -> StageResult:
     """Apply evidence-capture gates before any interpretation or measurement."""
     findings: list[str] = []
     blockers: list[str] = []
@@ -26,6 +75,10 @@ def assess_capture_quality(evidence: CaptureEvidence) -> StageResult:
         findings.append("Glare exceeds the 8% review threshold; recapture with diffuse lighting.")
     if evidence.water_present:
         findings.append("Wet-core appearance may reduce contrast; retain wet/dry state as metadata.")
+    if evidence.capture_confidence < confidence_threshold:
+        blockers.append(
+            f"Capture confidence {evidence.capture_confidence:.1%} is below {confidence_threshold:.0%}; request another photograph."
+        )
 
     status = "fail" if blockers else "review" if findings else "pass"
     return StageResult(
@@ -37,50 +90,119 @@ def assess_capture_quality(evidence: CaptureEvidence) -> StageResult:
             "megapixels": round(evidence.width_px * evidence.height_px / 1_000_000, 2),
             "glare_fraction": evidence.glare_fraction,
             "row_count": evidence.row_count,
+            "capture_confidence": evidence.capture_confidence,
+            "confidence_threshold": confidence_threshold,
         },
         evidence_refs=[evidence.image_path],
     )
 
 
-def plan_rectification(evidence: CaptureEvidence) -> StageResult:
-    """Describe the paper-aligned rectification action without claiming CV execution."""
-    ready = evidence.corners_visible and evidence.scale_marker_mm is not None
+def plan_rectification(evidence: CaptureEvidence, confidence_threshold: float = 0.95) -> StageResult:
+    """Require an executed, source-linked homography before automatic measurement."""
+    ready = (
+        evidence.corners_visible
+        and evidence.scale_marker_mm is not None
+        and evidence.rectification_executed
+        and evidence.rectification_confidence >= confidence_threshold
+        and evidence.rectified_image_path is not None
+        and evidence.homography_matrix is not None
+        and len(evidence.homography_matrix) == 9
+    )
     return StageResult(
         stage="rectification",
         status="pass" if ready else "fail",
         action="rectify_tray_perspective",
         findings=[
-            "Four-corner homography is configured; preserve the source image and transform matrix."
+            "Executed four-corner homography is linked to the source image and transform matrix."
             if ready
-            else "Rectification cannot proceed until corners and scale evidence are available."
+            else f"Automatic measurement is blocked until an executed homography reaches {confidence_threshold:.0%} confidence."
         ],
-        metrics={"target_inference_frame_px": 640, "source_preserved": True},
-        evidence_refs=[evidence.image_path],
+        metrics={
+            "target_inference_frame_px": 640,
+            "source_preserved": True,
+            "executed": evidence.rectification_executed,
+            "rectification_confidence": evidence.rectification_confidence,
+        },
+        evidence_refs=[path for path in [evidence.image_path, evidence.rectified_image_path] if path],
     )
 
 
-def plan_detection_and_segmentation(evidence: CaptureEvidence) -> StageResult:
-    """Register the open-source YOLO-to-SAM inference contract and evidence outputs."""
+def evaluate_vision_stage(
+    evidence: CaptureEvidence,
+    vision: VisionEvidence,
+    action: str,
+    confidence_threshold: float,
+) -> StageResult:
+    """Gate measured detector and segmenter evidence; contract-only configuration cannot pass."""
+    is_piece_stage = action == "detect_core_pieces"
+    confidence = vision.piece_detection_confidence if is_piece_stage else vision.defect_detection_confidence
+    executed = vision.execution_mode == "executed"
+    complete_provenance = bool(
+        vision.detector_model_hash and vision.segmenter_model_hash and vision.boxes_and_masks_ref
+    )
+    passed = executed and complete_provenance and confidence >= confidence_threshold
+    stage = "core_piece_detection" if is_piece_stage else "defect_detection"
     return StageResult(
-        stage="vision",
-        status="review",
-        action="detect_then_segment_core",
+        stage=stage,
+        status="pass" if passed else "fail",
+        action=action,
         findings=[
-            "Pipeline contract: detector boxes become promptable-segmentation inputs.",
-            "Runtime adapter is required before masks can be treated as measured evidence.",
-            "Keep per-piece boxes, masks, confidence, model hash and source-image coordinates.",
+            "Measured YOLO boxes, prompted masks, model hashes and source coordinates satisfy the automatic gate."
+            if passed
+            else (
+                f"{stage} confidence is {confidence:.1%}; automatic logging requires {confidence_threshold:.0%}. "
+                "Request another photograph or execute the open-source vision adapter."
+            ),
+            "Visible evidence only: contextual geology cannot create a detection.",
         ],
         metrics={
             "detector_family": "YOLO11-compatible",
             "segmenter_family": "SAM-compatible",
             "rows_expected": evidence.row_count,
-            "execution_mode": "contract_only",
+            "execution_mode": vision.execution_mode,
+            "confidence": confidence,
+            "confidence_threshold": confidence_threshold,
+            "detected_piece_count": vision.detected_piece_count,
+            "model_provenance_complete": complete_provenance,
         },
-        evidence_refs=[evidence.image_path],
+        evidence_refs=[path for path in [evidence.image_path, vision.boxes_and_masks_ref] if path],
     )
 
 
-def calculate_rqd(runs: list[CoreRunEvidence]) -> StageResult:
+def measure_recovery(runs: list[CoreRunEvidence], confidence_threshold: float) -> StageResult:
+    """Calculate deterministic recovered length and block low-confidence measurements."""
+    observations: list[dict[str, float | str]] = []
+    findings: list[str] = []
+    failed = False
+    for run in runs:
+        run_length_mm = (run.base_m - run.top_m) * 1000
+        recovered_length_mm = sum(run.recovered_piece_lengths_mm)
+        if run_length_mm <= 0 or recovered_length_mm > run_length_mm + 1:
+            failed = True
+            findings.append(f"{run.run_id}: recovered and drilled lengths are inconsistent.")
+            continue
+        if run.measurement_confidence < confidence_threshold:
+            failed = True
+            findings.append(
+                f"{run.run_id}: measurement confidence {run.measurement_confidence:.1%} is below {confidence_threshold:.0%}."
+            )
+        observations.append({
+            "run_id": run.run_id,
+            "run_length_mm": round(run_length_mm, 1),
+            "recovered_length_mm": round(recovered_length_mm, 1),
+            "core_recovery_percent": round(recovered_length_mm / run_length_mm * 100, 1),
+            "measurement_source": run.measurement_source,
+        })
+    return StageResult(
+        stage="recovery_measurement",
+        status="fail" if failed or not runs else "pass",
+        action="measure_core_recovery",
+        findings=findings or ["Recovered lengths and core recovery were calculated deterministically from the JSON measurements."],
+        metrics={"runs": observations, "confidence_threshold": confidence_threshold},
+    )
+
+
+def calculate_rqd(runs: list[CoreRunEvidence], confidence_threshold: float = 0.95) -> StageResult:
     """Calculate RQD from recovered core-piece lengths using the 100 mm threshold."""
     observations: list[dict[str, float | str | int]] = []
     findings: list[str] = []
@@ -92,6 +214,12 @@ def calculate_rqd(runs: list[CoreRunEvidence]) -> StageResult:
             statuses.append("fail")
             findings.append(f"{run.run_id}: base depth must exceed top depth.")
             continue
+        if run.measurement_confidence < confidence_threshold:
+            statuses.append("fail")
+            findings.append(
+                f"{run.run_id}: measurement confidence {run.measurement_confidence:.1%} is below {confidence_threshold:.0%}."
+            )
+            continue
         sound_length_mm = sum(length for length in run.recovered_piece_lengths_mm if length >= 100)
         recovered_length_mm = sum(run.recovered_piece_lengths_mm)
         rqd = min(100.0, sound_length_mm / run_length_mm * 100)
@@ -101,6 +229,7 @@ def calculate_rqd(runs: list[CoreRunEvidence]) -> StageResult:
                 "run_id": run.run_id,
                 "rqd_percent": round(rqd, 1),
                 "recovery_percent": round(recovery, 1),
+                "tcr_percent": round(recovery, 1),
                 "qualifying_length_mm": round(sound_length_mm, 1),
                 "mechanical_break_pairs": run.mechanical_break_pairs,
             }
@@ -115,15 +244,21 @@ def calculate_rqd(runs: list[CoreRunEvidence]) -> StageResult:
     return StageResult(
         stage="measurement",
         status=status,
-        action="calculate_core_recovery_scr_rqd",
+        action="calculate_rqd_tcr_fracture_metrics",
         findings=findings or ["RQD observations calculated from traceable run and piece lengths."],
-        metrics={"runs": observations, "rqd_threshold_mm": 100},
+        metrics={
+            "runs": observations,
+            "rqd_threshold_mm": 100,
+            "calculation_mode": "deterministic",
+            "confidence_threshold": confidence_threshold,
+        },
     )
 
 
 def validate_engineering_logs(
     intervals: list[GeologicalInterval],
     discontinuities: list[DiscontinuityEvidence],
+    confidence_threshold: float = 0.95,
 ) -> StageResult:
     """Check rock and discontinuity logs for engineering completeness and provenance."""
     findings: list[str] = []
@@ -143,17 +278,66 @@ def validate_engineering_logs(
         findings.append(f"{len(uncertain)} discontinuity record(s) require natural/mechanical origin review.")
     if incomplete_natural:
         findings.append(f"{len(incomplete_natural)} natural discontinuity record(s) lack orientation evidence.")
+    low_confidence = [
+        item for item in discontinuities
+        if item.detection_confidence < confidence_threshold
+        or item.classification_confidence < confidence_threshold
+    ]
+    low_interval_confidence = [
+        item for item in intervals if item.classification_confidence < confidence_threshold
+    ]
+    if low_confidence:
+        findings.append(
+            f"{len(low_confidence)} defect record(s) are below the {confidence_threshold:.0%} automatic classification threshold."
+        )
+    if low_interval_confidence:
+        findings.append(
+            f"{len(low_interval_confidence)} geological interval(s) are below the {confidence_threshold:.0%} automatic classification threshold."
+        )
 
     return StageResult(
         stage="geotechnical_logging",
-        status="review" if findings else "pass",
+        status="fail" if low_confidence or low_interval_confidence else "review" if findings else "pass",
         action="compile_rock_and_discontinuity_logs",
         findings=findings or ["Rock and discontinuity records contain the configured mandatory descriptors."],
         metrics={
             "geological_intervals": len(intervals),
             "discontinuities": len(discontinuities),
             "origin_uncertain": len(uncertain),
+            "confidence_threshold": confidence_threshold,
         },
+    )
+
+
+def build_report_contract(stages: list[StageResult], borehole_id: str) -> StageResult:
+    """Allow products only from a fully validated JSON evidence contract."""
+    upstream_failed = [stage.stage for stage in stages if stage.status == "fail"]
+    return StageResult(
+        stage="report_products",
+        status="fail" if upstream_failed else "review",
+        action="generate_json_ags_pdf_3d",
+        findings=[
+            f"Outputs blocked by upstream stages: {', '.join(upstream_failed)}."
+            if upstream_failed
+            else "JSON contract is complete; AGS, OpenGround-style PDF and 3D evidence outputs require engineer approval."
+        ],
+        metrics={
+            "source_contract": "sts-geoflow-corebox/1.0",
+            "borehole_id": borehole_id,
+            "ags_target": "4.1.1",
+            "pdf_style": "OpenGround-compatible visual log",
+            "three_d_mode": "texture-derived evidence twin or reviewed photogrammetry GLB",
+        },
+    )
+
+
+def skipped_stage(stage: str, action: str, dependency: str) -> StageResult:
+    return StageResult(
+        stage=stage,
+        status="fail",
+        action=action,
+        findings=[f"Not executed because prerequisite stage '{dependency}' did not pass."],
+        metrics={"skipped": True, "dependency": dependency},
     )
 
 

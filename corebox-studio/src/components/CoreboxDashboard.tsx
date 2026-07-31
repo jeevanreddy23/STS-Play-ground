@@ -387,7 +387,7 @@ function AgsView() {
 }
 
 function PromptView() {
-  const [selectedId, setSelectedId] = useState(intervals[1].id);
+  const [selectedId, setSelectedId] = useState(intervals[0].id);
   const selected = intervals.find((item) => item.id === selectedId) ?? intervals[0];
   const [result, setResult] = useState<PromptLoopResult>(() => runLocalPromptLoop(selected));
   const [draft, setDraft] = useState(result.improvedDescription);
@@ -403,15 +403,23 @@ function PromptView() {
   return (
     <section className="page-card prompt-view">
       <div className="section-hero">
-        <div><span className="eyebrow"><BrainCircuit size={14} /> AutoGen geotechnical workbench</span><h1>Self-improving logging and workflow agents</h1><p>Microsoft AutoGen Core coordinates typed, inspectable actions without a cloud model. Approved corrections become local examples; issue authority remains with the assigned engineer.</p></div>
-        <span className="local-engine"><CloudOff size={17} /> AutoGen Core 0.7.5 · offline</span>
+        <div><span className="eyebrow"><BrainCircuit size={14} /> AutoGen geotechnical workbench</span><h1>Multimodal evidence architecture, not a super prompt</h1><p>Photographs, OCR, depth labels, tray geometry and measured runs are fused as typed conditions. Contextual geology can check consistency but can never create an observation.</p></div>
+        <span className="local-engine"><CloudOff size={17} /> JSON-first · 95% gate · offline</span>
       </div>
       <div className="agent-strip" aria-label="AutoGen geotechnical agents">
-        <article><FileImage size={17} /><span><strong>Capture agent</strong><small>Quality gate + rectification</small></span><em>2 skills</em></article>
-        <article><ScanLine size={17} /><span><strong>Vision agent</strong><small>Detect, prompt, segment</small></span><em>3 skills</em></article>
-        <article><Gauge size={17} /><span><strong>Measurement agent</strong><small>Recovery, SCR + RQD</small></span><em>3 skills</em></article>
-        <article><ListChecks size={17} /><span><strong>Logging agent</strong><small>Rock + discontinuities</small></span><em>4 skills</em></article>
-        <article><ShieldCheck size={17} /><span><strong>Assurance agent</strong><small>AGS gate + sign-off</small></span><em>2 skills</em></article>
+        <article><ScanLine size={17} /><span><strong>Vision agent</strong><small>Visible pieces + defects</small></span><em>evidence</em></article>
+        <article><Gauge size={17} /><span><strong>Measurement agent</strong><small>Scale, lengths + recovery</small></span><em>numeric</em></article>
+        <article><ListChecks size={17} /><span><strong>Rule engine</strong><small>AS 1726 + ISRM rules</small></span><em>deterministic</em></article>
+        <article><ShieldCheck size={17} /><span><strong>Validation agent</strong><small>Confidence + consistency</small></span><em>95% gate</em></article>
+        <article><FileArchive size={17} /><span><strong>Report agent</strong><small>JSON → AGS + PDF + 3D</small></span><em>derived</em></article>
+      </div>
+      <div className="architecture-policy">
+        <article><span>Goal</span><strong>AS 1726-aligned digital core-box evidence</strong><small>Never invent defects or missing measurements.</small></article>
+        <article><span>Role</span><strong>Senior engineering geology review</strong><small>AS 1726 · ISRM · AGS 4.1.1 · OpenGround workflow</small></article>
+        <article className="critical"><span>Hard constraint</span><strong>Automatic logging requires ≥95%</strong><small>Below threshold: request another photograph or verified measurement.</small></article>
+      </div>
+      <div className="verification-chain" aria-label="Sequential verification chain">
+        {['Scale', 'Pieces', 'Recovery', 'Find defects', 'Classify', 'RQD', 'TCR', 'AGS', 'PDF'].map((stage, index) => <span key={stage}><em>{index + 1}</em>{stage}</span>)}
       </div>
       <div className="prompt-layout">
         <div className="prompt-input">
@@ -419,24 +427,24 @@ function PromptView() {
           <select value={selectedId} onChange={(event) => { const interval = intervals.find((item) => item.id === event.target.value) ?? intervals[0]; setSelectedId(interval.id); run(interval); }}>
             {intervals.map((item) => <option key={item.id} value={item.id}>{item.top.toFixed(2)}–{item.base.toFixed(2)} m · {item.legend}</option>)}
           </select>
-          <label>Observed description</label>
+          <label>JSON-derived reviewed description</label>
           <textarea value={selected.description} readOnly rows={5} />
           <div className="evidence-chips"><span>{selected.weathering}</span><span>{selected.strength}</span><span>{selected.structure}</span></div>
-          <button className="primary-button run-loop" onClick={() => run(selected)}><Play size={15} /> Run four-pass review</button>
+          <button className="primary-button run-loop" onClick={() => run(selected)}><Play size={15} /> Verify structured interval</button>
           <div className="prompt-policy"><ShieldCheck size={16} /><p><strong>Publication policy</strong><span>The engine can suggest and block; only an assigned engineer can approve issue data.</span></p></div>
         </div>
         <div className="prompt-passes">
           <div className="loop-line" />
           {result.passes.map((pass, index) => <article key={pass.id} className={pass.status}>
             <span className="pass-index">0{index + 1}</span>
-            <div><h3>{pass.label}</h3><p>{pass.summary}</p><div>{pass.keywords.map((word) => <em key={word}>{word}</em>)}</div></div>
+            <div><h3>{pass.label}</h3><p>{pass.summary}</p><div>{pass.keywords.map((word, wordIndex) => <em key={`${pass.id}-${wordIndex}-${word}`}>{word}</em>)}</div></div>
             {pass.status === "complete" ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
           </article>)}
         </div>
         <div className="prompt-output">
           <div className="output-head"><span><Sparkles size={15} /> Proposed engineering wording</span><strong>{Math.round(result.confidence * 100)}%</strong></div>
           <textarea value={draft} onChange={(event) => setDraft(event.target.value)} rows={9} />
-          <div className="missing-row"><span>Missing keywords</span>{result.missingKeywords.length ? result.missingKeywords.map((word) => <em key={word}>{word}</em>) : <strong><Check size={13} /> None</strong>}</div>
+          <div className="missing-row"><span>Missing keywords</span>{result.missingKeywords.length ? result.missingKeywords.map((word, wordIndex) => <em key={`${wordIndex}-${word}`}>{word}</em>) : <strong><Check size={13} /> None</strong>}</div>
           <button className="primary-button" onClick={() => { saveCorrection(selected.legend, draft); setSaved(true); }}><Save size={15} /> {saved ? "Correction learned locally" : "Approve & learn correction"}</button>
           <p className="privacy-note"><LockKeyhole size={13} /> Saves the approved example to browser local storage. No external request is made.</p>
         </div>

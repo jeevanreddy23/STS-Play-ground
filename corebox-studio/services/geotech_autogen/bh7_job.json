@@ -1,0 +1,48 @@
+{
+  "job_id": "32904-BH7-00760-01673",
+  "borehole_id": "BH7",
+  "capture": {
+    "image_path": "public/evidence/32904_BH7_00760-01673_source.png",
+    "width_px": 936,
+    "height_px": 768,
+    "corners_visible": true,
+    "scale_marker_mm": null,
+    "tags_between_rows": false,
+    "end_occlusion": false,
+    "glare_fraction": 0.04,
+    "water_present": true,
+    "row_count": 10,
+    "capture_confidence": 0.72,
+    "rectification_executed": false,
+    "rectification_confidence": 0.0,
+    "rectified_image_path": null,
+    "homography_matrix": null
+  },
+  "conditions": {
+    "evidence": [
+      {
+        "ref_id": "BH7-OVERVIEW",
+        "kind": "overview_photo",
+        "path": "public/evidence/32904_BH7_00760-01673_source.png",
+        "sha256": "4441DC542662B265DF2CB6E68AB89B72EDF08475AEE29C0866315EB3390843AC",
+        "confidence": 1.0,
+        "provenance": "observed"
+      },
+      {"ref_id": "BH7-OCR-DRAFT", "kind": "ocr", "path": "drafts/BH7_ocr.json", "confidence": 0.72, "provenance": "measured"},
+      {"ref_id": "BH7-DEPTH-DRAFT", "kind": "depth_labels", "path": "drafts/BH7_depth_rows.json", "confidence": 0.78, "provenance": "measured"}
+    ]
+  },
+  "vision": {
+    "execution_mode": "contract_only",
+    "piece_detection_confidence": 0.0,
+    "defect_detection_confidence": 0.0,
+    "detected_piece_count": 0,
+    "detector_model_hash": null,
+    "segmenter_model_hash": null,
+    "boxes_and_masks_ref": null
+  },
+  "runs": [],
+  "intervals": [],
+  "discontinuities": [],
+  "reviewer_approved": false
+}

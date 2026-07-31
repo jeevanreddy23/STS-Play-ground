@@ -13,6 +13,29 @@ The interface is functional, but the bundled measurements are demonstration data
 - Microsoft AutoGen Core 0.7.5 workflow with typed capture, vision, measurement, logging, and assurance agents. It uses no LLM model client and makes no cloud request.
 - Human issue gate: planned/demo computer vision and unresolved exceptions cannot become approved engineering data.
 
+## Multimodal, JSON-first architecture
+
+The orchestration pattern follows the architecture lesson from Hou et al. (2026), *3D digital core reconstruction from limited core-scanned images: An improved diffusion model with multi-modal information fusion*: bind multiple independent conditions deeply into the workflow instead of relying on one long text prompt.
+
+GeoFlow uses typed evidence conditions rather than pore-scale conditions:
+
+- overview and close-up photographs;
+- OCR, depth labels, core-run lengths and tray dimensions;
+- previous logs, AGS data, structural drawings, site geology, expected formation and project specifications.
+
+The last group is contextual only. It can test consistency but cannot create a defect, depth or recovered length. The sequential AutoGen chain is:
+
+1. bind multimodal evidence and read scale;
+2. detect core pieces;
+3. measure recovery;
+4. find visible defects;
+5. classify only measured defects;
+6. calculate RQD, TCR, fracture frequency and spacing deterministically;
+7. validate confidence and cross-stage consistency;
+8. derive AGS, OpenGround-style PDF and 3D products from the versioned JSON contract.
+
+Every automatic observation must reach 95% confidence. Below that threshold, the pipeline requests another photograph or verified measurement and blocks all dependent stages. It returns findings and evidence references, never hidden chain-of-thought.
+
 ## Paper-aligned image method
 
 The planned CV adapter follows Yan et al. (2026), *A zero-shot segmentation framework with detection prompts for automated rock quality designation (RQD) estimation from core box images*:
@@ -53,10 +76,11 @@ Set-Location services/geotech_autogen
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe -m geotech_autogen.cli example_job.json --output ..\..\output\autogen\tray-08-result.json
+.\.venv\Scripts\python.exe -m geotech_autogen.cli bh7_job.json --output ..\..\output\autogen\BH7-result.json
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-The result contains stage statuses, engineering findings, run-level RQD calculations, issue state, and an audit-event list. `review_required` is expected for the sample because the CV runtime is not yet attached and a mechanical-break decision remains open.
+The result is a versioned JSON contract containing the goal/role/constraint policy, evidence modalities, ordered stage statuses, deterministic metrics, requested evidence, downstream-output state and audit events. The BH7 job is intentionally blocked because only one oblique overview photograph is available; it does not invent RQD or defects.
 
 ## AGS issue control
 

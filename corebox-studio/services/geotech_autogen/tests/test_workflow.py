@@ -22,15 +22,51 @@ class WorkflowTests(unittest.TestCase):
         result = asyncio.run(run_workflow(self.load_request()))
         self.assertEqual(result.issue_status, "review_required")
         self.assertEqual(result.stages[-1].stage, "assurance")
-        self.assertIn("vision", [stage.stage for stage in result.stages])
+        self.assertEqual(
+            [stage.stage for stage in result.stages],
+            [
+                "multimodal_conditioning",
+                "capture_qa",
+                "rectification",
+                "core_piece_detection",
+                "recovery_measurement",
+                "defect_detection",
+                "geotechnical_logging",
+                "measurement",
+                "report_products",
+                "assurance",
+            ],
+        )
         self.assertEqual(len(result.audit_events), len(result.stages))
+        self.assertEqual(result.policy.automatic_logging_confidence, 0.95)
+        self.assertEqual(result.policy.output_contract, "json_first")
+        self.assertEqual(result.report_outputs["ags_4_1_1"], "review_required")
 
     def test_missing_scale_blocks_issue(self) -> None:
         request = self.load_request()
         request.capture.scale_marker_mm = None
         result = asyncio.run(run_workflow(request))
         self.assertEqual(result.issue_status, "blocked")
-        self.assertEqual(result.stages[0].status, "fail")
+        self.assertEqual(result.stages[1].stage, "capture_qa")
+        self.assertEqual(result.stages[1].status, "fail")
+        self.assertTrue(result.stages[3].metrics["skipped"])
+
+    def test_bh7_requests_additional_evidence_without_inventing_measurements(self) -> None:
+        payload = json.loads((ROOT / "bh7_job.json").read_text(encoding="utf-8"))
+        result = asyncio.run(run_workflow(WorkflowRequest.model_validate(payload)))
+        self.assertEqual(result.issue_status, "blocked")
+        self.assertTrue(result.requested_evidence)
+        recovery = next(stage for stage in result.stages if stage.stage == "recovery_measurement")
+        self.assertTrue(recovery.metrics["skipped"])
+        self.assertEqual(result.report_outputs["three_d_evidence"], "blocked")
+
+    def test_sub_95_percent_classification_blocks_automatic_logging(self) -> None:
+        request = self.load_request()
+        request.discontinuities[0].classification_confidence = 0.94
+        result = asyncio.run(run_workflow(request))
+        logging = next(stage for stage in result.stages if stage.stage == "geotechnical_logging")
+        self.assertEqual(logging.status, "fail")
+        self.assertEqual(result.issue_status, "blocked")
 
 
 if __name__ == "__main__":

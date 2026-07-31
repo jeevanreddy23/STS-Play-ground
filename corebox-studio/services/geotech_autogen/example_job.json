@@ -11,7 +11,32 @@
     "end_occlusion": false,
     "glare_fraction": 0.03,
     "water_present": false,
-    "row_count": 4
+    "row_count": 4,
+    "capture_confidence": 0.99,
+    "rectification_executed": true,
+    "rectification_confidence": 0.98,
+    "rectified_image_path": "evidence/BH-17/core_tray_08_rectified.png",
+    "homography_matrix": [1, 0, 0, 0, 1, 0, 0, 0, 1]
+  },
+  "conditions": {
+    "evidence": [
+      {"ref_id": "IMG-OVERVIEW", "kind": "overview_photo", "path": "evidence/BH-17/core_tray_08_original.jpg", "confidence": 0.99, "provenance": "observed"},
+      {"ref_id": "IMG-CLOSEUP", "kind": "closeup_photo", "path": "evidence/BH-17/core_tray_08_closeup.jpg", "confidence": 0.98, "provenance": "observed"},
+      {"ref_id": "OCR-01", "kind": "ocr", "path": "evidence/BH-17/ocr.json", "confidence": 0.97, "provenance": "measured"},
+      {"ref_id": "DEPTH-01", "kind": "depth_labels", "path": "evidence/BH-17/depth_labels.json", "confidence": 0.99, "provenance": "measured"},
+      {"ref_id": "RUNS-01", "kind": "core_run_lengths", "path": "evidence/BH-17/run_lengths.json", "confidence": 1.0, "provenance": "reviewer_supplied"},
+      {"ref_id": "TRAY-01", "kind": "tray_dimensions", "path": "evidence/BH-17/tray_dimensions.json", "confidence": 1.0, "provenance": "reviewer_supplied"},
+      {"ref_id": "GEOLOGY-01", "kind": "site_geology", "path": "context/site_geology.pdf", "confidence": 0.9, "provenance": "contextual"}
+    ]
+  },
+  "vision": {
+    "execution_mode": "executed",
+    "piece_detection_confidence": 0.98,
+    "defect_detection_confidence": 0.97,
+    "detected_piece_count": 15,
+    "detector_model_hash": "yolo11-local-demo-sha256",
+    "segmenter_model_hash": "sam-local-demo-sha256",
+    "boxes_and_masks_ref": "evidence/BH-17/vision_evidence.json"
   },
   "runs": [
     {"run_id": "RUN-19", "top_m": 18.4, "base_m": 19.4, "recovered_piece_lengths_mm": [340, 370, 290], "mechanical_break_pairs": 1},
