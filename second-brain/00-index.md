@@ -10,6 +10,10 @@ updated: 2026-07-29
 Start here. This is a map of content, not a container — every note below lives
 in its own file and links onward.
 
+## Reference library
+
+- [[Reference library]] — catalogue of the standards, papers and texts held locally
+
 ## Standards
 
 - [[AS 1726 soil and rock description]] — how we describe what comes out of the ground
