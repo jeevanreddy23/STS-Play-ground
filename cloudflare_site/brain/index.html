@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>STS Second Brain</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23fcfcfb'/%3E%3Ccircle cx='10' cy='11' r='3.5' fill='%232a78d6'/%3E%3Ccircle cx='22' cy='9' r='2.5' fill='%23eb6834'/%3E%3Ccircle cx='19' cy='22' r='3' fill='%231baf7a'/%3E%3Cpath d='M10 11 L22 9 M10 11 L19 22 M22 9 L19 22' stroke='%23898781' stroke-width='1.2' fill='none'/%3E%3C/svg%3E">
+<style>
+  :root {
+    color-scheme: light;
+    --surface: #fcfcfb; --plane: #f2f2ef; --sidebar: #f7f7f4;
+    --ink: #0b0b0b; --ink2: #52514e; --muted: #898781;
+    --line: #e1e0d9; --accent: #2a78d6; --accent-soft: #e7f0fb;
+    --link: #1c5cab; --tag: #eb6834;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme=light]) {
+      color-scheme: dark;
+      --surface: #1a1a19; --plane: #0d0d0d; --sidebar: #151514;
+      --ink: #ffffff; --ink2: #c3c2b7; --muted: #898781;
+      --line: #2c2c2a; --accent: #3987e5; --accent-soft: #17263a;
+      --link: #86b6ef; --tag: #d95926;
+    }
+  }
+  :root[data-theme=dark] {
+    color-scheme: dark;
+    --surface: #1a1a19; --plane: #0d0d0d; --sidebar: #151514;
+    --ink: #ffffff; --ink2: #c3c2b7; --muted: #898781;
+    --line: #2c2c2a; --accent: #3987e5; --accent-soft: #17263a;
+    --link: #86b6ef; --tag: #d95926;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px; color: var(--ink); background: var(--plane);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  header {
+    display: flex; align-items: center; gap: 12px; padding: 8px 16px;
+    background: var(--surface); border-bottom: 1px solid var(--line); flex-wrap: wrap;
+  }
+  header h1 { font-size: 15px; margin: 0; font-weight: 650; }
+  header .sub { font-size: 11.5px; color: var(--muted); }
+  .spacer { flex: 1; }
+  .seg { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .seg button {
+    border: 0; background: transparent; font: inherit; font-size: 12px;
+    padding: 4px 11px; cursor: pointer; color: var(--ink2);
+  }
+  .seg button.on { background: var(--accent); color: #fff; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .iconbtn {
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    border-radius: 7px; padding: 3px 9px; font: inherit; font-size: 13px; cursor: pointer;
+  }
+  #search {
+    flex: 1; min-width: 180px; max-width: 420px; padding: 5px 10px; font: inherit; font-size: 13px;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--plane); color: var(--ink);
+  }
+
+  .main { flex: 1; display: flex; min-height: 0; }
+  nav {
+    width: 250px; flex: none; background: var(--sidebar);
+    border-right: 1px solid var(--line); overflow-y: auto; padding-bottom: 24px;
+  }
+  nav .group { padding: 10px 12px 3px; font-size: 10px; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--muted); font-weight: 700; }
+  nav a.note {
+    display: block; padding: 4px 12px; font-size: 13px; color: var(--ink);
+    text-decoration: none; border-left: 2px solid transparent; cursor: pointer;
+  }
+  nav a.note:hover { background: var(--plane); }
+  nav a.note.active { border-left-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+  nav a.note .snip { display: block; font-size: 10.5px; color: var(--muted); }
+
+  .tags { padding: 6px 12px; display: flex; flex-wrap: wrap; gap: 5px; }
+  .tag {
+    font-size: 10.5px; padding: 1px 7px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink2);
+  }
+  .tag.on { border-color: var(--tag); color: var(--tag); font-weight: 650; }
+  .tag .n { color: var(--muted); }
+
+  main { flex: 1; overflow-y: auto; min-width: 0; }
+  article { max-width: 760px; margin: 0 auto; padding: 22px 28px 80px; }
+  article h1 { font-size: 26px; margin: 0 0 4px; letter-spacing: -.01em; }
+  article h2 { font-size: 18px; margin: 26px 0 8px; }
+  article h3 { font-size: 15px; margin: 20px 0 6px; }
+  article p, article li { line-height: 1.62; color: var(--ink); }
+  article ul, article ol { padding-left: 22px; }
+  article code {
+    background: var(--plane); padding: 1px 5px; border-radius: 4px;
+    font-size: 13px; font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  article pre {
+    background: var(--plane); padding: 11px 13px; border-radius: 8px; overflow-x: auto;
+    border: 1px solid var(--line);
+  }
+  article pre code { background: none; padding: 0; font-size: 12.5px; line-height: 1.5; }
+  article blockquote {
+    margin: 12px 0; padding: 8px 14px; border-left: 3px solid var(--accent);
+    background: var(--accent-soft); border-radius: 0 8px 8px 0; color: var(--ink2); font-size: 14px;
+  }
+  article blockquote p { margin: 4px 0; }
+  article table { border-collapse: collapse; font-size: 13.5px; margin: 10px 0; }
+  article th, article td { border: 1px solid var(--line); padding: 5px 11px; text-align: left; }
+  article th { background: var(--plane); font-size: 12px; }
+  a.wl { color: var(--link); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--link) 35%, transparent); cursor: pointer; }
+  a.wl:hover { border-bottom-color: var(--link); }
+  a.wl.broken { color: var(--tag); border-bottom-style: dotted; }
+
+  .meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+  .pill { font-size: 10.5px; padding: 1px 8px; border-radius: 999px; background: var(--plane); color: var(--ink2); border: 1px solid var(--line); }
+  .pill.type { background: var(--accent-soft); color: var(--link); border-color: transparent; }
+
+  .backlinks { margin-top: 34px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .backlinks h3 { margin-top: 0; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .backlinks a { display: block; font-size: 13px; color: var(--link); text-decoration: none; padding: 3px 0; cursor: pointer; }
+
+  .results { padding: 20px 28px; max-width: 760px; margin: 0 auto; }
+  .result { padding: 9px 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+  .result h4 { margin: 0 0 2px; font-size: 15px; }
+  .result p { margin: 0; font-size: 12.5px; color: var(--ink2); }
+  .result mark { background: color-mix(in srgb, var(--accent) 25%, transparent); color: inherit; border-radius: 3px; }
+
+  #graph { width: 100%; height: 100%; display: block; cursor: grab; }
+  .graphwrap { position: relative; height: 100%; }
+  .graphhint { position: absolute; left: 14px; bottom: 12px; font-size: 11px; color: var(--muted); }
+
+  .capture { max-width: 720px; margin: 0 auto; padding: 22px 28px 80px; }
+  .capture h2 { margin-top: 0; }
+  .qcard { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin-bottom: 14px; }
+  .qcard .qnum { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; }
+  .qcard .q { font-size: 16px; font-weight: 600; margin: 3px 0 4px; }
+  .qcard .why { font-size: 12px; color: var(--ink2); margin-bottom: 9px; }
+  .qcard textarea, .qcard input {
+    width: 100%; padding: 7px 9px; font: inherit; font-size: 14px; border: 1px solid var(--line);
+    border-radius: 7px; background: var(--plane); color: var(--ink); resize: vertical;
+  }
+  .qnav { display: flex; gap: 8px; align-items: center; }
+  .btn { font: inherit; font-size: 13px; padding: 5px 13px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--ink); border-radius: 8px; cursor: pointer; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .prog { font-size: 11.5px; color: var(--muted); }
+  #capture-out { width: 100%; min-height: 320px; font-family: ui-monospace, Menlo, monospace;
+    font-size: 12.5px; line-height: 1.5; padding: 12px; border: 1px solid var(--line);
+    border-radius: 9px; background: var(--plane); color: var(--ink); }
+  .hint { font-size: 12px; color: var(--ink2); }
+  footer { padding: 5px 16px; font-size: 10.5px; color: var(--muted); background: var(--surface); border-top: 1px solid var(--line); }
+
+  @media (max-width: 820px) {
+    .main { flex-direction: column; }
+    nav { width: 100%; max-height: 34vh; border-right: 0; border-bottom: 1px solid var(--line); }
+    article, .results, .capture { padding: 16px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>STS Second Brain</h1>
+    <div class="sub" id="stats">loading vault…</div>
+  </div>
+  <input id="search" type="search" placeholder="Search notes…  (/ to focus)" autocomplete="off">
+  <div class="seg" id="viewseg">
+    <button data-v="note" class="on">Notes</button>
+    <button data-v="graph">Graph</button>
+    <button data-v="capture">Capture</button>
+  </div>
+  <button class="iconbtn" id="theme" title="Toggle theme">◐</button>
+</header>
+
+<div class="main">
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+
+<footer id="foot">
+  Markdown vault under <code>second-brain/</code> — open it directly in Obsidian. This viewer is generated from it; the notes are the source of truth.
+</footer>
+
+<script>
+/* ------------------------------------------------------------------ state */
+let VAULT = null;
+let current = null;      // slug
+let view = 'note';       // note | graph | capture
+let activeTags = new Set();
+let query = '';
+
+const $ = (id) => document.getElementById(id);
+const bySlug = () => VAULT.index;
+
+/* ------------------------------------------------------------- markdown */
+/* Small renderer. Deliberately not a library: the vault uses a narrow subset
+   of Markdown, and wikilinks need resolving against the index anyway, which a
+   generic renderer would not do. */
+function esc(s) {
+  return s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+function inline(s) {
+  s = esc(s);
+  // wikilinks first, so their contents are not mangled by emphasis rules
+  s = s.replace(/\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]/g, (_, target, label) => {
+    const slug = VAULT.names[target.trim().toLowerCase()];
+    const text = (label ?? target).trim();
+    return slug
+      ? `<a class="wl" data-go="${slug}">${text}</a>`
+      : `<a class="wl broken" title="No note called &quot;${target}&quot;">${text}</a>`;
+  });
+  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/(^|[\s(])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+  s = s.replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  return s;
+}
+
+function renderMarkdown(md) {
+  const lines = md.split('\n');
+  const out = [];
+  let i = 0;
+  let list = null;
+
+  const closeList = () => { if (list) { out.push(`</${list}>`); list = null; } };
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    if (line.startsWith('```')) {
+      closeList();
+      const lang = line.slice(3).trim();
+      const buf = [];
+      i++;
+      while (i < lines.length && !lines[i].startsWith('```')) buf.push(lines[i++]);
+      i++;
+      out.push(`<pre><code data-lang="${esc(lang)}">${esc(buf.join('\n'))}</code></pre>`);
+      continue;
+    }
+
+    // table
+    if (line.includes('|') && lines[i + 1] && /^\s*\|?[\s:|-]+\|[\s:|-]*$/.test(lines[i + 1])) {
+      closeList();
+      const cells = (r) => r.split('|').map((c) => c.trim()).filter((c, k, a) => !(c === '' && (k === 0 || k === a.length - 1)));
+      out.push('<table><thead><tr>' + cells(line).map((c) => `<th>${inline(c)}</th>`).join('') + '</tr></thead><tbody>');
+      i += 2;
+      while (i < lines.length && lines[i].includes('|')) {
+        out.push('<tr>' + cells(lines[i]).map((c) => `<td>${inline(c)}</td>`).join('') + '</tr>');
+        i++;
+      }
+      out.push('</tbody></table>');
+      continue;
+    }
+
+    const h = line.match(/^(#{1,4})\s+(.*)$/);
+    if (h) { closeList(); out.push(`<h${h[1].length}>${inline(h[2])}</h${h[1].length}>`); i++; continue; }
+
+    if (/^>\s?/.test(line)) {
+      closeList();
+      const buf = [];
+      while (i < lines.length && /^>\s?/.test(lines[i])) buf.push(lines[i++].replace(/^>\s?/, ''));
+      out.push(`<blockquote>${renderMarkdown(buf.join('\n'))}</blockquote>`);
+      continue;
+    }
+
+    const ul = line.match(/^\s*[-*]\s+(.*)$/);
+    const ol = line.match(/^\s*\d+\.\s+(.*)$/);
+    if (ul || ol) {
+      const want = ul ? 'ul' : 'ol';
+      if (list !== want) { closeList(); out.push(`<${want}>`); list = want; }
+      out.push(`<li>${inline((ul ?? ol)[1])}</li>`);
+      i++;
+      continue;
+    }
+
+    if (line.trim() === '') { closeList(); i++; continue; }
+    if (/^---+$/.test(line.trim())) { closeList(); i++; continue; }
+
+    closeList();
+    const buf = [line];
+    i++;
+    while (i < lines.length && lines[i].trim() !== '' && !/^(#{1,4}\s|>|\s*[-*]\s|\s*\d+\.\s|```)/.test(lines[i])) buf.push(lines[i++]);
+    out.push(`<p>${inline(buf.join(' '))}</p>`);
+  }
+  closeList();
+  return out.join('\n');
+}
+
+/* ------------------------------------------------------------------- nav */
+const GROUP_ORDER = ['moc', 'standard', 'material', 'method', 'decision', 'reference', 'template', 'note'];
+const GROUP_LABEL = {
+  moc: 'Maps of content', standard: 'Standards', material: 'Materials',
+  method: 'Methods', decision: 'Decisions', reference: 'Reference library',
+  template: 'Templates', note: 'Notes',
+};
+/* Any type the list above does not know about still gets a group, so a note
+   can never disappear from navigation just because its frontmatter used a word
+   this file has not seen. */
+function groupOrder(notes) {
+  const seen = [...new Set(notes.map((n) => n.type))];
+  return [...GROUP_ORDER, ...seen.filter((t) => !GROUP_ORDER.includes(t))];
+}
+
+function visibleNotes() {
+  return VAULT.notes.filter((n) => {
+    if (activeTags.size && ![...activeTags].every((t) => n.tags.includes(t))) return false;
+    return true;
+  });
+}
+
+function renderNav() {
+  const nav = $('nav');
+  const notes = visibleNotes();
+  let html = '<div class="group">Tags</div><div class="tags">';
+  for (const { tag, count } of VAULT.tags.slice(0, 22)) {
+    html += `<span class="tag ${activeTags.has(tag) ? 'on' : ''}" data-tag="${tag}">#${tag} <span class="n">${count}</span></span>`;
+  }
+  html += '</div>';
+
+  for (const g of groupOrder(notes)) {
+    const inGroup = notes.filter((n) => n.type === g);
+    if (!inGroup.length) continue;
+    html += `<div class="group">${GROUP_LABEL[g] ?? g}</div>`;
+    for (const n of inGroup.sort((a, b) => a.title.localeCompare(b.title))) {
+      html += `<a class="note ${n.slug === current ? 'active' : ''}" data-go="${n.slug}">${esc(n.title)}
+        <span class="snip">${n.backlinks.length} in · ${n.resolved.length} out</span></a>`;
+    }
+  }
+  nav.innerHTML = html;
+}
+
+/* ---------------------------------------------------------------- render */
+function renderNote(slug) {
+  const n = bySlug()[slug];
+  if (!n) return;
+  current = slug;
+  view = 'note';
+  syncViewSeg();
+
+  const meta = [
+    `<span class="pill type">${n.type}</span>`,
+    ...n.tags.map((t) => `<span class="pill" data-tag="${t}" style="cursor:pointer">#${t}</span>`),
+    n.updated ? `<span class="pill">updated ${n.updated}</span>` : '',
+    `<span class="pill">${n.path}</span>`,
+  ].join('');
+
+  const backlinks = n.backlinks.length
+    ? `<div class="backlinks"><h3>Linked from (${n.backlinks.length})</h3>` +
+      n.backlinks.map((b) => `<a data-go="${b}">← ${esc(bySlug()[b].title)}</a>`).join('') + '</div>'
+    : `<div class="backlinks"><h3>Linked from</h3><p class="hint">Nothing links here yet. An orphan note is one you will not find again — link it from a map of content.</p></div>`;
+
+  $('main').innerHTML = `<article><div class="meta">${meta}</div>${renderMarkdown(n.body)}${backlinks}</article>`;
+  $('main').scrollTop = 0;
+  renderNav();
+  location.hash = slug;
+}
+
+function renderSearch() {
+  const q = query.toLowerCase().trim();
+  const terms = q.split(/\s+/).filter(Boolean);
+  const hits = visibleNotes()
+    .map((n) => {
+      const hay = (n.title + ' ' + n.tags.join(' ') + ' ' + n.text).toLowerCase();
+      if (!terms.every((t) => hay.includes(t))) return null;
+      let score = 0;
+      for (const t of terms) {
+        if (n.title.toLowerCase().includes(t)) score += 10;
+        if (n.tags.some((x) => x.includes(t))) score += 5;
+        score += (hay.split(t).length - 1);
+      }
+      const at = n.text.toLowerCase().indexOf(terms[0]);
+      const start = Math.max(0, at - 60);
+      let snip = esc(n.text.slice(start, start + 190));
+      for (const t of terms) snip = snip.replace(new RegExp(`(${t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'ig'), '<mark>$1</mark>');
+      return { n, score, snip: (start ? '…' : '') + snip + '…' };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.score - a.score);
+
+  $('main').innerHTML =
+    `<div class="results"><p class="hint">${hits.length} note${hits.length === 1 ? '' : 's'} matching “${esc(query)}”${activeTags.size ? ' within the active tags' : ''}</p>` +
+    hits.map((h) => `<div class="result" data-go="${h.n.slug}"><h4>${esc(h.n.title)}</h4><p>${h.snip}</p></div>`).join('') +
+    (hits.length ? '' : '<p class="hint">Nothing found. Try a shorter term, or clear the tag filter.</p>') +
+    '</div>';
+}
+
+/* ----------------------------------------------------------------- graph */
+function renderGraph() {
+  view = 'graph';
+  syncViewSeg();
+  $('main').innerHTML = '<div class="graphwrap"><canvas id="graph"></canvas><div class="graphhint">drag to pan · scroll to zoom · click a node to open it</div></div>';
+  const cv = $('graph');
+  const ctx = cv.getContext('2d');
+
+  const notes = visibleNotes();
+  const allow = new Set(notes.map((n) => n.slug));
+  const nodes = notes.map((n, i) => ({
+    slug: n.slug, title: n.title, type: n.type,
+    deg: n.backlinks.length + n.resolved.length,
+    x: Math.cos((i / notes.length) * Math.PI * 2) * 200 + (Math.random() - 0.5) * 40,
+    y: Math.sin((i / notes.length) * Math.PI * 2) * 200 + (Math.random() - 0.5) * 40,
+    vx: 0, vy: 0,
+  }));
+  const idx = new Map(nodes.map((n, i) => [n.slug, i]));
+  const links = [];
+  for (const n of notes) {
+    for (const r of n.resolved) {
+      if (allow.has(r.slug)) links.push([idx.get(n.slug), idx.get(r.slug)]);
+    }
+  }
+
+  const COLOUR = {
+    moc: '#4a3aa7', standard: '#2a78d6', material: '#1baf7a',
+    method: '#eb6834', decision: '#e34948', reference: '#eda100',
+    template: '#898781', note: '#898781',
+  };
+
+  let cam = { x: 0, y: 0, k: 1 };
+  let hover = null, dragging = false, last = null;
+
+  function size() {
+    const r = cv.parentElement.getBoundingClientRect();
+    cv.width = r.width * devicePixelRatio;
+    cv.height = r.height * devicePixelRatio;
+    cv.style.width = r.width + 'px';
+    cv.style.height = r.height + 'px';
+  }
+  size();
+  const ro = new ResizeObserver(size);
+  ro.observe(cv.parentElement);
+
+  /* Force layout: repulsion between all nodes, springs along links, gentle
+     pull to centre so disconnected notes do not drift off screen. */
+  function step() {
+    for (let a = 0; a < nodes.length; a++) {
+      for (let b = a + 1; b < nodes.length; b++) {
+        const A = nodes[a], B = nodes[b];
+        let dx = B.x - A.x, dy = B.y - A.y;
+        let d2 = dx * dx + dy * dy || 0.01;
+        if (d2 > 90000) continue;
+        const f = 2600 / d2;
+        const d = Math.sqrt(d2);
+        const fx = (dx / d) * f, fy = (dy / d) * f;
+        A.vx -= fx; A.vy -= fy; B.vx += fx; B.vy += fy;
+      }
+    }
+    for (const [a, b] of links) {
+      const A = nodes[a], B = nodes[b];
+      const dx = B.x - A.x, dy = B.y - A.y;
+      const d = Math.hypot(dx, dy) || 0.01;
+      const f = (d - 90) * 0.012;
+      const fx = (dx / d) * f, fy = (dy / d) * f;
+      A.vx += fx; A.vy += fy; B.vx -= fx; B.vy -= fy;
+    }
+    for (const n of nodes) {
+      n.vx -= n.x * 0.0016; n.vy -= n.y * 0.0016;
+      n.vx *= 0.86; n.vy *= 0.86;
+      n.x += n.vx; n.y += n.vy;
+    }
+  }
+
+  const css = getComputedStyle(document.documentElement);
+  function draw() {
+    const W = cv.width, H = cv.height, dpr = devicePixelRatio;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.setTransform(cam.k * dpr, 0, 0, cam.k * dpr, W / 2 + cam.x * dpr, H / 2 + cam.y * dpr);
+
+    ctx.strokeStyle = css.getPropertyValue('--line').trim() || '#e1e0d9';
+    ctx.lineWidth = 1 / cam.k;
+    for (const [a, b] of links) {
+      const A = nodes[a], B = nodes[b];
+      const lit = hover && (A.slug === hover.slug || B.slug === hover.slug);
+      ctx.globalAlpha = lit ? 1 : 0.45;
+      ctx.strokeStyle = lit ? (css.getPropertyValue('--accent').trim() || '#2a78d6') : (css.getPropertyValue('--line').trim() || '#e1e0d9');
+      ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    ctx.font = `${12 / cam.k}px system-ui, sans-serif`;
+    ctx.textAlign = 'center';
+    for (const n of nodes) {
+      const r = 4 + Math.min(n.deg, 10) * 0.9;
+      ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = COLOUR[n.type] ?? '#898781';
+      ctx.globalAlpha = hover && hover.slug !== n.slug ? 0.4 : 1;
+      ctx.fill();
+      if (n.slug === current) { ctx.lineWidth = 2.5 / cam.k; ctx.strokeStyle = css.getPropertyValue('--ink').trim() || '#0b0b0b'; ctx.stroke(); }
+      if (cam.k > 0.65 || hover?.slug === n.slug || n.deg > 4) {
+        ctx.fillStyle = css.getPropertyValue('--ink').trim() || '#0b0b0b';
+        ctx.fillText(n.title.length > 26 ? n.title.slice(0, 25) + '…' : n.title, n.x, n.y + r + 12 / cam.k);
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  let alive = true;
+  (function loop() {
+    if (!alive || view !== 'graph') { ro.disconnect(); return; }
+    step(); draw();
+    requestAnimationFrame(loop);
+  })();
+
+  function toWorld(ev) {
+    const r = cv.getBoundingClientRect();
+    return {
+      x: (ev.clientX - r.left - r.width / 2 - cam.x) / cam.k,
+      y: (ev.clientY - r.top - r.height / 2 - cam.y) / cam.k,
+    };
+  }
+  function pick(ev) {
+    const p = toWorld(ev);
+    let best = null, bd = 14 / cam.k;
+    for (const n of nodes) {
+      const d = Math.hypot(n.x - p.x, n.y - p.y);
+      if (d < bd) { bd = d; best = n; }
+    }
+    return best;
+  }
+  cv.addEventListener('pointerdown', (e) => { dragging = true; last = e; cv.style.cursor = 'grabbing'; });
+  addEventListener('pointerup', () => { dragging = false; cv.style.cursor = 'grab'; });
+  cv.addEventListener('pointermove', (e) => {
+    if (dragging && last) { cam.x += e.clientX - last.clientX; cam.y += e.clientY - last.clientY; last = e; }
+    else { hover = pick(e); cv.style.cursor = hover ? 'pointer' : 'grab'; }
+  });
+  cv.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    cam.k = Math.max(0.25, Math.min(3, cam.k * (e.deltaY > 0 ? 0.9 : 1.1)));
+  }, { passive: false });
+  cv.addEventListener('click', (e) => { const n = pick(e); if (n) { alive = false; renderNote(n.slug); } });
+}
+
+/* --------------------------------------------------------------- capture */
+/* Reverse prompting made concrete: rather than facing an empty note, you are
+   asked for the parts that are hard to reconstruct later. The bank is fixed
+   rather than model-generated so it works offline and produces the same shape
+   every time. */
+const BANKS = {
+  'site-visit': {
+    label: 'Site inspection',
+    type: 'note',
+    tags: ['site', 'inspection'],
+    dir: 'notes',
+    questions: [
+      { k: 'site', q: 'Which site, and what was the job number?', why: 'The first thing you will search on in two years.', short: true },
+      { k: 'brief', q: 'What were you actually asked to determine?', why: 'Separates what you set out to do from what you happened to notice.' },
+      { k: 'observed', q: 'What did you see? Materials, depths, and what each depth was measured from.', why: 'A depth without its reference surface is unusable later.' },
+      { k: 'surprise', q: 'What was different from what you expected walking in?', why: 'The gap between expectation and observation is where the knowledge is. This is the question people skip.' },
+      { k: 'judgement', q: 'What call did you make that another engineer might have made differently?', why: 'Records the judgement, not just the outcome — so it can be defended or revisited.' },
+      { k: 'unknown', q: 'What could you not establish, and why?', why: 'Absence of a note reads as absence of a problem. Write the gap down.' },
+      { k: 'next', q: 'What has to happen next, and who owns it?', why: 'Turns a note into something actionable.', short: true },
+    ],
+  },
+  'lesson': {
+    label: 'Lesson learned',
+    type: 'note',
+    tags: ['lesson'],
+    dir: 'notes',
+    questions: [
+      { k: 'what', q: 'What happened?', why: 'Facts first, no interpretation yet.' },
+      { k: 'expected', q: 'What did you expect to happen instead?', why: 'A lesson is the size of the gap between these two answers.' },
+      { k: 'cause', q: 'What actually caused the gap?', why: 'Push past the first answer. The first answer is usually a symptom.' },
+      { k: 'signal', q: 'What was the earliest signal you could have caught it on?', why: 'This is the reusable part — the rest is history.' },
+      { k: 'change', q: 'What will you do differently, specifically enough that someone else could follow it?', why: '"Be more careful" is not a change.' },
+    ],
+  },
+  'decision': {
+    label: 'Decision',
+    type: 'decision',
+    tags: ['decision'],
+    dir: 'decisions',
+    questions: [
+      { k: 'decision', q: 'State the decision in one sentence, present tense.', why: 'If it takes a paragraph it is not yet a decision.', short: true },
+      { k: 'problem', q: 'What problem forced it? What went wrong, or would have?', why: 'Without the problem the decision looks arbitrary in six months.' },
+      { k: 'options', q: 'What else was on the table, and why did each lose?', why: 'Stops the rejected options being re-proposed forever.' },
+      { k: 'consequences', q: 'What does this make easy, and what does it make harder?', why: 'Both halves. A decision with no downside was not a decision.' },
+      { k: 'cost', q: 'What did you accept to get it?', why: 'If nothing was traded, check whether a real decision was made.' },
+      { k: 'revisit', q: 'What would have to change for this to be worth revisiting?', why: 'Gives the decision an expiry condition instead of an indefinite life.' },
+    ],
+  },
+  'material': {
+    label: 'Material / ground condition',
+    type: 'material',
+    tags: ['material'],
+    dir: 'materials',
+    questions: [
+      { k: 'name', q: 'What is the material, described as you would log it?', why: 'Use the logging order so the note matches the log.', short: true },
+      { k: 'where', q: 'Where does it occur, and in what typical thickness?', why: 'Turns a description into something predictive.' },
+      { k: 'behaviour', q: 'How does it behave when you work it — excavation, exposure, water?', why: 'The part that never makes it into the standard description.' },
+      { k: 'confusion', q: 'What is it commonly confused with, and how do you tell them apart?', why: 'The single most useful thing an experienced logger knows.' },
+      { k: 'source', q: 'Which project and report is this drawn from?', why: 'A figure without a source cannot be defended.', short: true },
+    ],
+  },
+};
+
+let capture = { bank: null, i: 0, answers: {}, title: '' };
+
+function renderCapture() {
+  view = 'capture';
+  syncViewSeg();
+  const m = $('main');
+
+  if (!capture.bank) {
+    m.innerHTML = `<div class="capture">
+      <h2>Capture</h2>
+      <p class="hint">Rather than starting from a blank note, pick what you are recording and answer a short set of questions. The questions aim at what is hard to reconstruct later — the surprise, the judgement call, the thing you could not establish. You get a vault-ready Markdown file at the end.</p>
+      <div class="qcard">
+        <div class="qnum">Step 1</div>
+        <div class="q">What are you capturing?</div>
+        <div class="qnav" style="flex-wrap:wrap">
+          ${Object.entries(BANKS).map(([k, b]) => `<button class="btn" data-bank="${k}">${b.label} <span class="prog">· ${b.questions.length} questions</span></button>`).join('')}
+        </div>
+      </div>
+      <p class="hint">See <a class="wl" data-go="methods/reverse-prompting">Reverse prompting</a> for why this is shaped as an interview.</p>
+    </div>`;
+    return;
+  }
+
+  const bank = BANKS[capture.bank];
+  if (capture.i >= bank.questions.length) return renderCaptureOutput();
+
+  const q = bank.questions[capture.i];
+  m.innerHTML = `<div class="capture">
+    <h2>${bank.label}</h2>
+    ${capture.i === 0 ? `<div class="qcard"><div class="qnum">Title</div><div class="q">Give this note a title</div>
+      <input id="cap-title" value="${esc(capture.title)}" placeholder="e.g. Carter St Lidcombe pier inspection"></div>` : ''}
+    <div class="qcard">
+      <div class="qnum">Question ${capture.i + 1} of ${bank.questions.length}</div>
+      <div class="q">${esc(q.q)}</div>
+      <div class="why">${esc(q.why)}</div>
+      ${q.short
+        ? `<input id="cap-in" value="${esc(capture.answers[q.k] ?? '')}">`
+        : `<textarea id="cap-in" rows="5">${esc(capture.answers[q.k] ?? '')}</textarea>`}
+    </div>
+    <div class="qnav">
+      <button class="btn" id="cap-back" ${capture.i === 0 ? 'disabled' : ''}>← Back</button>
+      <button class="btn primary" id="cap-next">${capture.i === bank.questions.length - 1 ? 'Build note' : 'Next →'}</button>
+      <button class="btn" id="cap-skip">Skip</button>
+      <span class="prog">Blank answers are left out of the note rather than filled in.</span>
+    </div>
+  </div>`;
+  const input = $('cap-in');
+  input.focus();
+  const save = () => { capture.answers[q.k] = input.value.trim(); if ($('cap-title')) capture.title = $('cap-title').value.trim(); };
+  $('cap-next').onclick = () => { save(); capture.i++; renderCapture(); };
+  $('cap-skip').onclick = () => { capture.answers[q.k] = ''; capture.i++; renderCapture(); };
+  $('cap-back').onclick = () => { save(); capture.i--; renderCapture(); };
+  input.onkeydown = (e) => {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey || q.short)) { e.preventDefault(); save(); capture.i++; renderCapture(); }
+  };
+}
+
+function slugify(s) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'untitled';
+}
+
+function renderCaptureOutput() {
+  const bank = BANKS[capture.bank];
+  const title = capture.title || bank.label;
+  const today = new Date().toISOString().slice(0, 10);
+  const answered = bank.questions.filter((q) => (capture.answers[q.k] ?? '').length);
+  const skipped = bank.questions.filter((q) => !(capture.answers[q.k] ?? '').length);
+
+  let md = `---\ntitle: ${title}\ntype: ${bank.type}\ntags: [${bank.tags.join(', ')}]\nupdated: ${today}\n---\n\n# ${title}\n\n`;
+  for (const q of answered) {
+    md += `## ${q.q.replace(/\?$/, '')}\n\n${capture.answers[q.k]}\n\n`;
+  }
+  if (skipped.length) {
+    md += `## Not yet captured\n\n${skipped.map((q) => `- ${q.q}`).join('\n')}\n\n`;
+  }
+  md += `## Related\n\n- [[Index]]\n`;
+
+  const path = `second-brain/${bank.dir}/${slugify(title)}.md`;
+  $('main').innerHTML = `<div class="capture">
+    <h2>Note ready</h2>
+    <p class="hint">Save as <code>${path}</code>, then run <code>node scripts/build-vault-index.mjs</code> and redeploy. Add <code>[[wikilinks]]</code> to connect it — an unlinked note is one you will not find again.</p>
+    <textarea id="capture-out" spellcheck="false">${esc(md)}</textarea>
+    <div class="qnav" style="margin-top:10px">
+      <button class="btn primary" id="cap-copy">Copy Markdown</button>
+      <button class="btn" id="cap-dl">Download .md</button>
+      <button class="btn" id="cap-again">Start another</button>
+      ${skipped.length ? `<span class="prog">${skipped.length} question${skipped.length === 1 ? '' : 's'} left blank — listed in the note so the gap stays visible.</span>` : ''}
+    </div>
+  </div>`;
+  $('cap-copy').onclick = async () => {
+    await navigator.clipboard.writeText($('capture-out').value);
+    $('cap-copy').textContent = 'Copied';
+    setTimeout(() => ($('cap-copy').textContent = 'Copy Markdown'), 1400);
+  };
+  $('cap-dl').onclick = () => {
+    const blob = new Blob([$('capture-out').value], { type: 'text/markdown' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = slugify(title) + '.md';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+  $('cap-again').onclick = () => { capture = { bank: null, i: 0, answers: {}, title: '' }; renderCapture(); };
+}
+
+/* ------------------------------------------------------------------ wire */
+function syncViewSeg() {
+  document.querySelectorAll('#viewseg button').forEach((b) => b.classList.toggle('on', b.dataset.v === view));
+}
+
+function route() {
+  if (query) return renderSearch();
+  if (view === 'graph') return renderGraph();
+  if (view === 'capture') return renderCapture();
+  renderNote(current ?? VAULT.notes[0].slug);
+}
+
+document.addEventListener('click', (e) => {
+  const go = e.target.closest('[data-go]');
+  if (go) { e.preventDefault(); query = ''; $('search').value = ''; renderNote(go.dataset.go); return; }
+  const tag = e.target.closest('[data-tag]');
+  if (tag) {
+    const t = tag.dataset.tag;
+    activeTags.has(t) ? activeTags.delete(t) : activeTags.add(t);
+    renderNav();
+    if (query) renderSearch(); else if (view === 'graph') renderGraph();
+    return;
+  }
+  const bank = e.target.closest('[data-bank]');
+  if (bank) { capture = { bank: bank.dataset.bank, i: 0, answers: {}, title: '' }; renderCapture(); return; }
+});
+
+$('viewseg').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  view = b.dataset.v;
+  query = ''; $('search').value = '';
+  route();
+});
+
+$('search').addEventListener('input', (e) => {
+  query = e.target.value;
+  if (query) renderSearch();
+  else route();
+});
+
+addEventListener('keydown', (e) => {
+  if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+    e.preventDefault(); $('search').focus();
+  }
+  if (e.key === 'Escape') { query = ''; $('search').value = ''; $('search').blur(); route(); }
+});
+
+$('theme').addEventListener('click', () => {
+  const r = document.documentElement;
+  const dark = r.getAttribute('data-theme')
+    ? r.getAttribute('data-theme') === 'dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  r.setAttribute('data-theme', dark ? 'light' : 'dark');
+});
+
+addEventListener('hashchange', () => {
+  const s = location.hash.slice(1);
+  if (s && bySlug()[s] && s !== current) renderNote(s);
+});
+
+/* ------------------------------------------------------------------ boot */
+fetch('vault.json')
+  .then((r) => { if (!r.ok) throw new Error('vault.json ' + r.status); return r.json(); })
+  .then((v) => {
+    VAULT = v;
+    VAULT.index = Object.fromEntries(v.notes.map((n) => [n.slug, n]));
+    VAULT.names = {};
+    for (const n of v.notes) {
+      VAULT.names[n.title.toLowerCase()] = n.slug;
+      VAULT.names[n.slug.toLowerCase()] = n.slug;
+      VAULT.names[n.slug.split('/').pop().toLowerCase()] = n.slug;
+      for (const a of n.aliases) VAULT.names[String(a).toLowerCase()] = n.slug;
+    }
+    $('stats').textContent =
+      `${v.counts.notes} notes · ${v.counts.links} links · ${v.counts.tags} tags` +
+      (v.counts.unresolved ? ` · ${v.counts.unresolved} broken` : '');
+    renderNav();
+    const start = location.hash.slice(1);
+    current = VAULT.index[start] ? start : (VAULT.index['00-index'] ? '00-index' : v.notes[0].slug);
+    route();
+  })
+  .catch((err) => {
+    $('main').innerHTML = `<div class="results"><h2>Vault not loaded</h2><p class="hint">${esc(String(err.message))}</p>
+      <p class="hint">Run <code>node scripts/build-vault-index.mjs</code> to generate <code>vault.json</code> from the Markdown.</p></div>`;
+  });
+</script>
+</body>
+</html>

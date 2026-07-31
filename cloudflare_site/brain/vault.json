@@ -1,0 +1,1227 @@
+{
+ "generated": null,
+ "vault": "second-brain",
+ "counts": {
+  "notes": 27,
+  "links": 101,
+  "tags": 41,
+  "unresolved": 0
+ },
+ "tags": [
+  {
+   "tag": "library",
+   "count": 7
+  },
+  {
+   "tag": "logging",
+   "count": 5
+  },
+  {
+   "tag": "piling",
+   "count": 5
+  },
+  {
+   "tag": "rock",
+   "count": 5
+  },
+  {
+   "tag": "standard",
+   "count": 4
+  },
+  {
+   "tag": "field",
+   "count": 3
+  },
+  {
+   "tag": "ai",
+   "count": 2
+  },
+  {
+   "tag": "bearing",
+   "count": 2
+  },
+  {
+   "tag": "decision",
+   "count": 2
+  },
+  {
+   "tag": "moc",
+   "count": 2
+  },
+  {
+   "tag": "soil",
+   "count": 2
+  },
+  {
+   "tag": "sydney-basin",
+   "count": 2
+  },
+  {
+   "tag": "template",
+   "count": 2
+  },
+  {
+   "tag": "testing",
+   "count": 2
+  },
+  {
+   "tag": "tooling",
+   "count": 2
+  },
+  {
+   "tag": "workflow",
+   "count": 2
+  },
+  {
+   "tag": "capture",
+   "count": 1
+  },
+  {
+   "tag": "conventions",
+   "count": 1
+  },
+  {
+   "tag": "foundations",
+   "count": 1
+  },
+  {
+   "tag": "founding",
+   "count": 1
+  },
+  {
+   "tag": "geometry",
+   "count": 1
+  },
+  {
+   "tag": "groundwater",
+   "count": 1
+  },
+  {
+   "tag": "inspection",
+   "count": 1
+  },
+  {
+   "tag": "levels",
+   "count": 1
+  },
+  {
+   "tag": "orchestration",
+   "count": 1
+  },
+  {
+   "tag": "parameters",
+   "count": 1
+  },
+  {
+   "tag": "pile-viewer",
+   "count": 1
+  },
+  {
+   "tag": "plt",
+   "count": 1
+  },
+  {
+   "tag": "reactive-soil",
+   "count": 1
+  },
+  {
+   "tag": "reference",
+   "count": 1
+  },
+  {
+   "tag": "reporting",
+   "count": 1
+  },
+  {
+   "tag": "residential",
+   "count": 1
+  },
+  {
+   "tag": "rms",
+   "count": 1
+  },
+  {
+   "tag": "roads",
+   "count": 1
+  },
+  {
+   "tag": "salinity",
+   "count": 1
+  },
+  {
+   "tag": "socket",
+   "count": 1
+  },
+  {
+   "tag": "strength",
+   "count": 1
+  },
+  {
+   "tag": "survey",
+   "count": 1
+  },
+  {
+   "tag": "textbook",
+   "count": 1
+  },
+  {
+   "tag": "weathering",
+   "count": 1
+  },
+  {
+   "tag": "western-sydney",
+   "count": 1
+  }
+ ],
+ "unresolved": [],
+ "notes": [
+  {
+   "slug": "00-index",
+   "path": "00-index.md",
+   "title": "Index",
+   "type": "moc",
+   "tags": [
+    "moc"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# STS Second Brain\n\nStart here. This is a map of content, not a container — every note below lives\nin its own file and links onward.\n\n## Reference library\n\n- [[Reference library]] — catalogue of the standards, papers and texts held locally\n\n## Standards\n\n- [[AS 1726 soil and rock description]] — how we describe what comes out of the ground\n- [[AS 2159 piling]] — what governs bored pier construction and acceptance\n- [[AS 2870 residential site classification]] — reactive site classes\n\n## Materials\n\n- [[Soil description order]] — the sequence we write descriptions in\n- [[Rock weathering classes]] — XW through FR, and what each means for founding\n- [[Rock strength classes]] — EL through EH and the field tests behind them\n- [[Weathered siltstone]] — the founding material on most Sydney basin jobs\n\n## Methods\n\n- [[Bored pier inspection]] — what to check and record at the base of a pier\n- [[Rock socket length]] — how socket length is specified, measured and reported\n- [[DCP testing]] — blow counts to allowable bearing pressure\n- [[Reduced levels and datums]] — RL conventions and the mistakes that follow from getting them wrong\n- [[Groundwater observations]] — what a water level in a hole does and does not tell you\n- [[Borehole log conventions]] — how our logs are laid out and why\n\n## Working with AI\n\n- [[Reverse prompting]] — hand over context, let the agent ask what it is missing\n- [[Graph engineering]] — dependency maps, the fake-edge test, diamonds and checkers\n\n## Decisions\n\n- [[Why pile data carries provenance]] — the Field state model in the pile viewer\n- [[Socket compliance is indeterminate by default]] — why unknown never reads as pass\n\n## Templates\n\n- [[Template - site inspection note]]\n- [[Template - decision]]\n",
+   "text": "STS Second Brain Start here. This is a map of content, not a container — every note below lives in its own file and links onward. Reference library Reference library — catalogue of the standards, papers and texts held locally Standards AS 1726 soil and rock description — how we describe what comes out of the ground AS 2159 piling — what governs bored pier construction and acceptance AS 2870 residential site classification — reactive site classes Materials Soil description order — the sequence we write descriptions in Rock weathering classes — XW through FR, and what each means for founding Rock strength classes — EL through EH and the field tests behind them Weathered siltstone — the founding material on most Sydney basin jobs Methods Bored pier inspection — what to check and record at the base of a pier Rock socket length — how socket length is specified, measured and reported DCP testing — blow counts to allowable bearing pressure Reduced levels and datums — RL conventions and the mistakes that follow from getting them wrong Groundwater observations — what a water level in a hole does and does not tell you Borehole log conventions — how our logs are laid out and why Working with AI Reverse prompting — hand over context, let the agent ask what it is missing Graph engineering — dependency maps, the fake edge test, diamonds and checkers Decisions Why pile data carries provenance — the Field state model in the pile viewer Socket compliance is indeterminate by default — why unknown never reads as pass Templates Template site inspection note Template decision",
+   "resolved": [
+    {
+     "slug": "library/00-library",
+     "label": "Reference library"
+    },
+    {
+     "slug": "standards/AS-1726-soil-and-rock-description",
+     "label": "AS 1726 soil and rock description"
+    },
+    {
+     "slug": "standards/AS-2159-piling",
+     "label": "AS 2159 piling"
+    },
+    {
+     "slug": "standards/AS-2870-residential-site-classification",
+     "label": "AS 2870 residential site classification"
+    },
+    {
+     "slug": "materials/soil-description-order",
+     "label": "Soil description order"
+    },
+    {
+     "slug": "materials/rock-weathering-classes",
+     "label": "Rock weathering classes"
+    },
+    {
+     "slug": "materials/rock-strength-classes",
+     "label": "Rock strength classes"
+    },
+    {
+     "slug": "materials/weathered-siltstone",
+     "label": "Weathered siltstone"
+    },
+    {
+     "slug": "methods/bored-pier-inspection",
+     "label": "Bored pier inspection"
+    },
+    {
+     "slug": "methods/rock-socket-length",
+     "label": "Rock socket length"
+    },
+    {
+     "slug": "methods/dcp-testing",
+     "label": "DCP testing"
+    },
+    {
+     "slug": "methods/reduced-levels-and-datums",
+     "label": "Reduced levels and datums"
+    },
+    {
+     "slug": "methods/groundwater-observations",
+     "label": "Groundwater observations"
+    },
+    {
+     "slug": "methods/borehole-log-conventions",
+     "label": "Borehole log conventions"
+    },
+    {
+     "slug": "methods/reverse-prompting",
+     "label": "Reverse prompting"
+    },
+    {
+     "slug": "methods/graph-engineering",
+     "label": "Graph engineering"
+    },
+    {
+     "slug": "decisions/why-pile-data-carries-provenance",
+     "label": "Why pile data carries provenance"
+    },
+    {
+     "slug": "decisions/socket-compliance-is-indeterminate-by-default",
+     "label": "Socket compliance is indeterminate by default"
+    },
+    {
+     "slug": "templates/template-site-inspection-note",
+     "label": "Template - site inspection note"
+    },
+    {
+     "slug": "templates/template-decision",
+     "label": "Template - decision"
+    }
+   ],
+   "backlinks": [
+    "methods/reverse-prompting"
+   ]
+  },
+  {
+   "slug": "decisions/socket-compliance-is-indeterminate-by-default",
+   "path": "decisions/socket-compliance-is-indeterminate-by-default.md",
+   "title": "Socket compliance is indeterminate by default",
+   "type": "decision",
+   "tags": [
+    "decision",
+    "tooling",
+    "piling"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# Socket compliance is indeterminate by default\n\n**Decision.** When the required socket length is unknown, socket compliance\nreturns `indeterminate` — never `compliant`.\n\n## Reasoning\n\nCompliance is achieved measured against required. Our inspection reports carry\nthe achieved length; the requirement lives on the structural drawing, which we\noften do not hold. A tool that defaults to pass in that situation manufactures an\nengineering conclusion out of an absence of data.\n\n`indeterminate` is a first-class answer with its own colour in the 3D scene,\ndeliberately not the same orange as a verified socket, so an unassessed pier\ncannot read as approved at a glance.\n\n## What it means in practice\n\nOn the Carter Street job all 18 inspected piers report as compliance-unknown,\nbecause the report states no required socket. That is the correct reading of the\navailable information, and it makes the missing document visible.\n\n## Related\n\n- [[Rock socket length]]\n- [[AS 2159 piling]]\n- [[Why pile data carries provenance]]\n",
+   "text": "Socket compliance is indeterminate by default Decision. When the required socket length is unknown, socket compliance returns indeterminate — never compliant . Reasoning Compliance is achieved measured against required. Our inspection reports carry the achieved length; the requirement lives on the structural drawing, which we often do not hold. A tool that defaults to pass in that situation manufactures an engineering conclusion out of an absence of data. indeterminate is a first class answer with its own colour in the 3D scene, deliberately not the same orange as a verified socket, so an unassessed pier cannot read as approved at a glance. What it means in practice On the Carter Street job all 18 inspected piers report as compliance unknown, because the report states no required socket. That is the correct reading of the available information, and it makes the missing document visible. Related Rock socket length AS 2159 piling Why pile data carries provenance",
+   "resolved": [
+    {
+     "slug": "methods/rock-socket-length",
+     "label": "Rock socket length"
+    },
+    {
+     "slug": "standards/AS-2159-piling",
+     "label": "AS 2159 piling"
+    },
+    {
+     "slug": "decisions/why-pile-data-carries-provenance",
+     "label": "Why pile data carries provenance"
+    }
+   ],
+   "backlinks": [
+    "00-index",
+    "decisions/why-pile-data-carries-provenance",
+    "methods/bored-pier-inspection",
+    "methods/graph-engineering",
+    "methods/rock-socket-length",
+    "standards/AS-2159-piling"
+   ]
+  },
+  {
+   "slug": "decisions/why-pile-data-carries-provenance",
+   "path": "decisions/why-pile-data-carries-provenance.md",
+   "title": "Why pile data carries provenance",
+   "type": "decision",
+   "tags": [
+    "decision",
+    "tooling",
+    "pile-viewer"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# Why pile data carries provenance\n\n**Decision.** Every engineering value in the pile viewer is a `Field<T>` carrying\nvalue, state, source and confidence, rather than a bare number.\n\nStates: `extracted`, `calculated`, `manual`, `inferred`, `verified`,\n`conflicting`, `missing`.\n\n## The problem it solves\n\nOnce a number is in a spreadsheet it looks like every other number. A toe level\nread off a signed report and a toe level someone estimated from a drawing render\nidentically, and by the time it matters nobody can tell which is which.\n\n## Consequences\n\n- A missing value stays missing all the way to the screen. A pile with no toe\n  level has no length — it does not have a length of zero.\n- When two sources disagree the field is `conflicting`, both values are kept, and\n  the engineer resolves it. Source priority orders them for review; it does not\n  pick a winner, because a higher-priority document is only better if it is also\n  the current revision, which the tool cannot confirm.\n- Piles missing position, levels or diameter are listed as undrawable with the\n  blocker named, rather than placed at the origin with a guessed size.\n\n## Cost\n\nMore verbose than plain numbers, and every UI component has to render a state.\nAccepted — see [[Reduced levels and datums]] for the failure mode this prevents.\n\n## Related\n\n- [[Socket compliance is indeterminate by default]]\n",
+   "text": "Why pile data carries provenance Decision. Every engineering value in the pile viewer is a Field<T carrying value, state, source and confidence, rather than a bare number. States: extracted , calculated , manual , inferred , verified , conflicting , missing . The problem it solves Once a number is in a spreadsheet it looks like every other number. A toe level read off a signed report and a toe level someone estimated from a drawing render identically, and by the time it matters nobody can tell which is which. Consequences A missing value stays missing all the way to the screen. A pile with no toe level has no length — it does not have a length of zero. When two sources disagree the field is conflicting , both values are kept, and the engineer resolves it. Source priority orders them for review; it does not pick a winner, because a higher priority document is only better if it is also the current revision, which the tool cannot confirm. Piles missing position, levels or diameter are listed as undrawable with the blocker named, rather than placed at the origin with a guessed size. Cost More verbose than plain numbers, and every UI component has to render a state. Accepted — see Reduced levels and datums for the failure mode this prevents. Related Socket compliance is indeterminate by default",
+   "resolved": [
+    {
+     "slug": "methods/reduced-levels-and-datums",
+     "label": "Reduced levels and datums"
+    },
+    {
+     "slug": "decisions/socket-compliance-is-indeterminate-by-default",
+     "label": "Socket compliance is indeterminate by default"
+    }
+   ],
+   "backlinks": [
+    "00-index",
+    "decisions/socket-compliance-is-indeterminate-by-default",
+    "library/reference-texts",
+    "methods/reduced-levels-and-datums",
+    "methods/rock-socket-length"
+   ]
+  },
+  {
+   "slug": "library/00-library",
+   "path": "library/00-library.md",
+   "title": "Reference library",
+   "type": "moc",
+   "tags": [
+    "moc",
+    "library",
+    "reference"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# Reference library\n\nA catalogue of the geotechnical reference material held locally, so it can be\nfound from the notes that use it.\n\n**These are pointers, not copies.** The standards, papers and textbooks are\nlicensed or copyright material and are not reproduced in this vault — the notes\nrecord what a document covers and where it sits, and the document itself stays\nwhere it is. Anything relied on for a job is read from the source.\n\nLocal root: `C:\\Users\\pored\\Downloads\\G materials`\n\n## By topic\n\n- [[Library - Australian Standards]] — AS series held locally\n- [[Library - RMS and TfNSW specifications]] — roads specs and test methods\n- [[Library - Pells papers on Sydney sandstone and shale]] — the local rock-socket literature\n- [[Library - plate load testing]] — PLT procedure, spreadsheets and training\n- [[Library - salinity and sodic soils]] — western Sydney salinity guidance\n- [[Library - reference texts and parameter sources]] — textbooks and correlation sources\n\n## Housekeeping notes\n\nThe root folder holds several duplicates — `AS 1726 2017` and `AS1726-2017`\nare both present, `AS3798` appears twice, and `Australian and RMS Standards/`\ncontains a second copy of the whole `Australian/` and `RMS/` trees. Two files\nare zero bytes (`CG24-0518-A Rev 1.pdf`, `CG25-0768-1, Site plan_BB.pdf`) and\nwill not open. Worth a tidy before this becomes the reference of record.\n",
+   "text": "Reference library A catalogue of the geotechnical reference material held locally, so it can be found from the notes that use it. These are pointers, not copies. The standards, papers and textbooks are licensed or copyright material and are not reproduced in this vault — the notes record what a document covers and where it sits, and the document itself stays where it is. Anything relied on for a job is read from the source. Local root: C:\\Users\\pored\\Downloads\\G materials By topic Library Australian Standards — AS series held locally Library RMS and TfNSW specifications — roads specs and test methods Library Pells papers on Sydney sandstone and shale — the local rock socket literature Library plate load testing — PLT procedure, spreadsheets and training Library salinity and sodic soils — western Sydney salinity guidance Library reference texts and parameter sources — textbooks and correlation sources Housekeeping notes The root folder holds several duplicates — AS 1726 2017 and AS1726 2017 are both present, AS3798 appears twice, and Australian and RMS Standards/ contains a second copy of the whole Australian/ and RMS/ trees. Two files are zero bytes ( CG24 0518 A Rev 1.pdf , CG25 0768 1, Site plan BB.pdf ) and will not open. Worth a tidy before this becomes the reference of record.",
+   "resolved": [
+    {
+     "slug": "library/australian-standards",
+     "label": "Library - Australian Standards"
+    },
+    {
+     "slug": "library/rms-specifications",
+     "label": "Library - RMS and TfNSW specifications"
+    },
+    {
+     "slug": "library/pells-papers",
+     "label": "Library - Pells papers on Sydney sandstone and shale"
+    },
+    {
+     "slug": "library/plate-load-testing",
+     "label": "Library - plate load testing"
+    },
+    {
+     "slug": "library/salinity",
+     "label": "Library - salinity and sodic soils"
+    },
+    {
+     "slug": "library/reference-texts",
+     "label": "Library - reference texts and parameter sources"
+    }
+   ],
+   "backlinks": [
+    "00-index"
+   ]
+  },
+  {
+   "slug": "library/australian-standards",
+   "path": "library/australian-standards.md",
+   "title": "Library - Australian Standards",
+   "type": "reference",
+   "tags": [
+    "library",
+    "standard"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# Library - Australian Standards\n\nHeld under `G materials/Australian/` (and duplicated in\n`G materials/Australian and RMS Standards/Australian/`).\n\n| Standard | Covers | Vault note |\n|---|---|---|\n| AS 1726:2017 | Geotechnical site investigations | [[AS 1726 soil and rock description]] |\n| AS 2159:2009 | Piling — design and installation | [[AS 2159 piling]] |\n| AS 2870:2011 | Residential slabs and footings | [[AS 2870 residential site classification]] |\n| AS 3798:2007 | Earthworks for commercial and residential developments | — |\n| AS 4678:2002 | Earth-retaining structures | — |\n| AS 1547:2012 | On-site domestic wastewater management (scanned) | — |\n| AS 1170.2:2011 | Wind actions | — |\n| AS 1170.4:2007 | Earthquake actions in Australia | — |\n| AS 1289.6.3.2:1997 | Dynamic cone penetrometer method | [[DCP testing]] |\n| AS 1289.6.3.3:1997 | Perth sand penetrometer method | [[DCP testing]] |\n| AS 4055:2012 | Wind loads for housing | — |\n| HB 160:2006 | Site classification handbook | [[AS 2870 residential site classification]] |\n| BS 5930 | Site investigations (British, for comparison) | — |\n\nAlso present: `nr44 Earthworks Specification.pdf`,\n`Terms-Symbols-GEOT017_10.pdf`, and\n`DES-C031 AS2870 App H Footings near trees.xlsx` — the App H spreadsheet is the\none to reach for when a tree is close to a footing.\n\n> Copyright material. Clause references in this vault are pointers; the wording\n> stays in the standard.\n",
+   "text": "Library Australian Standards Held under G materials/Australian/ (and duplicated in G materials/Australian and RMS Standards/Australian/ ). Standard Covers Vault note AS 1726:2017 Geotechnical site investigations AS 1726 soil and rock description AS 2159:2009 Piling — design and installation AS 2159 piling AS 2870:2011 Residential slabs and footings AS 2870 residential site classification AS 3798:2007 Earthworks for commercial and residential developments — AS 4678:2002 Earth retaining structures — AS 1547:2012 On site domestic wastewater management (scanned) — AS 1170.2:2011 Wind actions — AS 1170.4:2007 Earthquake actions in Australia — AS 1289.6.3.2:1997 Dynamic cone penetrometer method DCP testing AS 1289.6.3.3:1997 Perth sand penetrometer method DCP testing AS 4055:2012 Wind loads for housing — HB 160:2006 Site classification handbook AS 2870 residential site classification BS 5930 Site investigations (British, for comparison) — Also present: nr44 Earthworks Specification.pdf , Terms Symbols GEOT017 10.pdf , and DES C031 AS2870 App H Footings near trees.xlsx — the App H spreadsheet is the one to reach for when a tree is close to a footing. Copyright material. Clause references in this vault are pointers; the wording stays in the standard.",
+   "resolved": [
+    {
+     "slug": "standards/AS-1726-soil-and-rock-description",
+     "label": "AS 1726 soil and rock description"
+    },
+    {
+     "slug": "standards/AS-2159-piling",
+     "label": "AS 2159 piling"
+    },
+    {
+     "slug": "standards/AS-2870-residential-site-classification",
+     "label": "AS 2870 residential site classification"
+    },
+    {
+     "slug": "methods/dcp-testing",
+     "label": "DCP testing"
+    }
+   ],
+   "backlinks": [
+    "library/00-library"
+   ]
+  },
+  {
+   "slug": "library/pells-papers",
+   "path": "library/pells-papers.md",
+   "title": "Library - Pells papers on Sydney sandstone and shale",
+   "type": "reference",
+   "tags": [
+    "library",
+    "rock",
+    "sydney-basin",
+    "piling"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# Library - Pells papers on Sydney sandstone and shale\n\n`G materials/Pells Paper/`. The local literature behind how sockets in Sydney\nsandstone and shale are classified and designed — directly relevant to\n[[Rock socket length]] and [[Weathered siltstone]].\n\n| Paper | Why it matters |\n|---|---|\n| Pells, Mostyn & Wong (2019) — Classification of sandstones and shales in the Sydney region | The classification scheme used locally to describe Sydney basin rock |\n| Pells — The design of socketed piles in rock | Socket design method, side resistance and end bearing |\n| Pells — Bored piles socketed into shale and sandstone | Field behaviour of sockets in the local materials |\n| Pells — Foundations on sandstone and shale in the Sydney region | Founding practice across the basin |\n| Substance and mass properties for the design of engineering structures in the Hawkesbury Sandstone | Intact vs mass properties — the distinction that matters for defect-controlled rock |\n\n## What to take from these\n\nIntact strength and mass behaviour diverge in bedded rock, which is the point\nmade in [[Rock strength classes]]. A socket in shale that rates medium on hand\nspecimens can be governed by bedding partings rather than intact strength.\n\n> Copyright papers. Cite them, do not paste them.\n",
+   "text": "Library Pells papers on Sydney sandstone and shale G materials/Pells Paper/ . The local literature behind how sockets in Sydney sandstone and shale are classified and designed — directly relevant to Rock socket length and Weathered siltstone. Paper Why it matters Pells, Mostyn & Wong (2019) — Classification of sandstones and shales in the Sydney region The classification scheme used locally to describe Sydney basin rock Pells — The design of socketed piles in rock Socket design method, side resistance and end bearing Pells — Bored piles socketed into shale and sandstone Field behaviour of sockets in the local materials Pells — Foundations on sandstone and shale in the Sydney region Founding practice across the basin Substance and mass properties for the design of engineering structures in the Hawkesbury Sandstone Intact vs mass properties — the distinction that matters for defect controlled rock What to take from these Intact strength and mass behaviour diverge in bedded rock, which is the point made in Rock strength classes. A socket in shale that rates medium on hand specimens can be governed by bedding partings rather than intact strength. Copyright papers. Cite them, do not paste them.",
+   "resolved": [
+    {
+     "slug": "methods/rock-socket-length",
+     "label": "Rock socket length"
+    },
+    {
+     "slug": "materials/weathered-siltstone",
+     "label": "Weathered siltstone"
+    },
+    {
+     "slug": "materials/rock-strength-classes",
+     "label": "Rock strength classes"
+    }
+   ],
+   "backlinks": [
+    "library/00-library"
+   ]
+  },
+  {
+   "slug": "library/plate-load-testing",
+   "path": "library/plate-load-testing.md",
+   "title": "Library - plate load testing",
+   "type": "reference",
+   "tags": [
+    "library",
+    "testing",
+    "plt",
+    "bearing"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# Library - plate load testing\n\n`G materials/Plate Load Testing/`. Procedure, computation spreadsheets and\ntraining for the light and dynamic plate load kit.\n\n| File | What it is |\n|---|---|\n| `050-Setup Proceedure for PLT Draft 4 Feb 2024.docx/.pdf` | Our setup procedure — draft status, check before relying on it |\n| `ax_v80_en.xltm` | Manufacturer computation template |\n| `AX01a recommended Loading Stages 6/7.xlsx` | Loading stage schedules |\n| `PLT Calculations for AX01a.pdf`, `Calculations.pdf` | Worked computation |\n| `Relationship Between Ev2 and Evd.xlsx` | Static-to-dynamic modulus correlation |\n| `AX01 Sample Results with GPS.pdf/.xlsm` | Sample output with positions |\n| `BedAnlAx01a_engl V40a.pdf` | Equipment manual |\n| `PLT Training Presentation.pptx`, `PLT Electronic Menu Structure Training.pptx` | Training |\n\n## Caution\n\nThe Ev2/Evd relationship is a correlation, not an identity, and it is\nmaterial-dependent. Reporting a dynamic result as if it were a static modulus\nwithout stating the correlation is the same class of error described in\n[[DCP testing]].\n\n## Related\n\n- [[Library - reference texts and parameter sources]]\n",
+   "text": "Library plate load testing G materials/Plate Load Testing/ . Procedure, computation spreadsheets and training for the light and dynamic plate load kit. File What it is 050 Setup Proceedure for PLT Draft 4 Feb 2024.docx/.pdf Our setup procedure — draft status, check before relying on it ax v80 en.xltm Manufacturer computation template AX01a recommended Loading Stages 6/7.xlsx Loading stage schedules PLT Calculations for AX01a.pdf , Calculations.pdf Worked computation Relationship Between Ev2 and Evd.xlsx Static to dynamic modulus correlation AX01 Sample Results with GPS.pdf/.xlsm Sample output with positions BedAnlAx01a engl V40a.pdf Equipment manual PLT Training Presentation.pptx , PLT Electronic Menu Structure Training.pptx Training Caution The Ev2/Evd relationship is a correlation, not an identity, and it is material dependent. Reporting a dynamic result as if it were a static modulus without stating the correlation is the same class of error described in DCP testing. Related Library reference texts and parameter sources",
+   "resolved": [
+    {
+     "slug": "methods/dcp-testing",
+     "label": "DCP testing"
+    },
+    {
+     "slug": "library/reference-texts",
+     "label": "Library - reference texts and parameter sources"
+    }
+   ],
+   "backlinks": [
+    "library/00-library",
+    "library/reference-texts"
+   ]
+  },
+  {
+   "slug": "library/reference-texts",
+   "path": "library/reference-texts.md",
+   "title": "Library - reference texts and parameter sources",
+   "type": "reference",
+   "tags": [
+    "library",
+    "parameters",
+    "textbook"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# Library - reference texts and parameter sources\n\nWhere a parameter comes from when it is not measured on the job. Every value\ntaken from here is a published correlation, not a site measurement, and is\nrecorded as such — see [[Why pile data carries provenance]].\n\n| Source | Use |\n|---|---|\n| Look, *Handbook of Geotechnical Investigation and Design Tables* (2014) | First stop for indicative parameters and correlations |\n| `Correlations of Soil Properties.pdf` | Correlation compendium |\n| `8 Determination of Geotechnical Parameters.pdf` | Parameter selection method |\n| Schnaid, *In Situ Testing in Geomechanics* | Interpreting in-situ tests |\n| Das, *Principles of Geotechnical Engineering* (8th ed.) | General reference |\n| Lambe & Whitman, *Soil Mechanics* | Fundamentals |\n| `SPT direct methods for prediction of pile bearing capacity...pdf` | SPT-to-pile-capacity methods |\n| `Munsell Color Chart.pdf` | Colour description — pair with [[Soil description order]] |\n| `Shallow Bearing Capacity - Various Methods and Settlement Rev 4.xltm` | Our bearing capacity spreadsheet |\n| `Earth pressure calculations.xlsx` | Retaining wall pressures |\n| `Working Platforms for tracked plant.pdf` | Working platform design for piling rigs |\n\n## The discipline that matters here\n\nA correlation is valid for the material and test it was derived from. Carrying\nan SPT-based capacity into a rock socket, or a sand correlation into clay,\nproduces a confident number with no basis. State the source and the assumed\nmaterial whenever one of these is used.\n\n## Related\n\n- [[DCP testing]]\n- [[Library - plate load testing]]\n",
+   "text": "Library reference texts and parameter sources Where a parameter comes from when it is not measured on the job. Every value taken from here is a published correlation, not a site measurement, and is recorded as such — see Why pile data carries provenance. Source Use Look, Handbook of Geotechnical Investigation and Design Tables (2014) First stop for indicative parameters and correlations Correlations of Soil Properties.pdf Correlation compendium 8 Determination of Geotechnical Parameters.pdf Parameter selection method Schnaid, In Situ Testing in Geomechanics Interpreting in situ tests Das, Principles of Geotechnical Engineering (8th ed.) General reference Lambe & Whitman, Soil Mechanics Fundamentals SPT direct methods for prediction of pile bearing capacity...pdf SPT to pile capacity methods Munsell Color Chart.pdf Colour description — pair with Soil description order Shallow Bearing Capacity Various Methods and Settlement Rev 4.xltm Our bearing capacity spreadsheet Earth pressure calculations.xlsx Retaining wall pressures Working Platforms for tracked plant.pdf Working platform design for piling rigs The discipline that matters here A correlation is valid for the material and test it was derived from. Carrying an SPT based capacity into a rock socket, or a sand correlation into clay, produces a confident number with no basis. State the source and the assumed material whenever one of these is used. Related DCP testing Library plate load testing",
+   "resolved": [
+    {
+     "slug": "decisions/why-pile-data-carries-provenance",
+     "label": "Why pile data carries provenance"
+    },
+    {
+     "slug": "materials/soil-description-order",
+     "label": "Soil description order"
+    },
+    {
+     "slug": "methods/dcp-testing",
+     "label": "DCP testing"
+    },
+    {
+     "slug": "library/plate-load-testing",
+     "label": "Library - plate load testing"
+    }
+   ],
+   "backlinks": [
+    "library/00-library",
+    "library/plate-load-testing"
+   ]
+  },
+  {
+   "slug": "library/rms-specifications",
+   "path": "library/rms-specifications.md",
+   "title": "Library - RMS and TfNSW specifications",
+   "type": "reference",
+   "tags": [
+    "library",
+    "rms",
+    "roads"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# Library - RMS and TfNSW specifications\n\nHeld under `G materials/RMS/` and `G materials/Australian and RMS Standards/`.\n\nSpecifications and test methods carried by file code rather than title, which\nmakes them hard to find without an index — hence this note.\n\n| File | What it is |\n|---|---|\n| `R44_E3_R15.pdf`, `r044.pdf` | Earthworks specification (R44) |\n| `r011.pdf` | Stormwater drainage |\n| `r057.pdf` | Design of reinforced soil walls |\n| `RMS Spec D & C R63.pdf` | Design and construct R63 |\n| `b030.pdf` | Bridge works |\n| `dc_r071.pdf` | Design and construct R71 |\n| `t108.pdf`, `t117a.pdf`, `t132.pdf` | RMS test methods |\n| `RTA 3051.pdf` | RTA specification 3051 |\n| `R64 index.pdf`, `index.pdf` | Specification indexes — start here |\n| `gtd-2020-001.pdf`, `RMS_ Attachment A_ GTD 2012-01.pdf` | Geotechnical design guidance |\n| `guideline-geotechnical.pdf` | Geotechnical guideline |\n| `guideline-for-batter-surface-stabilisation-using-vegetation.pdf` | Batter stabilisation |\n| `vibrationguide0643.pdf`, `Planning-...-Noise-and-Vibration-Strategy-ST-157.pdf` | Construction noise and vibration |\n| `TS 02088_0.00_Trenchless Excavation...pdf` | Trenchless work in road easements |\n\n## Related\n\n- [[Borehole log conventions]]\n",
+   "text": "Library RMS and TfNSW specifications Held under G materials/RMS/ and G materials/Australian and RMS Standards/ . Specifications and test methods carried by file code rather than title, which makes them hard to find without an index — hence this note. File What it is R44 E3 R15.pdf , r044.pdf Earthworks specification (R44) r011.pdf Stormwater drainage r057.pdf Design of reinforced soil walls RMS Spec D & C R63.pdf Design and construct R63 b030.pdf Bridge works dc r071.pdf Design and construct R71 t108.pdf , t117a.pdf , t132.pdf RMS test methods RTA 3051.pdf RTA specification 3051 R64 index.pdf , index.pdf Specification indexes — start here gtd 2020 001.pdf , RMS Attachment A GTD 2012 01.pdf Geotechnical design guidance guideline geotechnical.pdf Geotechnical guideline guideline for batter surface stabilisation using vegetation.pdf Batter stabilisation vibrationguide0643.pdf , Planning ... Noise and Vibration Strategy ST 157.pdf Construction noise and vibration TS 02088 0.00 Trenchless Excavation...pdf Trenchless work in road easements Related Borehole log conventions",
+   "resolved": [
+    {
+     "slug": "methods/borehole-log-conventions",
+     "label": "Borehole log conventions"
+    }
+   ],
+   "backlinks": [
+    "library/00-library"
+   ]
+  },
+  {
+   "slug": "library/salinity",
+   "path": "library/salinity.md",
+   "title": "Library - salinity and sodic soils",
+   "type": "reference",
+   "tags": [
+    "library",
+    "salinity",
+    "western-sydney"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# Library - salinity and sodic soils\n\n`G materials/Soil salinity and textural classification/`. Western Sydney\nsalinity is a routine issue on residential work and drives both site\nclassification and concrete durability recommendations.\n\n| File | What it is |\n|---|---|\n| `salinity-potential-western-sydney-map-2002.pdf` | Regional salinity potential mapping |\n| `booklet3siteinvestigationsforurbansalinity (2).pdf` | Investigating urban salinity |\n| `booklet5new.pdf` | Salinity management booklet |\n| `building-in-saline-environment-080145.pdf` | Building in saline environments |\n| `INDUSTRY_GUIDE_T56_Residential_Slabs_and_Footings_in_Saline_Environments.pdf` | Slabs and footings in saline ground |\n| `Salinity and textural classification.pdf` | Textural classification |\n| `Sodic-soil-management.pdf` | Sodic soil management |\n| `roads-and-salinity.pdf`, `Techniques-to-use-on-roads-affected-by-salinity.pdf` | Salinity effects on pavements |\n\nReport templates using this material sit at\n`G materials/CG25-0XX-A Rev 0 SITE CLASS AND SALINITY REPORT.doc`.\n\n## Related\n\n- [[AS 2870 residential site classification]]\n",
+   "text": "Library salinity and sodic soils G materials/Soil salinity and textural classification/ . Western Sydney salinity is a routine issue on residential work and drives both site classification and concrete durability recommendations. File What it is salinity potential western sydney map 2002.pdf Regional salinity potential mapping booklet3siteinvestigationsforurbansalinity (2).pdf Investigating urban salinity booklet5new.pdf Salinity management booklet building in saline environment 080145.pdf Building in saline environments INDUSTRY GUIDE T56 Residential Slabs and Footings in Saline Environments.pdf Slabs and footings in saline ground Salinity and textural classification.pdf Textural classification Sodic soil management.pdf Sodic soil management roads and salinity.pdf , Techniques to use on roads affected by salinity.pdf Salinity effects on pavements Report templates using this material sit at G materials/CG25 0XX A Rev 0 SITE CLASS AND SALINITY REPORT.doc . Related AS 2870 residential site classification",
+   "resolved": [
+    {
+     "slug": "standards/AS-2870-residential-site-classification",
+     "label": "AS 2870 residential site classification"
+    }
+   ],
+   "backlinks": [
+    "library/00-library"
+   ]
+  },
+  {
+   "slug": "materials/rock-strength-classes",
+   "path": "materials/rock-strength-classes.md",
+   "title": "Rock strength classes",
+   "type": "material",
+   "tags": [
+    "logging",
+    "rock",
+    "strength"
+   ],
+   "aliases": [
+    "rock strength",
+    "EL",
+    "VL",
+    "L",
+    "M",
+    "H",
+    "VH",
+    "EH"
+   ],
+   "updated": "2026-07-29",
+   "body": "\n# Rock strength classes\n\nField estimates of unconfined compressive strength, per\n[[AS 1726 soil and rock description]]. Assessed with a geological pick and\nhand pressure, and recorded as an estimate — a field class is not a laboratory\nUCS result and should never be reported as one.\n\n| Class | Approx. UCS | Field behaviour |\n|---|---|---|\n| EL — extremely low | < 0.6 MPa | Crumbles under firm hand pressure |\n| VL — very low | 0.6–2 MPa | Peels with a knife; deep pick indentation |\n| L — low | 2–6 MPa | Pick indents; cannot be peeled |\n| M — medium | 6–20 MPa | Shallow pick indentation |\n| H — high | 20–60 MPa | Hand specimen breaks with one firm hammer blow |\n| VH — very high | 60–200 MPa | Several blows to break |\n| EH — extremely high | > 200 MPa | Chips only |\n\n## The judgement to be careful with\n\nStrength varies with moisture and with defect spacing. A tightly bedded siltstone\ncan rate medium on intact fragments and behave far weaker as a mass because it\nparts along bedding. Log the defects as well as the intact strength.\n\n## Related\n\n- [[Rock weathering classes]]\n- [[Rock socket length]]\n",
+   "text": "Rock strength classes Field estimates of unconfined compressive strength, per AS 1726 soil and rock description. Assessed with a geological pick and hand pressure, and recorded as an estimate — a field class is not a laboratory UCS result and should never be reported as one. Class Approx. UCS Field behaviour EL — extremely low < 0.6 MPa Crumbles under firm hand pressure VL — very low 0.6–2 MPa Peels with a knife; deep pick indentation L — low 2–6 MPa Pick indents; cannot be peeled M — medium 6–20 MPa Shallow pick indentation H — high 20–60 MPa Hand specimen breaks with one firm hammer blow VH — very high 60–200 MPa Several blows to break EH — extremely high 200 MPa Chips only The judgement to be careful with Strength varies with moisture and with defect spacing. A tightly bedded siltstone can rate medium on intact fragments and behave far weaker as a mass because it parts along bedding. Log the defects as well as the intact strength. Related Rock weathering classes Rock socket length",
+   "resolved": [
+    {
+     "slug": "standards/AS-1726-soil-and-rock-description",
+     "label": "AS 1726 soil and rock description"
+    },
+    {
+     "slug": "materials/rock-weathering-classes",
+     "label": "Rock weathering classes"
+    },
+    {
+     "slug": "methods/rock-socket-length",
+     "label": "Rock socket length"
+    }
+   ],
+   "backlinks": [
+    "00-index",
+    "library/pells-papers",
+    "materials/rock-weathering-classes",
+    "methods/bored-pier-inspection",
+    "methods/borehole-log-conventions",
+    "standards/AS-1726-soil-and-rock-description"
+   ]
+  },
+  {
+   "slug": "materials/rock-weathering-classes",
+   "path": "materials/rock-weathering-classes.md",
+   "title": "Rock weathering classes",
+   "type": "material",
+   "tags": [
+    "logging",
+    "rock",
+    "weathering"
+   ],
+   "aliases": [
+    "weathering",
+    "XW",
+    "HW",
+    "MW",
+    "SW",
+    "FR"
+   ],
+   "updated": "2026-07-29",
+   "body": "\n# Rock weathering classes\n\nPer [[AS 1726 soil and rock description]], in decreasing order of weathering:\n\n- **RS** — residual soil. Soil texture; original fabric destroyed.\n- **XW** — extremely weathered. Has soil strength but rock fabric survives.\n- **HW** — highly weathered. Discoloured throughout, strength much reduced.\n- **MW** — moderately weathered. Discoloured, partly reduced strength.\n- **SW** — slightly weathered. Slight discolouration, strength near fresh.\n- **FR** — fresh. No visible weathering.\n\n## Where the founding decision sits\n\nFor bored piers, the usual requirement is founding in rock that is at worst\nmoderately weathered and of a stated minimum strength — weathering class alone\ndoes not carry the requirement. XW material can look convincingly like rock in\nthe base of a pier and still behave as a stiff soil. Class it honestly and pair\nit with a strength assessment; see [[Rock strength classes]].\n\n## Related\n\n- [[Weathered siltstone]]\n- [[Bored pier inspection]]\n",
+   "text": "Rock weathering classes Per AS 1726 soil and rock description, in decreasing order of weathering: RS — residual soil. Soil texture; original fabric destroyed. XW — extremely weathered. Has soil strength but rock fabric survives. HW — highly weathered. Discoloured throughout, strength much reduced. MW — moderately weathered. Discoloured, partly reduced strength. SW — slightly weathered. Slight discolouration, strength near fresh. FR — fresh. No visible weathering. Where the founding decision sits For bored piers, the usual requirement is founding in rock that is at worst moderately weathered and of a stated minimum strength — weathering class alone does not carry the requirement. XW material can look convincingly like rock in the base of a pier and still behave as a stiff soil. Class it honestly and pair it with a strength assessment; see Rock strength classes. Related Weathered siltstone Bored pier inspection",
+   "resolved": [
+    {
+     "slug": "standards/AS-1726-soil-and-rock-description",
+     "label": "AS 1726 soil and rock description"
+    },
+    {
+     "slug": "materials/rock-strength-classes",
+     "label": "Rock strength classes"
+    },
+    {
+     "slug": "materials/weathered-siltstone",
+     "label": "Weathered siltstone"
+    },
+    {
+     "slug": "methods/bored-pier-inspection",
+     "label": "Bored pier inspection"
+    }
+   ],
+   "backlinks": [
+    "00-index",
+    "materials/rock-strength-classes",
+    "materials/soil-description-order",
+    "materials/weathered-siltstone",
+    "methods/bored-pier-inspection",
+    "methods/borehole-log-conventions",
+    "standards/AS-1726-soil-and-rock-description"
+   ]
+  },
+  {
+   "slug": "materials/soil-description-order",
+   "path": "materials/soil-description-order.md",
+   "title": "Soil description order",
+   "type": "material",
+   "tags": [
+    "logging",
+    "soil"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# Soil description order\n\nThe sequence a soil description is written in, per [[AS 1726 soil and rock description]].\n\n**SOIL NAME: plasticity or particle characteristics, colour, secondary\ncomponents, structure, consistency or density, moisture, origin**\n\nExample as logged: `CLAY: high plasticity, pale grey mottled red-orange, trace\nfine sand, stiff, moist, residual`\n\n## Why the order is fixed\n\nLogs are read as a column, scanned for change. Putting the governing material\nfirst means the eye catches the boundary. Everything after it is qualification.\n\n## Consistency vs density\n\nConsistency terms (very soft, soft, firm, stiff, very stiff, hard) are for\ncohesive soils. Density index terms (very loose, loose, medium dense, dense,\nvery dense) are for granular soils. Mixing the two — \"dense clay\" — is a logging\nerror that will be picked up in review.\n\n## Related\n\n- [[Rock weathering classes]]\n- [[Borehole log conventions]]\n",
+   "text": "Soil description order The sequence a soil description is written in, per AS 1726 soil and rock description. SOIL NAME: plasticity or particle characteristics, colour, secondary components, structure, consistency or density, moisture, origin Example as logged: CLAY: high plasticity, pale grey mottled red orange, trace fine sand, stiff, moist, residual Why the order is fixed Logs are read as a column, scanned for change. Putting the governing material first means the eye catches the boundary. Everything after it is qualification. Consistency vs density Consistency terms (very soft, soft, firm, stiff, very stiff, hard) are for cohesive soils. Density index terms (very loose, loose, medium dense, dense, very dense) are for granular soils. Mixing the two — \"dense clay\" — is a logging error that will be picked up in review. Related Rock weathering classes Borehole log conventions",
+   "resolved": [
+    {
+     "slug": "standards/AS-1726-soil-and-rock-description",
+     "label": "AS 1726 soil and rock description"
+    },
+    {
+     "slug": "materials/rock-weathering-classes",
+     "label": "Rock weathering classes"
+    },
+    {
+     "slug": "methods/borehole-log-conventions",
+     "label": "Borehole log conventions"
+    }
+   ],
+   "backlinks": [
+    "00-index",
+    "library/reference-texts",
+    "methods/borehole-log-conventions",
+    "standards/AS-1726-soil-and-rock-description",
+    "standards/AS-2870-residential-site-classification"
+   ]
+  },
+  {
+   "slug": "materials/weathered-siltstone",
+   "path": "materials/weathered-siltstone.md",
+   "title": "Weathered siltstone",
+   "type": "material",
+   "tags": [
+    "rock",
+    "sydney-basin",
+    "founding"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# Weathered siltstone\n\nThe material most of our western Sydney bored piers found on. Ashfield Shale and\nrelated Wianamatta Group siltstones, weathered from the surface down.\n\n## Typical profile\n\nResidual high-plasticity silty clay, pale grey mottled red-orange, roughly\n0.0–1.2 m thick, over extremely to moderately weathered siltstone. Rockhead is\noften gradational rather than a clean surface, which is why proving it needs the\npier base inspected rather than a depth called from a nearby borehole.\n\n*Source: STS report 26/0988, 24-26 Carter Street Lidcombe, 18 piers inspected\n27 Jul 2026 — piers founded 1.8–3.3 m below platform with sockets 0.6–2.0 m.*\n\n## What to watch\n\n- Slaking. Exposed siltstone softens quickly once wet, which is the reason\n  [[AS 2159 piling]] wants concrete placed promptly.\n- The XW/HW boundary is where most disagreements happen. See\n  [[Rock weathering classes]].\n\n## Related\n\n- [[Bored pier inspection]]\n",
+   "text": "Weathered siltstone The material most of our western Sydney bored piers found on. Ashfield Shale and related Wianamatta Group siltstones, weathered from the surface down. Typical profile Residual high plasticity silty clay, pale grey mottled red orange, roughly 0.0–1.2 m thick, over extremely to moderately weathered siltstone. Rockhead is often gradational rather than a clean surface, which is why proving it needs the pier base inspected rather than a depth called from a nearby borehole. Source: STS report 26/0988, 24 26 Carter Street Lidcombe, 18 piers inspected 27 Jul 2026 — piers founded 1.8–3.3 m below platform with sockets 0.6–2.0 m. What to watch Slaking. Exposed siltstone softens quickly once wet, which is the reason AS 2159 piling wants concrete placed promptly. The XW/HW boundary is where most disagreements happen. See Rock weathering classes. Related Bored pier inspection",
+   "resolved": [
+    {
+     "slug": "standards/AS-2159-piling",
+     "label": "AS 2159 piling"
+    },
+    {
+     "slug": "materials/rock-weathering-classes",
+     "label": "Rock weathering classes"
+    },
+    {
+     "slug": "methods/bored-pier-inspection",
+     "label": "Bored pier inspection"
+    }
+   ],
+   "backlinks": [
+    "00-index",
+    "library/pells-papers",
+    "materials/rock-weathering-classes",
+    "methods/rock-socket-length",
+    "standards/AS-1726-soil-and-rock-description"
+   ]
+  },
+  {
+   "slug": "methods/bored-pier-inspection",
+   "path": "methods/bored-pier-inspection.md",
+   "title": "Bored pier inspection",
+   "type": "method",
+   "tags": [
+    "field",
+    "piling",
+    "inspection"
+   ],
+   "aliases": [
+    "pier inspection",
+    "pile inspection"
+   ],
+   "updated": "2026-07-29",
+   "body": "\n# Bored pier inspection\n\nWhat gets checked and recorded at the base of a bored pier before concrete.\n\n## On site\n\n1. Confirm the pier reference against the [[Borehole log conventions|structural drawing]] — pier tag, not just position.\n2. Record depth to founding level and depth to rockhead, both below the working platform.\n3. Describe the founding material: [[Rock weathering classes|weathering]], [[Rock strength classes|strength]], defects.\n4. Measure the achieved socket — see [[Rock socket length]].\n5. Confirm the base is clean and free of loose or softened material.\n6. Note groundwater — see [[Groundwater observations]].\n7. Photograph the base with the pier tag visible in frame.\n\n## What the report can and cannot say\n\nIt can say the exposed material was competent and consistent with the design\nassumption at the time of inspection. It cannot certify the pile. Acceptance\nagainst the design requirement needs the required socket length from the\napproved drawing, which the inspection report often does not carry — see\n[[Socket compliance is indeterminate by default]].\n\n## The recurring failure\n\nReporting a depth without the platform level it was measured from. A depth below\nground is not a level, and once the platform is cut or filled the number means\nnothing. See [[Reduced levels and datums]].\n\n## Related\n\n- [[AS 2159 piling]]\n",
+   "text": "Bored pier inspection What gets checked and recorded at the base of a bored pier before concrete. On site 1. Confirm the pier reference against the structural drawingBorehole log conventions — pier tag, not just position. 2. Record depth to founding level and depth to rockhead, both below the working platform. 3. Describe the founding material: weatheringRock weathering classes, strengthRock strength classes, defects. 4. Measure the achieved socket — see Rock socket length. 5. Confirm the base is clean and free of loose or softened material. 6. Note groundwater — see Groundwater observations. 7. Photograph the base with the pier tag visible in frame. What the report can and cannot say It can say the exposed material was competent and consistent with the design assumption at the time of inspection. It cannot certify the pile. Acceptance against the design requirement needs the required socket length from the approved drawing, which the inspection report often does not carry — see Socket compliance is indeterminate by default. The recurring failure Reporting a depth without the platform level it was measured from. A depth below ground is not a level, and once the platform is cut or filled the number means nothing. See Reduced levels and datums. Related AS 2159 piling",
+   "resolved": [
+    {
+     "slug": "methods/borehole-log-conventions",
+     "label": "structural drawing"
+    },
+    {
+     "slug": "materials/rock-weathering-classes",
+     "label": "weathering"
+    },
+    {
+     "slug": "materials/rock-strength-classes",
+     "label": "strength"
+    },
+    {
+     "slug": "methods/rock-socket-length",
+     "label": "Rock socket length"
+    },
+    {
+     "slug": "methods/groundwater-observations",
+     "label": "Groundwater observations"
+    },
+    {
+     "slug": "decisions/socket-compliance-is-indeterminate-by-default",
+     "label": "Socket compliance is indeterminate by default"
+    },
+    {
+     "slug": "methods/reduced-levels-and-datums",
+     "label": "Reduced levels and datums"
+    },
+    {
+     "slug": "standards/AS-2159-piling",
+     "label": "AS 2159 piling"
+    }
+   ],
+   "backlinks": [
+    "00-index",
+    "materials/rock-weathering-classes",
+    "materials/weathered-siltstone",
+    "methods/groundwater-observations",
+    "methods/rock-socket-length",
+    "standards/AS-2159-piling"
+   ]
+  },
+  {
+   "slug": "methods/borehole-log-conventions",
+   "path": "methods/borehole-log-conventions.md",
+   "title": "Borehole log conventions",
+   "type": "method",
+   "tags": [
+    "logging",
+    "reporting"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# Borehole log conventions\n\nHow our logs are laid out, and the reasons behind the layout.\n\n## Columns\n\nDepth scale, graphic log, material description, sampling and in-situ tests,\nwater, and remarks. The depth scale runs downward with the description beside\nit, so a reader scanning for a boundary tracks one column.\n\n## Description\n\nPer [[Soil description order]] for soil and the weathering plus strength pairing\nfor rock — [[Rock weathering classes]], [[Rock strength classes]].\n\n## What must appear on every log\n\n- Hole reference, and the method and rig used.\n- Surface RL and its datum, or an explicit note that it is assumed. See\n  [[Reduced levels and datums]].\n- Date drilled and who logged it.\n- Groundwater observations with timing — [[Groundwater observations]].\n- Where the log was terminated and why: target depth, refusal, or obstruction.\n\n## Related\n\n- [[AS 1726 soil and rock description]]\n",
+   "text": "Borehole log conventions How our logs are laid out, and the reasons behind the layout. Columns Depth scale, graphic log, material description, sampling and in situ tests, water, and remarks. The depth scale runs downward with the description beside it, so a reader scanning for a boundary tracks one column. Description Per Soil description order for soil and the weathering plus strength pairing for rock — Rock weathering classes, Rock strength classes. What must appear on every log Hole reference, and the method and rig used. Surface RL and its datum, or an explicit note that it is assumed. See Reduced levels and datums. Date drilled and who logged it. Groundwater observations with timing — Groundwater observations. Where the log was terminated and why: target depth, refusal, or obstruction. Related AS 1726 soil and rock description",
+   "resolved": [
+    {
+     "slug": "materials/soil-description-order",
+     "label": "Soil description order"
+    },
+    {
+     "slug": "materials/rock-weathering-classes",
+     "label": "Rock weathering classes"
+    },
+    {
+     "slug": "materials/rock-strength-classes",
+     "label": "Rock strength classes"
+    },
+    {
+     "slug": "methods/reduced-levels-and-datums",
+     "label": "Reduced levels and datums"
+    },
+    {
+     "slug": "methods/groundwater-observations",
+     "label": "Groundwater observations"
+    },
+    {
+     "slug": "standards/AS-1726-soil-and-rock-description",
+     "label": "AS 1726 soil and rock description"
+    }
+   ],
+   "backlinks": [
+    "00-index",
+    "library/rms-specifications",
+    "materials/soil-description-order",
+    "methods/bored-pier-inspection",
+    "methods/reduced-levels-and-datums",
+    "standards/AS-1726-soil-and-rock-description"
+   ]
+  },
+  {
+   "slug": "methods/dcp-testing",
+   "path": "methods/dcp-testing.md",
+   "title": "DCP testing",
+   "type": "method",
+   "tags": [
+    "field",
+    "testing",
+    "bearing"
+   ],
+   "aliases": [
+    "DCP",
+    "dynamic cone penetrometer",
+    "perth penetrometer"
+   ],
+   "updated": "2026-07-29",
+   "body": "\n# DCP testing\n\nDynamic cone penetrometer — 9 kg hammer, 510 mm drop, driving a 20 mm cone.\nBlows per 100 mm increment. Quick, cheap, and shallow.\n\n## What it is good for\n\nConsistency and density profiling in the top couple of metres, checking that\nfounding material is as expected across a footprint, and identifying soft spots\nand fill.\n\n## What it is not\n\nIt is not a bearing capacity test. Correlations from blow counts to allowable\nbearing pressure carry wide scatter, and they are correlations for the material\ntype assumed. Applying a sand correlation to clay produces a confident number\nthat is wrong.\n\n## Reporting\n\nReport the blow count profile. If an allowable bearing pressure is given,\nstate the correlation used, the assumed material and the depth range it applies\nover, and flag refusal or possible obstruction rather than reading it as very\ndense material.\n\n## Related\n\n- [[AS 2870 residential site classification]]\n- [[Groundwater observations]]\n",
+   "text": "DCP testing Dynamic cone penetrometer — 9 kg hammer, 510 mm drop, driving a 20 mm cone. Blows per 100 mm increment. Quick, cheap, and shallow. What it is good for Consistency and density profiling in the top couple of metres, checking that founding material is as expected across a footprint, and identifying soft spots and fill. What it is not It is not a bearing capacity test. Correlations from blow counts to allowable bearing pressure carry wide scatter, and they are correlations for the material type assumed. Applying a sand correlation to clay produces a confident number that is wrong. Reporting Report the blow count profile. If an allowable bearing pressure is given, state the correlation used, the assumed material and the depth range it applies over, and flag refusal or possible obstruction rather than reading it as very dense material. Related AS 2870 residential site classification Groundwater observations",
+   "resolved": [
+    {
+     "slug": "standards/AS-2870-residential-site-classification",
+     "label": "AS 2870 residential site classification"
+    },
+    {
+     "slug": "methods/groundwater-observations",
+     "label": "Groundwater observations"
+    }
+   ],
+   "backlinks": [
+    "00-index",
+    "library/australian-standards",
+    "library/plate-load-testing",
+    "library/reference-texts",
+    "methods/groundwater-observations",
+    "standards/AS-2870-residential-site-classification"
+   ]
+  },
+  {
+   "slug": "methods/graph-engineering",
+   "path": "methods/graph-engineering.md",
+   "title": "Graph engineering",
+   "type": "method",
+   "tags": [
+    "ai",
+    "workflow",
+    "orchestration"
+   ],
+   "aliases": [
+    "graphs",
+    "diamond pattern",
+    "fake edge",
+    "checker node"
+   ],
+   "updated": "2026-07-29",
+   "body": "\n# Graph engineering\n\nA way of laying out agent work as a dependency map rather than a list of steps.\n\n- **Node** — one unit of work. One input, one output. The smaller and more\n  defined, the more useful.\n- **Edge** — a real dependency. It exists only when the second node consumes\n  what the first produced.\n\n## The fake-edge test\n\nWrite the steps as boxes, draw an arrow between each consecutive pair, then ask\nof every arrow: *does data from A actually go into B?* If not, the arrow is an\nartefact of the order you typed things in, and the wait it imposes is free time\nyou are giving away. Anything with no incoming arrow can start immediately.\n\nMost workflows hold two or three fake edges. \"Review file A, then review file B\"\nis the classic — B never reads A's output.\n\n## The diamond\n\nOne node fans out to several independent nodes, which all converge on one node\nthat combines them. The convergence waits for the slowest branch rather than the\nsum of all branches.\n\nTwo conditions. The parallel nodes must be genuinely independent, and the\nconvergence must actually need all of them. If it only needs one, the rest are\nwasted work.\n\n## Checker nodes\n\nParallelism removes the natural checkpoints where you would have spotted a bad\nresult. A branch that returns nothing, or hallucinates, feeds into synthesis\nalongside good branches and the final answer is confidently wrong — with the\nerror diluted enough to be hard to trace.\n\nA checker sits between the parallel layer and the convergence and does no work\nof its own. It looks for empty outputs, outputs that contradict each other,\noff-topic results, low confidence, and format errors that would break parsing.\nFlagged branches are retried or dropped, never merged.\n\n## Static vs dynamic\n\nStatic graphs are fixed before the run: fast, predictable, auditable. Dynamic\ngraphs grow as they run, with nodes deciding what comes next — flexible, but\nwhat actually ran is not what you drew, which makes debugging and auditing\nharder. Reach for static first. Never use dynamic where you need to audit\nexactly what ran and why, which for engineering work is most of the time.\n\n## Where this already exists in our work\n\nThe `geoflow-verify-graph` skill in this repo is a diamond: independent\nread-only verifier agents fan out, a barrier collects their reports, findings\nare reduced, fixed, and re-verified. The reduce step is the checker.\n\n## Caution for engineering use\n\nThe parallel-then-combine shape is right for review and search. It is wrong for\nanything where one branch's finding should change what another branch looks for\n— which happens often in ground investigation, where a single unexpected result\nshould redirect the whole enquiry rather than being averaged in with the rest.\n\n## Related\n\n- [[Reverse prompting]]\n- [[Socket compliance is indeterminate by default]] — a checker in a different guise\n",
+   "text": "Graph engineering A way of laying out agent work as a dependency map rather than a list of steps. Node — one unit of work. One input, one output. The smaller and more defined, the more useful. Edge — a real dependency. It exists only when the second node consumes what the first produced. The fake edge test Write the steps as boxes, draw an arrow between each consecutive pair, then ask of every arrow: does data from A actually go into B? If not, the arrow is an artefact of the order you typed things in, and the wait it imposes is free time you are giving away. Anything with no incoming arrow can start immediately. Most workflows hold two or three fake edges. \"Review file A, then review file B\" is the classic — B never reads A's output. The diamond One node fans out to several independent nodes, which all converge on one node that combines them. The convergence waits for the slowest branch rather than the sum of all branches. Two conditions. The parallel nodes must be genuinely independent, and the convergence must actually need all of them. If it only needs one, the rest are wasted work. Checker nodes Parallelism removes the natural checkpoints where you would have spotted a bad result. A branch that returns nothing, or hallucinates, feeds into synthesis alongside good branches and the final answer is confidently wrong — with the error diluted enough to be hard to trace. A checker sits between the parallel layer and the convergence and does no work of its own. It looks for empty outputs, outputs that contradict each other, off topic results, low confidence, and format errors that would break parsing. Flagged branches are retried or dropped, never merged. Static vs dynamic Static graphs are fixed before the run: fast, predictable, auditable. Dynamic graphs grow as they run, with nodes deciding what comes next — flexible, but what actually ran is not what you drew, which makes debugging and auditing harder. Reach for static first. Never use dynamic where you need to audit exactly what ran and why, which for engineering work is most of the time. Where this already exists in our work The geoflow verify graph skill in this repo is a diamond: independent read only verifier agents fan out, a barrier collects their reports, findings are reduced, fixed, and re verified. The reduce step is the checker. Caution for engineering use The parallel then combine shape is right for review and search. It is wrong for anything where one branch's finding should change what another branch looks for — which happens often in ground investigation, where a single unexpected result should redirect the whole enquiry rather than being averaged in with the rest. Related Reverse prompting Socket compliance is indeterminate by default — a checker in a different guise",
+   "resolved": [
+    {
+     "slug": "methods/reverse-prompting",
+     "label": "Reverse prompting"
+    },
+    {
+     "slug": "decisions/socket-compliance-is-indeterminate-by-default",
+     "label": "Socket compliance is indeterminate by default"
+    }
+   ],
+   "backlinks": [
+    "00-index"
+   ]
+  },
+  {
+   "slug": "methods/groundwater-observations",
+   "path": "methods/groundwater-observations.md",
+   "title": "Groundwater observations",
+   "type": "method",
+   "tags": [
+    "field",
+    "groundwater"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# Groundwater observations\n\nA water level in an open hole is an observation at a moment, not a water table.\n\n## What to record\n\n- Depth to water, and the time since the hole was advanced to that depth.\n- Whether water was added during drilling.\n- Whether the level was still rising when observed.\n- Seepage: at what depth, and whether it was a defined horizon.\n- \"Not encountered\" as an explicit statement, because absence of a note is not\n  the same as absence of water.\n\n## Why the caveat matters\n\nIn low-permeability clay a hole can take days to equilibrate, so a short-term\nreading understates the standing level. In fractured rock the reading may reflect\none defect rather than a regional level. Neither is a design groundwater level\nwithout a standpipe and repeat readings.\n\n## Related\n\n- [[Bored pier inspection]]\n- [[DCP testing]]\n",
+   "text": "Groundwater observations A water level in an open hole is an observation at a moment, not a water table. What to record Depth to water, and the time since the hole was advanced to that depth. Whether water was added during drilling. Whether the level was still rising when observed. Seepage: at what depth, and whether it was a defined horizon. \"Not encountered\" as an explicit statement, because absence of a note is not the same as absence of water. Why the caveat matters In low permeability clay a hole can take days to equilibrate, so a short term reading understates the standing level. In fractured rock the reading may reflect one defect rather than a regional level. Neither is a design groundwater level without a standpipe and repeat readings. Related Bored pier inspection DCP testing",
+   "resolved": [
+    {
+     "slug": "methods/bored-pier-inspection",
+     "label": "Bored pier inspection"
+    },
+    {
+     "slug": "methods/dcp-testing",
+     "label": "DCP testing"
+    }
+   ],
+   "backlinks": [
+    "00-index",
+    "methods/bored-pier-inspection",
+    "methods/borehole-log-conventions",
+    "methods/dcp-testing"
+   ]
+  },
+  {
+   "slug": "methods/reduced-levels-and-datums",
+   "path": "methods/reduced-levels-and-datums.md",
+   "title": "Reduced levels and datums",
+   "type": "method",
+   "tags": [
+    "survey",
+    "levels",
+    "conventions"
+   ],
+   "aliases": [
+    "RL",
+    "datum",
+    "reduced level"
+   ],
+   "updated": "2026-07-29",
+   "body": "\n# Reduced levels and datums\n\nRL is height above a datum, increasing upward. Depth is measured downward from a\nsurface. They are not interchangeable and the confusion between them causes real\nerrors.\n\n```\ndepth below platform = platform RL − toe RL\ntoe RL              = platform RL − depth below platform\n```\n\n## Rules we hold to\n\n- Every depth is recorded with the surface it was measured from.\n- Every level records its datum — AHD, or a stated site datum, or \"assumed\".\n- An assumed datum is written as assumed. A level on an assumed datum cannot be\n  compared with a surveyed one, and a model built on it is dimensionally right\n  and absolutely wrong.\n\n## Where it bites\n\nA report that tabulates depths below ground with no platform RL cannot be turned\ninto a model with true levels. The pile viewer marks the platform level\n`inferred` in that case and flags every level derived from it, rather than\nquietly assuming zero — see [[Why pile data carries provenance]].\n\n## Related\n\n- [[Borehole log conventions]]\n",
+   "text": "Reduced levels and datums RL is height above a datum, increasing upward. Depth is measured downward from a surface. They are not interchangeable and the confusion between them causes real errors. Rules we hold to Every depth is recorded with the surface it was measured from. Every level records its datum — AHD, or a stated site datum, or \"assumed\". An assumed datum is written as assumed. A level on an assumed datum cannot be compared with a surveyed one, and a model built on it is dimensionally right and absolutely wrong. Where it bites A report that tabulates depths below ground with no platform RL cannot be turned into a model with true levels. The pile viewer marks the platform level inferred in that case and flags every level derived from it, rather than quietly assuming zero — see Why pile data carries provenance. Related Borehole log conventions",
+   "resolved": [
+    {
+     "slug": "decisions/why-pile-data-carries-provenance",
+     "label": "Why pile data carries provenance"
+    },
+    {
+     "slug": "methods/borehole-log-conventions",
+     "label": "Borehole log conventions"
+    }
+   ],
+   "backlinks": [
+    "00-index",
+    "decisions/why-pile-data-carries-provenance",
+    "methods/bored-pier-inspection",
+    "methods/borehole-log-conventions"
+   ]
+  },
+  {
+   "slug": "methods/reverse-prompting",
+   "path": "methods/reverse-prompting.md",
+   "title": "Reverse prompting",
+   "type": "method",
+   "tags": [
+    "ai",
+    "workflow",
+    "capture"
+   ],
+   "aliases": [
+    "reverse prompt",
+    "interview capture"
+   ],
+   "updated": "2026-07-29",
+   "body": "\n# Reverse prompting\n\nInstead of writing a prompt, hand over context and let the agent ask what else it\nneeds. The useful form is a single question:\n\n> Based on what you know about me and my goals, what more could I give you so you\n> can help faster and take more off my plate?\n\nThen: *what can you do right now that moves us toward that?*\n\n## Why it works\n\nNot because the model knows things you don't. It works because the model can see\nthe shape of the gap in what you've given it, and asking forces you to articulate\nthings you'd otherwise leave tacit. Most bad AI output traces to missing context\nrather than weak reasoning, and this closes that gap faster than you guessing what\nto include.\n\n## Where it does not\n\nThe model cannot ask about a domain it has no purchase on, so in narrow technical\nwork you still have to seed it. And questions cost your attention — a long\ninterview that produces a note you could have written in two minutes is a net\nloss. Keep interviews short and aimed at knowledge that is genuinely in your head\nand nowhere else.\n\n## How it is used here\n\nThe Capture mode in the [[Index|second brain]] viewer is this idea made concrete:\npick a note type and it interviews you, then emits a vault-ready Markdown note\nwith frontmatter, tags and wikilinks. The questions are a fixed bank rather than\nan LLM, so it works offline and produces the same structure every time. A live\nmodel asking follow-ups would need an API key and a backend, which the static\nworker does not have.\n\n## Related\n\n- [[Template - site inspection note]]\n",
+   "text": "Reverse prompting Instead of writing a prompt, hand over context and let the agent ask what else it needs. The useful form is a single question: Based on what you know about me and my goals, what more could I give you so you can help faster and take more off my plate? Then: what can you do right now that moves us toward that? Why it works Not because the model knows things you don't. It works because the model can see the shape of the gap in what you've given it, and asking forces you to articulate things you'd otherwise leave tacit. Most bad AI output traces to missing context rather than weak reasoning, and this closes that gap faster than you guessing what to include. Where it does not The model cannot ask about a domain it has no purchase on, so in narrow technical work you still have to seed it. And questions cost your attention — a long interview that produces a note you could have written in two minutes is a net loss. Keep interviews short and aimed at knowledge that is genuinely in your head and nowhere else. How it is used here The Capture mode in the second brainIndex viewer is this idea made concrete: pick a note type and it interviews you, then emits a vault ready Markdown note with frontmatter, tags and wikilinks. The questions are a fixed bank rather than an LLM, so it works offline and produces the same structure every time. A live model asking follow ups would need an API key and a backend, which the static worker does not have. Related Template site inspection note",
+   "resolved": [
+    {
+     "slug": "00-index",
+     "label": "second brain"
+    },
+    {
+     "slug": "templates/template-site-inspection-note",
+     "label": "Template - site inspection note"
+    }
+   ],
+   "backlinks": [
+    "00-index",
+    "methods/graph-engineering"
+   ]
+  },
+  {
+   "slug": "methods/rock-socket-length",
+   "path": "methods/rock-socket-length.md",
+   "title": "Rock socket length",
+   "type": "method",
+   "tags": [
+    "piling",
+    "socket",
+    "geometry"
+   ],
+   "aliases": [
+    "socket",
+    "socket length"
+   ],
+   "updated": "2026-07-29",
+   "body": "\n# Rock socket length\n\nThe length of pier penetrating competent rock, measured from proved rockhead to\nthe toe.\n\n```\nsocket = top-of-bedrock RL − toe RL\n```\n\n## Required vs achieved\n\nTwo different numbers that get confused constantly.\n\n- **Required** comes from the approved structural drawing or pile schedule. It\n  is a design requirement.\n- **Achieved** is what was built and measured on site.\n\nA report giving only the achieved socket cannot demonstrate compliance. The tool\nhandles this by refusing to call it a pass — see\n[[Socket compliance is indeterminate by default]].\n\n## Measuring honestly\n\nRockhead is often gradational in [[Weathered siltstone]], so the socket depends\non where you call the top of competent rock. Record the weathering class at that\nlevel, not just the depth, so the call can be reviewed.\n\n## Related\n\n- [[Bored pier inspection]]\n- [[Why pile data carries provenance]]\n",
+   "text": "Rock socket length The length of pier penetrating competent rock, measured from proved rockhead to the toe. Required vs achieved Two different numbers that get confused constantly. Required comes from the approved structural drawing or pile schedule. It is a design requirement. Achieved is what was built and measured on site. A report giving only the achieved socket cannot demonstrate compliance. The tool handles this by refusing to call it a pass — see Socket compliance is indeterminate by default. Measuring honestly Rockhead is often gradational in Weathered siltstone, so the socket depends on where you call the top of competent rock. Record the weathering class at that level, not just the depth, so the call can be reviewed. Related Bored pier inspection Why pile data carries provenance",
+   "resolved": [
+    {
+     "slug": "decisions/socket-compliance-is-indeterminate-by-default",
+     "label": "Socket compliance is indeterminate by default"
+    },
+    {
+     "slug": "materials/weathered-siltstone",
+     "label": "Weathered siltstone"
+    },
+    {
+     "slug": "methods/bored-pier-inspection",
+     "label": "Bored pier inspection"
+    },
+    {
+     "slug": "decisions/why-pile-data-carries-provenance",
+     "label": "Why pile data carries provenance"
+    }
+   ],
+   "backlinks": [
+    "00-index",
+    "decisions/socket-compliance-is-indeterminate-by-default",
+    "library/pells-papers",
+    "materials/rock-strength-classes",
+    "methods/bored-pier-inspection",
+    "standards/AS-2159-piling"
+   ]
+  },
+  {
+   "slug": "standards/AS-1726-soil-and-rock-description",
+   "path": "standards/AS-1726-soil-and-rock-description.md",
+   "title": "AS 1726 soil and rock description",
+   "type": "standard",
+   "tags": [
+    "standard",
+    "logging",
+    "soil",
+    "rock"
+   ],
+   "aliases": [
+    "AS 1726",
+    "AS1726"
+   ],
+   "updated": "2026-07-29",
+   "body": "\n# AS 1726 soil and rock description\n\nAS 1726:2017 *Geotechnical site investigations* is the Australian standard that\nsets out how ground is described and logged. It is the reason two engineers\nlogging the same core should produce comparable descriptions.\n\n> The standard itself is copyright and is not reproduced here. Clause numbers\n> are recorded so the passage can be found; check the actual document before\n> relying on any of this on a job.\n\n## What it governs\n\n- The vocabulary for soil and rock description, and the order terms appear in —\n  see [[Soil description order]].\n- Weathering and strength classification for rock — see\n  [[Rock weathering classes]] and [[Rock strength classes]].\n- Sampling and in-situ test reporting requirements.\n- What a borehole log must show — see [[Borehole log conventions]].\n\n## Why the order matters\n\nThe description order is not stylistic. A log is read by people scanning a\ncolumn for a change in material, so the governing term comes first and the\nqualifiers follow. Writing \"brown clay, high plasticity\" instead of\n\"CLAY: high plasticity, brown\" breaks the scan.\n\n## Related\n\n- [[AS 2159 piling]] — founding requirements that rely on these descriptions\n- [[Weathered siltstone]] — the description applied on most of our Sydney work\n",
+   "text": "AS 1726 soil and rock description AS 1726:2017 Geotechnical site investigations is the Australian standard that sets out how ground is described and logged. It is the reason two engineers logging the same core should produce comparable descriptions. The standard itself is copyright and is not reproduced here. Clause numbers are recorded so the passage can be found; check the actual document before relying on any of this on a job. What it governs The vocabulary for soil and rock description, and the order terms appear in — see Soil description order. Weathering and strength classification for rock — see Rock weathering classes and Rock strength classes. Sampling and in situ test reporting requirements. What a borehole log must show — see Borehole log conventions. Why the order matters The description order is not stylistic. A log is read by people scanning a column for a change in material, so the governing term comes first and the qualifiers follow. Writing \"brown clay, high plasticity\" instead of \"CLAY: high plasticity, brown\" breaks the scan. Related AS 2159 piling — founding requirements that rely on these descriptions Weathered siltstone — the description applied on most of our Sydney work",
+   "resolved": [
+    {
+     "slug": "materials/soil-description-order",
+     "label": "Soil description order"
+    },
+    {
+     "slug": "materials/rock-weathering-classes",
+     "label": "Rock weathering classes"
+    },
+    {
+     "slug": "materials/rock-strength-classes",
+     "label": "Rock strength classes"
+    },
+    {
+     "slug": "methods/borehole-log-conventions",
+     "label": "Borehole log conventions"
+    },
+    {
+     "slug": "standards/AS-2159-piling",
+     "label": "AS 2159 piling"
+    },
+    {
+     "slug": "materials/weathered-siltstone",
+     "label": "Weathered siltstone"
+    }
+   ],
+   "backlinks": [
+    "00-index",
+    "library/australian-standards",
+    "materials/rock-strength-classes",
+    "materials/rock-weathering-classes",
+    "materials/soil-description-order",
+    "methods/borehole-log-conventions",
+    "standards/AS-2159-piling"
+   ]
+  },
+  {
+   "slug": "standards/AS-2159-piling",
+   "path": "standards/AS-2159-piling.md",
+   "title": "AS 2159 piling",
+   "type": "standard",
+   "tags": [
+    "standard",
+    "piling",
+    "foundations"
+   ],
+   "aliases": [
+    "AS 2159",
+    "AS2159",
+    "piling standard"
+   ],
+   "updated": "2026-07-29",
+   "body": "\n# AS 2159 piling\n\nAS 2159:2009 *Piling — Design and installation* governs pile design and\nconstruction, including bored piers.\n\n> Summarised, not reproduced. Clause references are pointers, not quotations.\n\n## What we lean on it for\n\n- **Base cleanliness and concrete placement.** Clause 7.6.5(c) is the one cited\n  in most of our inspection reports: loose or softened material at the base is\n  removed before concrete, and concrete follows promptly after drilling,\n  cleaning and geotechnical approval. See [[Bored pier inspection]].\n- **Founding verification.** The pier is proved into the material the design\n  assumed, not merely to a nominated depth.\n- **Risk rating and the geotechnical strength reduction factor.** The standard\n  ties the factor to how much site investigation and construction control there\n  actually is — better investigation earns a higher factor.\n\n## The practical consequence for inspections\n\nOur sign-off is that the exposed founding material was competent and consistent\nwith the design assumption at the time of inspection. That is a narrower claim\nthan \"the pile is adequate\", and the report wording keeps it narrow. Acceptance\nof the pile as a structural element remains with the design engineer — see\n[[Socket compliance is indeterminate by default]].\n\n## Related\n\n- [[Rock socket length]]\n- [[AS 1726 soil and rock description]]\n",
+   "text": "AS 2159 piling AS 2159:2009 Piling — Design and installation governs pile design and construction, including bored piers. Summarised, not reproduced. Clause references are pointers, not quotations. What we lean on it for Base cleanliness and concrete placement. Clause 7.6.5(c) is the one cited in most of our inspection reports: loose or softened material at the base is removed before concrete, and concrete follows promptly after drilling, cleaning and geotechnical approval. See Bored pier inspection. Founding verification. The pier is proved into the material the design assumed, not merely to a nominated depth. Risk rating and the geotechnical strength reduction factor. The standard ties the factor to how much site investigation and construction control there actually is — better investigation earns a higher factor. The practical consequence for inspections Our sign off is that the exposed founding material was competent and consistent with the design assumption at the time of inspection. That is a narrower claim than \"the pile is adequate\", and the report wording keeps it narrow. Acceptance of the pile as a structural element remains with the design engineer — see Socket compliance is indeterminate by default. Related Rock socket length AS 1726 soil and rock description",
+   "resolved": [
+    {
+     "slug": "methods/bored-pier-inspection",
+     "label": "Bored pier inspection"
+    },
+    {
+     "slug": "decisions/socket-compliance-is-indeterminate-by-default",
+     "label": "Socket compliance is indeterminate by default"
+    },
+    {
+     "slug": "methods/rock-socket-length",
+     "label": "Rock socket length"
+    },
+    {
+     "slug": "standards/AS-1726-soil-and-rock-description",
+     "label": "AS 1726 soil and rock description"
+    }
+   ],
+   "backlinks": [
+    "00-index",
+    "decisions/socket-compliance-is-indeterminate-by-default",
+    "library/australian-standards",
+    "materials/weathered-siltstone",
+    "methods/bored-pier-inspection",
+    "standards/AS-1726-soil-and-rock-description"
+   ]
+  },
+  {
+   "slug": "standards/AS-2870-residential-site-classification",
+   "path": "standards/AS-2870-residential-site-classification.md",
+   "title": "AS 2870 residential site classification",
+   "type": "standard",
+   "tags": [
+    "standard",
+    "residential",
+    "reactive-soil"
+   ],
+   "aliases": [
+    "AS 2870",
+    "AS2870",
+    "site classification"
+   ],
+   "updated": "2026-07-29",
+   "body": "\n# AS 2870 residential site classification\n\nAS 2870 *Residential slabs and footings* classifies sites by how much the soil\nmoves with moisture change, which then drives the footing design.\n\n> Summarised. Class definitions and design tables live in the standard.\n\n## Classes in short\n\n- **A** — stable, little or no ground movement from moisture change (sand, rock)\n- **S** — slightly reactive clay\n- **M** — moderately reactive clay or silt\n- **H1 / H2** — highly reactive clay\n- **E** — extremely reactive clay\n- **P** — problem site: fill, soft soil, mine subsidence, landslip, or where the\n  above cannot be applied\n\n## What decides the class\n\nCharacteristic surface movement `y_s`, calculated from soil reactivity and the\ndepth of the design suction change. Reactivity comes from shrink-swell index\ntesting, not from the description alone — a clay that looks the same in two\nsuburbs can classify differently.\n\n## The trap\n\nFill, cut, and trees change the answer. A site with uncontrolled fill is P\nregardless of the clay underneath it, and removing a large tree can leave years\nof ongoing heave. Classification without checking site history is guesswork.\n\n## Related\n\n- [[Soil description order]]\n- [[DCP testing]]\n",
+   "text": "AS 2870 residential site classification AS 2870 Residential slabs and footings classifies sites by how much the soil moves with moisture change, which then drives the footing design. Summarised. Class definitions and design tables live in the standard. Classes in short A — stable, little or no ground movement from moisture change (sand, rock) S — slightly reactive clay M — moderately reactive clay or silt H1 / H2 — highly reactive clay E — extremely reactive clay P — problem site: fill, soft soil, mine subsidence, landslip, or where the above cannot be applied What decides the class Characteristic surface movement y s , calculated from soil reactivity and the depth of the design suction change. Reactivity comes from shrink swell index testing, not from the description alone — a clay that looks the same in two suburbs can classify differently. The trap Fill, cut, and trees change the answer. A site with uncontrolled fill is P regardless of the clay underneath it, and removing a large tree can leave years of ongoing heave. Classification without checking site history is guesswork. Related Soil description order DCP testing",
+   "resolved": [
+    {
+     "slug": "materials/soil-description-order",
+     "label": "Soil description order"
+    },
+    {
+     "slug": "methods/dcp-testing",
+     "label": "DCP testing"
+    }
+   ],
+   "backlinks": [
+    "00-index",
+    "library/australian-standards",
+    "library/salinity",
+    "methods/dcp-testing"
+   ]
+  },
+  {
+   "slug": "templates/template-decision",
+   "path": "templates/template-decision.md",
+   "title": "Template - decision",
+   "type": "template",
+   "tags": [
+    "template"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# Template - decision\n\n```markdown\n---\ntitle:\ntype: decision\ntags: [decision]\nupdated:\n---\n\n# {{Decision}}\n\n**Decision.** One sentence, present tense.\n\n## Problem\nWhat went wrong, or would have.\n\n## Options considered\nWhat else was on the table and why it lost.\n\n## Consequences\nWhat this makes easy, and what it makes harder.\n\n## Cost\nWhat was accepted to get it. If nothing, the decision was not real.\n```\n",
+   "text": "Template decision",
+   "resolved": [],
+   "backlinks": [
+    "00-index"
+   ]
+  },
+  {
+   "slug": "templates/template-site-inspection-note",
+   "path": "templates/template-site-inspection-note.md",
+   "title": "Template - site inspection note",
+   "type": "template",
+   "tags": [
+    "template"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# Template - site inspection note\n\n```markdown\n---\ntitle:\ntype: note\ntags: [site, inspection]\nproject:\nreport:\ndate:\nupdated:\n---\n\n# {{Site}} — {{date}}\n\n## Brief\nWhat was asked for, by whom.\n\n## Observed\nWhat was actually seen. Materials per [[Soil description order]] and\n[[Rock weathering classes]]. Depths with the surface they were measured from.\n\n## Measured\n| Ref | Depth (m) | Socket (m) | Founding material |\n|---|---|---|---|\n\n## Not established\nWhat could not be determined and why. This section is not optional.\n\n## Follow-up\n```\n",
+   "text": "Template site inspection note",
+   "resolved": [],
+   "backlinks": [
+    "00-index",
+    "methods/reverse-prompting"
+   ]
+  }
+ ]
+}
