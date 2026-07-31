@@ -52,6 +52,11 @@ class VisionEvidence(BaseModel):
     detector_model_hash: str | None = None
     segmenter_model_hash: str | None = None
     boxes_and_masks_ref: str | None = None
+    detection_review_complete: bool = False
+    mask_review_complete: bool = False
+    manual_box_corrections: int = Field(default=0, ge=0)
+    manual_mask_corrections: int = Field(default=0, ge=0)
+    rqd_comparison_within_tolerance: bool | None = None
 
 
 class CaptureEvidence(BaseModel):
@@ -127,14 +132,21 @@ class CaptureTask(BaseModel):
 class VisionTask(BaseModel):
     evidence: CaptureEvidence
     vision: VisionEvidence
-    action: Literal["detect_core_pieces", "find_defects"]
+    action: Literal[
+        "detect_core_pieces",
+        "review_detection_boxes",
+        "segment_core_masks",
+        "review_segmentation_masks",
+        "find_defects",
+    ]
     confidence_threshold: float = Field(ge=0, le=1)
 
 
 class MeasurementTask(BaseModel):
     runs: list[CoreRunEvidence]
-    action: Literal["measure_recovery", "compute_rqd_tcr"]
+    action: Literal["measure_recovery", "compute_rqd_tcr", "compare_rqd"]
     confidence_threshold: float = Field(ge=0, le=1)
+    rqd_comparison_within_tolerance: bool | None = None
 
 
 class LoggingTask(BaseModel):

@@ -134,6 +134,60 @@ def evaluate_vision_stage(
     confidence_threshold: float,
 ) -> StageResult:
     """Gate measured detector and segmenter evidence; contract-only configuration cannot pass."""
+    if action == "review_detection_boxes":
+        accepted = vision.detection_review_complete
+        return StageResult(
+            stage="detection_box_review",
+            status="pass" if accepted else "fail",
+            action=action,
+            findings=[
+                "Every detector box is accepted; correction events are preserved."
+                if accepted
+                else "Detection review is incomplete. Edit or accept every box before segmentation."
+            ],
+            metrics={
+                "review_complete": accepted,
+                "manual_box_corrections": vision.manual_box_corrections,
+                "downstream_invalidated_on_edit": True,
+            },
+            evidence_refs=[vision.boxes_and_masks_ref] if vision.boxes_and_masks_ref else [],
+        )
+    if action == "segment_core_masks":
+        ready = (
+            vision.execution_mode == "executed"
+            and vision.segmenter_model_hash is not None
+            and vision.boxes_and_masks_ref is not None
+        )
+        return StageResult(
+            stage="core_mask_segmentation",
+            status="pass" if ready else "fail",
+            action=action,
+            findings=[
+                "SAM-compatible masks were generated from accepted detector boxes."
+                if ready
+                else "Segmentation is blocked until accepted boxes are processed by the local SAM-compatible adapter."
+            ],
+            metrics={"execution_mode": vision.execution_mode, "segmenter_model_hash": vision.segmenter_model_hash},
+            evidence_refs=[vision.boxes_and_masks_ref] if vision.boxes_and_masks_ref else [],
+        )
+    if action == "review_segmentation_masks":
+        accepted = vision.mask_review_complete
+        return StageResult(
+            stage="segmentation_mask_review",
+            status="pass" if accepted else "fail",
+            action=action,
+            findings=[
+                "Every segmentation mask is accepted; corrective prompts are preserved."
+                if accepted
+                else "Mask review is incomplete. Add foreground/background prompts or accept every mask before measurement."
+            ],
+            metrics={
+                "review_complete": accepted,
+                "manual_mask_corrections": vision.manual_mask_corrections,
+                "measurement_invalidated_on_edit": True,
+            },
+            evidence_refs=[vision.boxes_and_masks_ref] if vision.boxes_and_masks_ref else [],
+        )
     is_piece_stage = action == "detect_core_pieces"
     confidence = vision.piece_detection_confidence if is_piece_stage else vision.defect_detection_confidence
     executed = vision.execution_mode == "executed"
@@ -166,6 +220,21 @@ def evaluate_vision_stage(
             "model_provenance_complete": complete_provenance,
         },
         evidence_refs=[path for path in [evidence.image_path, vision.boxes_and_masks_ref] if path],
+    )
+
+
+def compare_rqd_engineering_tolerance(within_tolerance: bool | None) -> StageResult:
+    """Require an explicit engineering comparison after deterministic RQD calculation."""
+    return StageResult(
+        stage="rqd_engineering_comparison",
+        status="pass" if within_tolerance is True else "fail",
+        action="compare_rqd_engineering_tolerance",
+        findings=[
+            "Reviewed RQD inclusions are within the configured project tolerance."
+            if within_tolerance is True
+            else "Compare qualifying pieces with the engineering log and record the project-tolerance decision."
+        ],
+        metrics={"within_tolerance": within_tolerance, "comparison_recorded": within_tolerance is not None},
     )
 
 

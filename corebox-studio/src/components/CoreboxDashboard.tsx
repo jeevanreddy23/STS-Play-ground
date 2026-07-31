@@ -40,6 +40,7 @@ import {
   X,
 } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
+import RqdPipelineView from "@/components/RqdPipelineView";
 import { defects, intervals, pieces, project, runs, sourcePhotoUrl } from "@/data/demo";
 import { buildAgs411, downloadTextFile, validateAgsDraft } from "@/lib/ags";
 import { runLocalPromptLoop, saveCorrection } from "@/lib/prompt-loop";
@@ -55,9 +56,10 @@ const CoreScene = dynamic(() => import("@/components/CoreScene"), {
   ),
 });
 
-type ViewId = "twin" | "logging" | "ags" | "prompt";
+type ViewId = "pipeline" | "twin" | "logging" | "ags" | "prompt";
 
 const navItems: Array<{ id: ViewId; label: string; icon: typeof Box; badge?: string }> = [
+  { id: "pipeline", label: "RQD pipeline", icon: ScanLine, badge: "MVP" },
   { id: "twin", label: "Core twin", icon: Box },
   { id: "logging", label: "Logging & defects", icon: ListChecks, badge: "7" },
   { id: "ags", label: "AGS issue", icon: FileArchive },
@@ -454,7 +456,7 @@ function PromptView() {
 }
 
 export default function CoreboxDashboard() {
-  const [view, setView] = useState<ViewId>("twin");
+  const [view, setView] = useState<ViewId>("pipeline");
   const [menuOpen, setMenuOpen] = useState(false);
   return (
     <div className="app-shell">
@@ -470,6 +472,7 @@ export default function CoreboxDashboard() {
             <div><AlertTriangle size={16} /><span>Review items</span><strong className="amber">7</strong></div>
             <div><ShieldCheck size={16} /><span>Source rows</span><strong>10 linked</strong></div>
           </div>
+          {view === "pipeline" ? <RqdPipelineView /> : null}
           {view === "twin" ? <TwinView /> : null}
           {view === "logging" ? <LoggingView /> : null}
           {view === "ags" ? <AgsView /> : null}

@@ -36,7 +36,12 @@
     "detected_piece_count": 15,
     "detector_model_hash": "yolo11-local-demo-sha256",
     "segmenter_model_hash": "sam-local-demo-sha256",
-    "boxes_and_masks_ref": "evidence/BH-17/vision_evidence.json"
+    "boxes_and_masks_ref": "evidence/BH-17/vision_evidence.json",
+    "detection_review_complete": true,
+    "mask_review_complete": true,
+    "manual_box_corrections": 2,
+    "manual_mask_corrections": 1,
+    "rqd_comparison_within_tolerance": true
   },
   "runs": [
     {"run_id": "RUN-19", "top_m": 18.4, "base_m": 19.4, "recovered_piece_lengths_mm": [340, 370, 290], "mechanical_break_pairs": 1},

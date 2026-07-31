@@ -29,10 +29,14 @@ class WorkflowTests(unittest.TestCase):
                 "capture_qa",
                 "rectification",
                 "core_piece_detection",
+                "detection_box_review",
+                "core_mask_segmentation",
+                "segmentation_mask_review",
                 "recovery_measurement",
                 "defect_detection",
                 "geotechnical_logging",
                 "measurement",
+                "rqd_engineering_comparison",
                 "report_products",
                 "assurance",
             ],
@@ -66,6 +70,23 @@ class WorkflowTests(unittest.TestCase):
         result = asyncio.run(run_workflow(request))
         logging = next(stage for stage in result.stages if stage.stage == "geotechnical_logging")
         self.assertEqual(logging.status, "fail")
+        self.assertEqual(result.issue_status, "blocked")
+
+    def test_box_edit_gate_blocks_segmentation(self) -> None:
+        request = self.load_request()
+        request.vision.detection_review_complete = False
+        result = asyncio.run(run_workflow(request))
+        box_review = next(stage for stage in result.stages if stage.stage == "detection_box_review")
+        mask_stage = next(stage for stage in result.stages if stage.stage == "core_mask_segmentation")
+        self.assertEqual(box_review.status, "fail")
+        self.assertTrue(mask_stage.metrics["skipped"])
+
+    def test_rqd_comparison_is_a_hard_issue_gate(self) -> None:
+        request = self.load_request()
+        request.vision.rqd_comparison_within_tolerance = None
+        result = asyncio.run(run_workflow(request))
+        comparison = next(stage for stage in result.stages if stage.stage == "rqd_engineering_comparison")
+        self.assertEqual(comparison.status, "fail")
         self.assertEqual(result.issue_status, "blocked")
 
 

@@ -22,6 +22,7 @@ from .skills import (
     build_assurance_gate,
     build_report_contract,
     calculate_rqd,
+    compare_rqd_engineering_tolerance,
     evaluate_vision_stage,
     measure_recovery,
     plan_rectification,
@@ -61,6 +62,8 @@ class MeasurementAgent(RoutedAgent):
     async def measure(self, message: MeasurementTask, ctx: MessageContext) -> StageResult:
         if message.action == "measure_recovery":
             return measure_recovery(message.runs, message.confidence_threshold)
+        if message.action == "compare_rqd":
+            return compare_rqd_engineering_tolerance(message.rqd_comparison_within_tolerance)
         return calculate_rqd(message.runs, message.confidence_threshold)
 
 
@@ -126,6 +129,48 @@ class WorkflowCoordinator(RoutedAgent):
         stages.append(piece_detection)
 
         if piece_detection.status == "pass":
+            detection_review = await self.send_message(
+                VisionTask(
+                    evidence=message.capture,
+                    vision=message.vision,
+                    action="review_detection_boxes",
+                    confidence_threshold=threshold,
+                ),
+                AgentId("vision_agent", self.id.key),
+            )
+        else:
+            detection_review = skipped_stage("detection_box_review", "review_detection_boxes", piece_detection.stage)
+        stages.append(detection_review)
+
+        if detection_review.status == "pass":
+            segmentation = await self.send_message(
+                VisionTask(
+                    evidence=message.capture,
+                    vision=message.vision,
+                    action="segment_core_masks",
+                    confidence_threshold=threshold,
+                ),
+                AgentId("vision_agent", self.id.key),
+            )
+        else:
+            segmentation = skipped_stage("core_mask_segmentation", "segment_core_masks", detection_review.stage)
+        stages.append(segmentation)
+
+        if segmentation.status == "pass":
+            mask_review = await self.send_message(
+                VisionTask(
+                    evidence=message.capture,
+                    vision=message.vision,
+                    action="review_segmentation_masks",
+                    confidence_threshold=threshold,
+                ),
+                AgentId("vision_agent", self.id.key),
+            )
+        else:
+            mask_review = skipped_stage("segmentation_mask_review", "review_segmentation_masks", segmentation.stage)
+        stages.append(mask_review)
+
+        if mask_review.status == "pass":
             recovery = await self.send_message(
                 MeasurementTask(
                     runs=message.runs,
@@ -135,7 +180,7 @@ class WorkflowCoordinator(RoutedAgent):
                 AgentId("measurement_agent", self.id.key),
             )
         else:
-            recovery = skipped_stage("recovery_measurement", "measure_core_recovery", piece_detection.stage)
+            recovery = skipped_stage("recovery_measurement", "measure_core_recovery", mask_review.stage)
         stages.append(recovery)
 
         if recovery.status == "pass":
@@ -181,6 +226,24 @@ class WorkflowCoordinator(RoutedAgent):
         else:
             rqd_tcr = skipped_stage("measurement", "calculate_rqd_tcr_fracture_metrics", classification.stage)
         stages.append(rqd_tcr)
+
+        if rqd_tcr.status != "fail":
+            rqd_comparison = await self.send_message(
+                MeasurementTask(
+                    runs=message.runs,
+                    action="compare_rqd",
+                    confidence_threshold=threshold,
+                    rqd_comparison_within_tolerance=message.vision.rqd_comparison_within_tolerance,
+                ),
+                AgentId("measurement_agent", self.id.key),
+            )
+        else:
+            rqd_comparison = skipped_stage(
+                "rqd_engineering_comparison",
+                "compare_rqd_engineering_tolerance",
+                rqd_tcr.stage,
+            )
+        stages.append(rqd_comparison)
 
         report = await self.send_message(
             ReportTask(stages=stages, borehole_id=message.borehole_id),

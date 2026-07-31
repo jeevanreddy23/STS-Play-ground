@@ -6,6 +6,8 @@ The interface is functional, but the bundled measurements are demonstration data
 
 ## What is implemented
 
+- Paper-aligned RQD workbench with the full photo → rectification → YOLO11 proposal → box review → SAM mask → mask review → deterministic measurement → engineering comparison graph.
+- Interactive draft box/mask correction controls, reverse-intake questions, physical-scale inputs, and hard downstream issue gates. The screen is explicitly labelled as a correction prototype until a local vision runtime is connected.
 - Interactive React/Three.js core tray with selectable pieces, evidence markers, high-detail controls, local photo texture mapping, and GLB photogrammetry import.
 - Rock/defect ledger with confidence and review states.
 - AGS 4.1.1-oriented `PROJ`, `LOCA`, `GEOL`, `DETL`, `CORE`, `FRAC`, and `FILE` groups with ASCII/CRLF structural checks and draft export.
@@ -26,13 +28,14 @@ GeoFlow uses typed evidence conditions rather than pore-scale conditions:
 The last group is contextual only. It can test consistency but cannot create a defect, depth or recovered length. The sequential AutoGen chain is:
 
 1. bind multimodal evidence and read scale;
-2. detect core pieces;
-3. measure recovery;
-4. find visible defects;
-5. classify only measured defects;
-6. calculate RQD, TCR, fracture frequency and spacing deterministically;
-7. validate confidence and cross-stage consistency;
-8. derive AGS, OpenGround-style PDF and 3D products from the versioned JSON contract.
+2. detect core pieces and review/correct every box;
+3. segment from accepted boxes and review/correct every mask;
+4. measure recovery from calibrated evidence;
+5. find visible defects;
+6. classify only measured defects;
+7. calculate RQD, TCR, fracture frequency and spacing deterministically;
+8. compare RQD inclusions against the engineering log within the project tolerance;
+9. derive AGS, OpenGround-style PDF and 3D products from the versioned JSON contract.
 
 Every automatic observation must reach 95% confidence. Below that threshold, the pipeline requests another photograph or verified measurement and blocks all dependent stages. It returns findings and evidence references, never hidden chain-of-thought.
 
@@ -43,8 +46,10 @@ The planned CV adapter follows Yan et al. (2026), *A zero-shot segmentation fram
 1. Preserve the source and rectify tray perspective from its four corners.
 2. Detect each core piece with a YOLO11-compatible detector.
 3. Pass detection boxes to a SAM-compatible promptable segmenter.
-4. Measure mask intersections along calibrated horizontal scanlines and calculate RQD.
-5. Route occlusion, narrow gaps, glare/water, tag interference, mechanical breaks, and low-confidence boundaries to engineer review.
+4. Require box acceptance or correction before segmentation; a box edit invalidates its downstream mask.
+5. Require mask acceptance or foreground/background correction before measurement.
+6. Measure mask intersections along physically calibrated scanlines and calculate RQD deterministically.
+7. Compare included pieces with the engineering log and route occlusion, narrow gaps, glare/water, tag interference, mechanical breaks, and low-confidence boundaries to engineer review.
 
 The paper-reported accuracy and speed are reference results, not performance claims for this prototype. The AutoGen vision stage is explicitly `contract_only` until it is connected to and validated against a real local inference runtime.
 
