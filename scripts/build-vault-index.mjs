@@ -55,9 +55,13 @@ async function walk(dir) {
   return out;
 }
 
-/** Links written inside fenced code blocks are examples, not real edges. */
+/**
+ * Links written inside code are examples, not real edges — Obsidian does not
+ * link them either, so counting them would put phantom edges in the graph.
+ * Fenced blocks and inline backticks both have to go.
+ */
 function stripFences(body) {
-  return body.replace(/```[\s\S]*?```/g, '');
+  return body.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '');
 }
 
 function extractLinks(body) {
