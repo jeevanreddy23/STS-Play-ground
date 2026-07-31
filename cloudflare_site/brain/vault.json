@@ -2,9 +2,9 @@
  "generated": null,
  "vault": "second-brain",
  "counts": {
-  "notes": 27,
-  "links": 101,
-  "tags": 41,
+  "notes": 28,
+  "links": 102,
+  "tags": 42,
   "unresolved": 0
  },
  "tags": [
@@ -94,6 +94,10 @@
   },
   {
    "tag": "groundwater",
+   "count": 1
+  },
+  {
+   "tag": "howto",
    "count": 1
   },
   {
@@ -270,8 +274,29 @@
     }
    ],
    "backlinks": [
+    "OPEN-IN-OBSIDIAN",
     "methods/reverse-prompting"
    ]
+  },
+  {
+   "slug": "OPEN-IN-OBSIDIAN",
+   "path": "OPEN-IN-OBSIDIAN.md",
+   "title": "Open in Obsidian",
+   "type": "note",
+   "tags": [
+    "howto"
+   ],
+   "aliases": [],
+   "updated": "2026-07-29",
+   "body": "\n# Open in Obsidian\n\n1. Open Obsidian → **Open folder as vault**\n2. Choose the folder this file is in (`STS-Second-Brain`)\n3. Trust the vault when prompted — the only thing in `.obsidian/` is graph and\n   appearance settings, no plugins or scripts\n\nGraph view is on the left ribbon, or `Ctrl+G`. It comes pre-coloured by folder:\n\n| Colour | Folder |\n|---|---|\n| Violet | the index |\n| Blue | standards |\n| Green | materials |\n| Orange | methods |\n| Red | decisions |\n| Amber | reference library |\n| Grey | templates |\n\nLocal graph (`Ctrl+Shift+G` or the note's ⋮ menu) shows what one note connects\nto, which is usually more useful than the whole graph once the vault grows.\n\n## Keeping it in step with the web viewer\n\nThe Markdown here is the source of truth. After editing, regenerate the web\nviewer's index from the repo:\n\n```bash\nnode scripts/build-vault-index.mjs\n```\n\nThe repo copy lives at `sts-playground/second-brain/`. If you edit here and\nthere, they will drift — pick one as the working copy.\n\n## Related\n\n- [[Index]]\n",
+   "text": "Open in Obsidian 1. Open Obsidian → Open folder as vault 2. Choose the folder this file is in ( STS Second Brain ) 3. Trust the vault when prompted — the only thing in .obsidian/ is graph and appearance settings, no plugins or scripts Graph view is on the left ribbon, or Ctrl+G . It comes pre coloured by folder: Colour Folder Violet the index Blue standards Green materials Orange methods Red decisions Amber reference library Grey templates Local graph ( Ctrl+Shift+G or the note's ⋮ menu) shows what one note connects to, which is usually more useful than the whole graph once the vault grows. Keeping it in step with the web viewer The Markdown here is the source of truth. After editing, regenerate the web viewer's index from the repo: The repo copy lives at sts playground/second brain/ . If you edit here and there, they will drift — pick one as the working copy. Related Index",
+   "resolved": [
+    {
+     "slug": "00-index",
+     "label": "Index"
+    }
+   ],
+   "backlinks": []
   },
   {
    "slug": "decisions/socket-compliance-is-indeterminate-by-default",
