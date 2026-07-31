@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import {
   Activity,
   AlertTriangle,
@@ -19,7 +20,6 @@ import {
   FileImage,
   FileText,
   Gauge,
-  Grid3X3,
   HardDrive,
   Layers3,
   ListChecks,
@@ -40,7 +40,7 @@ import {
   X,
 } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
-import { defects, intervals, pieces, project, runs } from "@/data/demo";
+import { defects, intervals, pieces, project, runs, sourcePhotoUrl } from "@/data/demo";
 import { buildAgs411, downloadTextFile, validateAgsDraft } from "@/lib/ags";
 import { runLocalPromptLoop, saveCorrection } from "@/lib/prompt-loop";
 import type { LogInterval, PromptLoopResult } from "@/types/core";
@@ -59,17 +59,17 @@ type ViewId = "twin" | "logging" | "ags" | "prompt";
 
 const navItems: Array<{ id: ViewId; label: string; icon: typeof Box; badge?: string }> = [
   { id: "twin", label: "Core twin", icon: Box },
-  { id: "logging", label: "Logging & defects", icon: ListChecks, badge: "2" },
+  { id: "logging", label: "Logging & defects", icon: ListChecks, badge: "7" },
   { id: "ags", label: "AGS issue", icon: FileArchive },
   { id: "prompt", label: "Learning loop", icon: BrainCircuit },
 ];
 
 const workflow = [
-  { label: "Rectify", note: "4 corners", state: "done" },
-  { label: "Detect", note: "15 boxes", state: "done" },
-  { label: "Segment", note: "15 masks", state: "done" },
-  { label: "Measure", note: "scanline RQD", state: "done" },
-  { label: "Review", note: "2 exceptions", state: "active" },
+  { label: "Source", note: "SHA-256 linked", state: "done" },
+  { label: "Rectify", note: "review needed", state: "active" },
+  { label: "Crop rows", note: "10 drafts", state: "done" },
+  { label: "Segment", note: "not executed", state: "blocked" },
+  { label: "Review", note: "7 observations", state: "active" },
   { label: "Issue", note: "Blocked", state: "blocked" },
 ];
 
@@ -91,9 +91,9 @@ function Header({ onMenu }: { onMenu: () => void }) {
         <Menu size={19} />
       </button>
       <div className="crumbs">
-        <span>Northbank Bridge</span>
+        <span>{project.name}</span>
         <span>/</span>
-        <strong>BH-17</strong>
+        <strong>{project.boreholeId}</strong>
         <span className="status-chip"><span /> Local draft</span>
       </div>
       <div className="topbar-actions">
@@ -114,8 +114,8 @@ function Sidebar({ active, onChange, open, onClose }: { active: ViewId; onChange
         <button className="icon-button sidebar-close" onClick={onClose} aria-label="Close navigation"><X size={18} /></button>
       </div>
       <button className="project-switcher">
-        <span className="project-avatar">NB</span>
-        <span><strong>{project.name}</strong><small>{project.boreholeId} · Core tray 08</small></span>
+        <span className="project-avatar">BH7</span>
+        <span><strong>{project.name}</strong><small>{project.boreholeId} · 7.60–16.73 m</small></span>
         <ChevronDown size={15} />
       </button>
       <nav aria-label="Workspace navigation">
@@ -166,10 +166,11 @@ function WorkflowStrip() {
 
 function TwinView() {
   const [selectedId, setSelectedId] = useState(pieces[5].id);
-  const [photoUrl, setPhotoUrl] = useState<string>();
+  const [photoUrl, setPhotoUrl] = useState<string>(sourcePhotoUrl);
   const [modelUrl, setModelUrl] = useState<string>();
   const [detail, setDetail] = useState(2);
   const [showDefects, setShowDefects] = useState(true);
+  const [viewMode, setViewMode] = useState<"twin" | "photo">("twin");
   const photoInput = useRef<HTMLInputElement>(null);
   const modelInput = useRef<HTMLInputElement>(null);
 
@@ -183,9 +184,10 @@ function TwinView() {
     if (type === "photo") {
       setModelUrl(undefined);
       setPhotoUrl(url);
+      setViewMode("photo");
     } else {
-      setPhotoUrl(undefined);
       setModelUrl(url);
+      setViewMode("twin");
     }
   };
 
@@ -195,7 +197,7 @@ function TwinView() {
         <div className="viewer-head">
           <div>
             <span className="eyebrow"><ScanLine size={14} /> Digital evidence model</span>
-            <h1>Core tray 08 <small>18.40–22.80 m</small></h1>
+            <h1>{project.boreholeId} core boxes <small>7.60–16.73 m · source photograph linked</small></h1>
           </div>
           <div className="viewer-actions">
             <input ref={photoInput} className="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => pickLocalFile(event.target.files?.[0], "photo")} />
@@ -205,65 +207,90 @@ function TwinView() {
           </div>
         </div>
         <div className="method-ribbon">
-          <span><strong>Research blueprint</strong> Yan et al. (2026)</span>
+          <span><strong>Evidence mode</strong> single oblique photograph</span>
           <i />
-          <span>Four-corner homography</span>
-          <span>YOLO boxes</span>
-          <span>Box-prompted SAM masks</span>
-          <span>Horizontal scanline RQD</span>
+          <span>10 manual row crops</span>
+          <span>Texture-derived twin</span>
+          <span>Break origin unresolved</span>
+          <span>RQD not calculated</span>
         </div>
         <div className="viewer-stage">
-          <CoreScene
-            pieces={pieces}
-            defects={defects}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-            photoUrl={photoUrl}
-            modelUrl={modelUrl}
-            detail={detail}
-            showDefects={showDefects}
-          />
+          {viewMode === "photo" && photoUrl ? (
+            <div className="photo-evidence-stage">
+              <div className="photo-evidence-frame">
+                <Image src={photoUrl} alt="Source core-box photograph for project 32904 borehole BH7" fill sizes="(max-width: 900px) 100vw, 70vw" unoptimized priority />
+                <div className="photo-row-layer" aria-label="Draft calibrated row intervals">
+                  {pieces.map((piece) => piece.photoCrop ? (
+                    <button
+                      key={piece.id}
+                      className={selectedId === piece.id ? "active" : ""}
+                      style={{
+                        left: `${piece.photoCrop.x * 100}%`,
+                        top: `${piece.photoCrop.y * 100}%`,
+                        width: `${piece.photoCrop.width * 100}%`,
+                        height: `${piece.photoCrop.height * 100}%`,
+                      }}
+                      onClick={() => setSelectedId(piece.id)}
+                      aria-label={`Select draft row ${piece.top.toFixed(2)} to ${piece.base.toFixed(2)} metres`}
+                    ><span>{piece.top.toFixed(2)}–{piece.base.toFixed(2)} m</span></button>
+                  ) : null)}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <CoreScene
+              pieces={pieces}
+              defects={defects}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+              photoUrl={photoUrl}
+              modelUrl={modelUrl}
+              detail={detail}
+              showDefects={showDefects}
+            />
+          )}
           <div className="viewer-overlay top-left">
-            <span><Orbit size={14} /> Orbit</span>
-            <span>Scroll to zoom</span>
-            <span>Click core to inspect</span>
+            <span>{viewMode === "twin" ? <><Orbit size={14} /> Orbit</> : <><FileImage size={14} /> Source evidence</>}</span>
+            <span>{viewMode === "twin" ? "Scroll to zoom" : "Draft row bounds"}</span>
+            <span>Click a row to inspect</span>
           </div>
           <div className="viewer-overlay bottom-left">
-            <button className={showDefects ? "active" : ""} onClick={() => setShowDefects((value) => !value)}><Eye size={14} /> Defects</button>
-            <button><Grid3X3 size={14} /> Depth grid</button>
+            <button className={viewMode === "twin" ? "active" : ""} onClick={() => setViewMode("twin")}><Box size={14} /> 3D twin</button>
+            <button className={viewMode === "photo" ? "active" : ""} onClick={() => setViewMode("photo")} disabled={!photoUrl}><FileImage size={14} /> Source photo</button>
+            <button className={showDefects ? "active" : ""} onClick={() => setShowDefects((value) => !value)}><Eye size={14} /> Observations</button>
           </div>
-          <div className="quality-panel">
-            <span>Geometry detail</span>
+          {viewMode === "twin" ? <div className="quality-panel">
+            <span>Texture & geometry detail</span>
             <div>{[0, 1, 2, 3].map((level) => <button key={level} className={detail === level ? "active" : ""} onClick={() => setDetail(level)}>{level === 0 ? "Eco" : `${level + 1}×`}</button>)}</div>
-            <small>{photoUrl ? "Full-resolution texture active" : modelUrl ? "Photogrammetry mesh active" : "Procedural PBR material"}</small>
-          </div>
+            <small>{modelUrl ? "Photogrammetry mesh active" : "Full-resolution row crops · relief enhanced"}</small>
+          </div> : <div className="photo-status-panel"><ShieldCheck size={14} /><span><strong>Original evidence</strong><small>936 × 768 PNG · no hidden geometry inferred</small></span></div>}
         </div>
         <div className="evidence-footer">
-          <span><ShieldCheck size={15} /> Source-preserving view</span>
-          <span><FileImage size={15} /> {photoUrl ? "Local photo mapped · original retained" : "Demo material · add a tray photo"}</span>
-          <span><Gauge size={15} /> Calibration RMSE 2.1 mm</span>
+          <span><ShieldCheck size={15} /> Source preserved and checksum-linked</span>
+          <span><FileImage size={15} /> 32904 · BH7 · 7.60–16.73 m</span>
+          <span><AlertTriangle size={15} /> Row calibration and breaks require review</span>
         </div>
       </section>
 
       <aside className="inspector-card">
         <div className="inspector-head">
-          <div><span className="eyebrow">Selected core piece</span><h2>{selected.id}</h2></div>
+          <div><span className="eyebrow">Selected row interval</span><h2>{selected.id}</h2></div>
           <button className="icon-button" aria-label="More options"><Settings2 size={17} /></button>
         </div>
         <div className="depth-range"><span>{selected.top.toFixed(2)} m</span><i /><span>{selected.base.toFixed(2)} m</span></div>
         <div className="inspector-score">
           <ScoreRing value={Math.round(selected.confidence * 100)} label="confidence" />
-          <div><span>Length</span><strong>{spanMm} mm</strong><span>Diameter</span><strong>{selected.diameterMm} mm</strong></div>
+          <div><span>Interval span</span><strong>{spanMm} mm</strong><span>Diameter</span><strong>{selected.diameterMm ? `${selected.diameterMm} mm` : "Pending"}</strong></div>
         </div>
         <div className="field-block">
           <label>Material</label>
           <button className="select-like"><span className="material-dot" style={{ background: selected.materialColor }} />{selected.lithology}<ChevronDown size={14} /></button>
         </div>
         <div className="field-grid">
-          <div><label>RQD decision</label><strong className={selected.includedInRqd ? "value-good" : "value-warn"}>{selected.includedInRqd ? "Included" : "Excluded"}</strong></div>
+          <div><label>RQD decision</label><strong className="value-warn">{selected.includedInRqd === null ? "Not calculated" : selected.includedInRqd ? "Included" : "Excluded"}</strong></div>
           <div><label>Reviewer</label><strong>{selected.approved ? "Approved" : "Required"}</strong></div>
         </div>
-        <div className="section-title"><span>Detected evidence</span><em>{selectedDefects.length}</em></div>
+        <div className="section-title"><span>Visible observations</span><em>{selectedDefects.length}</em></div>
         <div className="defect-list">
           {selectedDefects.length ? selectedDefects.map((item) => (
             <button key={item.id}>
@@ -275,16 +302,16 @@ function TwinView() {
         </div>
         <div className="review-callout">
           <Sparkles size={17} />
-          <div><strong>Why is this an exception?</strong><p>Weathered fabric crosses the 100 mm RQD threshold. Confirm boundaries before issue.</p></div>
+          <div><strong>Why is this review-only?</strong><p>This is a texture-derived twin from one oblique image. Confirm scale, core-piece boundaries and mechanical breaks before recovery or RQD calculations.</p></div>
         </div>
         <div className="capture-checklist">
           <strong>Next capture</strong>
-          <span><Check size={12} /> Keep all four tray corners visible</span>
-          <span><Check size={12} /> Put tags in inter-row gaps</span>
-          <span><Check size={12} /> Add a round known-length marker</span>
-          <span><AlertTriangle size={12} /> Avoid core-end occlusion, glare and pooled water</span>
+          <span><Check size={12} /> Project, borehole and depth labels are visible</span>
+          <span><Check size={12} /> Linear scale and colour card are present</span>
+          <span><AlertTriangle size={12} /> Capture is oblique; rectify before measurement</span>
+          <span><AlertTriangle size={12} /> Add a round scale marker and dry wet surfaces</span>
         </div>
-        <div className="inspector-actions"><button className="quiet-button"><RotateCcw size={14} /> Correct</button><button className="primary-button"><Check size={14} /> Approve piece</button></div>
+        <div className="inspector-actions"><button className="quiet-button"><RotateCcw size={14} /> Correct</button><button className="primary-button"><Check size={14} /> Approve row</button></div>
       </aside>
     </div>
   );
@@ -296,8 +323,8 @@ function LoggingView() {
   return (
     <section className="page-card logging-view">
       <div className="section-hero">
-        <div><span className="eyebrow"><ListChecks size={14} /> Evidence ledger</span><h1>Rock & defect logging</h1><p>Observed evidence, machine suggestions and reviewer decisions remain separately versioned.</p></div>
-        <div className="hero-metrics"><div><span>Intervals</span><strong>3</strong></div><div><span>Defects</span><strong>6</strong></div><div><span>Needs review</span><strong className="amber">2</strong></div></div>
+        <div><span className="eyebrow"><ListChecks size={14} /> Evidence ledger</span><h1>BH7 photo observations</h1><p>Visible features are recorded separately from engineering interpretation. Every break remains uncertain until physical core review.</p></div>
+        <div className="hero-metrics"><div><span>Intervals</span><strong>{intervals.length}</strong></div><div><span>Observations</span><strong>{defects.length}</strong></div><div><span>Needs review</span><strong className="amber">{defects.length}</strong></div></div>
       </div>
       <div className="toolbar-row">
         <label className="search-box"><Search size={15} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search depth, defect or description" /></label>
@@ -334,13 +361,13 @@ function AgsView() {
     <section className="page-card ags-view">
       <div className="section-hero">
         <div><span className="eyebrow"><FileArchive size={14} /> AGS 4.1.1-oriented transfer</span><h1>Issue without proprietary logging software</h1><p>Generate transparent AGS text plus a polished visual log. Final conformance remains an explicit validation step.</p></div>
-        <div className="standard-badge"><ShieldCheck size={22} /><span><strong>7 groups</strong><small>18 draft DATA rows</small></span></div>
+        <div className="standard-badge"><ShieldCheck size={22} /><span><strong>7 groups</strong><small>21 draft DATA rows</small></span></div>
       </div>
       <div className="ags-grid">
         <div className="ags-groups">
           <h2>Included groups</h2>
           {[
-            ["PROJ", "Project and client metadata", "1 row"], ["LOCA", "Borehole, coordinates and datum", "1 row"], ["GEOL", "Field geological descriptions", "3 rows"], ["DETL", "Defect and detail descriptions", "6 rows"], ["CORE", "Recovery, SCR and RQD", "4 rows"], ["FRAC", "Fracture spacing evidence", "2 rows"], ["FILE", "Source photograph reference", "1 row"],
+            ["PROJ", "Project and client metadata", "1 row"], ["LOCA", "Borehole; coordinates pending", "1 row"], ["GEOL", "Photo-based description draft", "1 row"], ["DETL", "Uncertain break observations", "7 rows"], ["CORE", "Run rows; measurements blank", "10 rows"], ["FRAC", "No approved fracture rows", "0 rows"], ["FILE", "Source photograph reference", "1 row"],
           ].map(([code, label, count]) => <div key={code}><span>{code}</span><strong>{label}</strong><small>{count}</small><CheckCircle2 size={16} /></div>)}
         </div>
         <div className="validation-panel">
@@ -430,10 +457,10 @@ export default function CoreboxDashboard() {
         <main className="workspace-main">
           <WorkflowStrip />
           <div className="summary-strip">
-            <div><Activity size={16} /><span>Analysed</span><strong>4.40 m</strong></div>
-            <div><Gauge size={16} /><span>Weighted RQD</span><strong>75.5%</strong></div>
-            <div><AlertTriangle size={16} /><span>Exceptions</span><strong className="amber">2</strong></div>
-            <div><ShieldCheck size={16} /><span>Traceability</span><strong>100%</strong></div>
+            <div><Activity size={16} /><span>Photo span</span><strong>9.13 m</strong></div>
+            <div><Gauge size={16} /><span>RQD</span><strong>Pending</strong></div>
+            <div><AlertTriangle size={16} /><span>Review items</span><strong className="amber">7</strong></div>
+            <div><ShieldCheck size={16} /><span>Source rows</span><strong>10 linked</strong></div>
           </div>
           {view === "twin" ? <TwinView /> : null}
           {view === "logging" ? <LoggingView /> : null}

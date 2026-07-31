@@ -6,7 +6,15 @@ export type DefectType =
   | "open joint"
   | "weathered seam"
   | "core loss"
-  | "vein";
+  | "vein"
+  | "uncertain break";
+
+export interface PhotoCrop {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 export interface CoreDefect {
   id: string;
@@ -23,23 +31,26 @@ export interface CorePiece {
   row: number;
   top: number;
   base: number;
-  diameterMm: number;
+  diameterMm: number | null;
   lithology: string;
   materialColor: string;
-  includedInRqd: boolean;
+  includedInRqd: boolean | null;
   confidence: number;
   defectIds: string[];
   approved: boolean;
+  photoCrop?: PhotoCrop;
+  rowOffsetM?: number;
+  evidenceBasis?: "observed" | "inferred" | "corrected";
 }
 
 export interface CoreRun {
   id: string;
   top: number;
   base: number;
-  recovery: number;
-  solidRecovery: number;
-  rqd: number;
-  diameterMm: number;
+  recovery: number | null;
+  solidRecovery: number | null;
+  rqd: number | null;
+  diameterMm: number | null;
   status: "approved" | "review";
 }
 
@@ -63,9 +74,9 @@ export interface CoreProject {
   location: string;
   engineer: string;
   boreholeId: string;
-  easting: number;
-  northing: number;
-  groundLevel: number;
+  easting: number | null;
+  northing: number | null;
+  groundLevel: number | null;
   gridReference: string;
   finalDepth: number;
   startedAt: string;
