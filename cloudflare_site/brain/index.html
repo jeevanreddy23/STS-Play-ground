@@ -641,8 +641,21 @@ function renderGraph() {
   const radius = (n) =>
     (n.kind === 'tag' ? 3.2 : 4.6) * o.nodeSize + Math.min(n.deg, 12) * 0.72 * o.nodeSize;
 
+  /* Simulated annealing. Every force is scaled by a temperature that decays
+     each frame, so the layout expands hot, cools, and then stops. Without it,
+     a graph this dense (500+ edges) oscillates forever: springs pull discs
+     into overlap, the overlap shove kicks them back apart, and every node
+     jitters sideways for as long as the tab is open. */
+  let alpha = 1, heatBase = 1, heatAt = performance.now();
+  const reheat = (a) => {
+    heatBase = Math.max(alpha, a);
+    heatAt = performance.now();
+    alpha = heatBase;
+  };
+
   function step() {
     const nodes = graphState.nodes, links = graphState.links;
+    const T = alpha;
     for (let a = 0; a < nodes.length; a++) {
       for (let b = a + 1; b < nodes.length; b++) {
         const A = nodes[a], B = nodes[b];
@@ -653,8 +666,10 @@ function renderGraph() {
         // Repulsion, plus a hard shove when discs overlap so labels stay legible.
         let f = (2400 * o.repel) / d2;
         const minD = radius(A) + radius(B) + 12;
-        if (d < minD) f += (minD - d) * 0.9;
-        const fx = (dx / d) * f, fy = (dy / d) * f;
+        /* The shove is gentle and cools with everything else — a stiff shove
+           against 500 springs is exactly the oscillator we are damping out. */
+        if (d < minD) f += (minD - d) * 0.45;
+        const fx = (dx / d) * f * T, fy = (dy / d) * f * T;
         A.vx -= fx; A.vy -= fy; B.vx += fx; B.vy += fy;
       }
     }
@@ -665,7 +680,7 @@ function renderGraph() {
       const dx = B.x - A.x, dy = B.y - A.y;
       const d = Math.hypot(dx, dy) || 0.01;
       const rest = l.kind === 'tag' ? 120 : 95;
-      const f = (d - rest) * 0.012 * o.linkForce * (l.kind === 'tag' ? 0.6 : 1);
+      const f = (d - rest) * 0.012 * o.linkForce * (l.kind === 'tag' ? 0.6 : 1) * T;
       const fx = (dx / d) * f, fy = (dy / d) * f;
       A.vx += fx; A.vy += fy; B.vx -= fx; B.vy -= fy;
     }
@@ -675,10 +690,13 @@ function renderGraph() {
       /* Pull scales with degree, so hubs settle in the middle and leaves sit on
          the rim. With a flat pull the mass of a hub's own neighbours pushes it
          to the edge, which reads backwards — the busiest note looks peripheral. */
-      const pull = 0.0015 * o.centre * (1 + Math.sqrt(n.deg) * 0.5);
+      const pull = 0.0015 * o.centre * (1 + Math.sqrt(n.deg) * 0.5) * T;
       n.vx -= n.x * pull;
       n.vy -= n.y * pull;
       n.vx *= 0.87; n.vy *= 0.87;
+      // Cap the step so a crowded node cannot overshoot and ring back.
+      const sp = Math.hypot(n.vx, n.vy);
+      if (sp > 6) { n.vx *= 6 / sp; n.vy *= 6 / sp; }
       n.x += n.vx; n.y += n.vy;
       energy += n.vx * n.vx + n.vy * n.vy;
     }
@@ -834,7 +852,15 @@ function renderGraph() {
   let alive = true, frames = 0, fitted = false;
   (function loop() {
     if (!alive || view !== 'graph') { ro.disconnect(); return; }
-    const energy = step();
+    /* Once cold, stop stepping entirely — a frozen layout costs nothing and
+       cannot jitter. Interaction reheats it. Cooling is wall-clock, not
+       per-frame, so a slow machine still freezes in the same ~6 seconds. */
+    const hot = alpha > 0.004 || drag;
+    const energy = hot ? step() : 0;
+    if (hot && !drag) {
+      const elapsed = (performance.now() - heatAt) / 1000;
+      alpha = heatBase * Math.pow(0.985, elapsed * 60);
+    }
     frames++;
     /* Fit once the layout has stopped moving. A fixed frame count fires while
        the graph is still expanding, which framed a view that immediately grew
@@ -870,7 +896,7 @@ function renderGraph() {
     cv.style.cursor = 'grabbing';
   });
   addEventListener('pointerup', () => {
-    if (drag) { drag.fixed = false; drag = null; }
+    if (drag) { drag.fixed = false; drag = null; reheat(0.3); }
     panning = false;
     cv.style.cursor = 'grab';
   });
@@ -879,6 +905,7 @@ function renderGraph() {
     if (drag) {
       const p = toWorld(e);
       drag.x = p.x; drag.y = p.y; drag.vx = 0; drag.vy = 0;
+      reheat(0.3);
       return;
     }
     if (panning && last) {
@@ -926,6 +953,7 @@ function renderGraph() {
       activeTags.has(t) ? activeTags.delete(t) : activeTags.add(t);
       renderNav();
       rebuild(true);
+      reheat(1); frames = 0; fitted = false;
       return;
     }
     alive = false;
@@ -947,12 +975,13 @@ function renderGraph() {
     if (!el) return;
     el.addEventListener('input', () => {
       o[key] = kind === 'bool' ? el.checked : Number(el.value);
+      reheat(0.6);
       if (kind === 'bool' || key === 'depth') {
         if (key === 'depth') {
           $('g-depth-l').textContent = o.depth === 0 ? 'whole vault' : o.depth + ' hop' + (o.depth > 1 ? 's' : '');
         }
         rebuild(true);
-        frames = 0; fitted = false;
+        reheat(1); frames = 0; fitted = false;
       }
     });
   };
