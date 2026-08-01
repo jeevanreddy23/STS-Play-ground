@@ -11,7 +11,7 @@
     --surface: #fcfcfb; --plane: #f2f2ef; --sidebar: #f7f7f4;
     --ink: #0b0b0b; --ink2: #52514e; --muted: #898781;
     --line: #e1e0d9; --accent: #2a78d6; --accent-soft: #e7f0fb;
-    --link: #1c5cab; --tag: #eb6834;
+    --link: #1c5cab; --tag: #eb6834; --border-ring: rgba(11,11,11,.1);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme=light]) {
@@ -19,7 +19,7 @@
       --surface: #1a1a19; --plane: #0d0d0d; --sidebar: #151514;
       --ink: #ffffff; --ink2: #c3c2b7; --muted: #898781;
       --line: #2c2c2a; --accent: #3987e5; --accent-soft: #17263a;
-      --link: #86b6ef; --tag: #d95926;
+      --link: #86b6ef; --tag: #d95926; --border-ring: rgba(255,255,255,.12);
     }
   }
   :root[data-theme=dark] {
@@ -27,7 +27,7 @@
     --surface: #1a1a19; --plane: #0d0d0d; --sidebar: #151514;
     --ink: #ffffff; --ink2: #c3c2b7; --muted: #898781;
     --line: #2c2c2a; --accent: #3987e5; --accent-soft: #17263a;
-    --link: #86b6ef; --tag: #d95926;
+    --link: #86b6ef; --tag: #d95926; --border-ring: rgba(255,255,255,.12);
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
@@ -124,9 +124,58 @@
   .result p { margin: 0; font-size: 12.5px; color: var(--ink2); }
   .result mark { background: color-mix(in srgb, var(--accent) 25%, transparent); color: inherit; border-radius: 3px; }
 
-  #graph { width: 100%; height: 100%; display: block; cursor: grab; }
-  .graphwrap { position: relative; height: 100%; }
-  .graphhint { position: absolute; left: 14px; bottom: 12px; font-size: 11px; color: var(--muted); }
+  #graph { width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+  .graphwrap { position: relative; height: 100%; overflow: hidden; }
+  .graphhint { position: absolute; left: 14px; bottom: 12px; font-size: 11px; color: var(--muted); pointer-events: none; }
+
+  #gtip {
+    position: absolute; display: none; pointer-events: none; z-index: 6;
+    background: rgba(11,11,11,.9); color: #fff; border-radius: 8px;
+    padding: 6px 10px; font-size: 12px; line-height: 1.45; max-width: 240px;
+  }
+  #gtip .t2 { color: #c3c2b7; font-size: 10.5px; }
+
+  .glegend {
+    position: absolute; left: 12px; top: 12px; z-index: 5;
+    background: color-mix(in srgb, var(--surface) 90%, transparent);
+    border: 1px solid var(--border-ring, rgba(11,11,11,.1));
+    border-radius: 9px; padding: 8px 11px; font-size: 11px; color: var(--ink2); line-height: 1.8;
+    pointer-events: none;
+  }
+  .glegend .sw { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+  .glegend .sw.hollow { background: transparent; border: 1.6px solid; }
+  .glegend .dim { color: var(--muted); margin-top: 3px; }
+
+  .gpanel {
+    position: absolute; right: 12px; top: 12px; z-index: 5; width: 208px;
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 4px 10px 8px; font-size: 11.5px; color: var(--ink2);
+    max-height: calc(100% - 24px); overflow-y: auto;
+  }
+  .gpanel details { border-bottom: 1px solid var(--line); padding: 4px 0; }
+  .gpanel details:last-of-type { border-bottom: 0; }
+  .gpanel summary {
+    cursor: pointer; font-weight: 700; color: var(--ink); list-style: none;
+    font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; padding: 3px 0;
+  }
+  .gpanel summary::-webkit-details-marker { display: none; }
+  .gpanel summary::before { content: '▾ '; color: var(--muted); }
+  .gpanel details:not([open]) summary::before { content: '▸ '; }
+  .gpanel .row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; padding: 3px 0; cursor: pointer;
+  }
+  .gpanel .row.dim { color: var(--muted); font-size: 10.5px; cursor: default; padding-top: 0; }
+  .gpanel input[type=range] { width: 92px; accent-color: var(--accent); }
+  .gpanel input[type=checkbox] { accent-color: var(--accent); }
+  .gpanel .btn { width: 100%; margin-top: 6px; font-size: 11.5px; padding: 4px 8px; }
+
+  @media (max-width: 820px) {
+    .gpanel { width: 168px; font-size: 11px; }
+    .gpanel input[type=range] { width: 66px; }
+    .glegend { display: none; }
+  }
 
   .capture { max-width: 720px; margin: 0 auto; padding: 22px 28px 80px; }
   .capture h2 { margin-top: 0; }
@@ -387,43 +436,194 @@ function renderSearch() {
 }
 
 /* ----------------------------------------------------------------- graph */
-function renderGraph() {
-  view = 'graph';
-  syncViewSeg();
-  $('main').innerHTML = '<div class="graphwrap"><canvas id="graph"></canvas><div class="graphhint">drag to pan · scroll to zoom · click a node to open it</div></div>';
-  const cv = $('graph');
-  const ctx = cv.getContext('2d');
+/**
+ * Knowledge graph.
+ *
+ * Notes and tags are both nodes, which is what makes this a knowledge graph
+ * rather than a link diagram: a tag is a real piece of structure connecting
+ * notes that never cite each other, and hiding it loses that. Tags are drawn
+ * smaller and hollow so they can never be mistaken for a note.
+ *
+ * Layout is a plain force simulation — repulsion between every pair, springs
+ * along edges, a weak pull to centre so unconnected notes stay on screen, and
+ * collision so labels do not stack. State lives outside the render function so
+ * toggling a control does not throw away the layout you were looking at.
+ */
+const graphState = {
+  nodes: null,
+  links: null,
+  cam: { x: 0, y: 0, k: 1 },
+  opts: {
+    showTags: true,
+    showOrphans: true,
+    showArrows: true,
+    depth: 0, // 0 = whole vault; 1-3 = local graph around the open note
+    textFade: 1.1, // zoom above which every label becomes a candidate
+    nodeSize: 1,
+    linkForce: 1,
+    repel: 1.4,
+    centre: 1.3,
+  },
+  built: null, // signature of the data the current layout was built from
+};
 
+const NODE_COLOUR = {
+  moc: '#4a3aa7', standard: '#2a78d6', material: '#1baf7a',
+  method: '#eb6834', decision: '#e34948', reference: '#eda100',
+  template: '#898781', note: '#898781',
+};
+const TAG_COLOUR = '#e87ba4';
+
+/** Nodes within `depth` hops of the open note. depth 0 means everything. */
+function withinDepth(nodes, links, rootId, depth) {
+  if (!depth || !rootId) return null;
+  const adj = new Map();
+  for (const l of links) {
+    (adj.get(l.a) ?? adj.set(l.a, []).get(l.a)).push(l.b);
+    (adj.get(l.b) ?? adj.set(l.b, []).get(l.b)).push(l.a);
+  }
+  const seen = new Set([rootId]);
+  let frontier = [rootId];
+  for (let d = 0; d < depth; d++) {
+    const next = [];
+    for (const id of frontier) {
+      for (const n of adj.get(id) ?? []) {
+        if (!seen.has(n)) { seen.add(n); next.push(n); }
+      }
+    }
+    frontier = next;
+  }
+  return seen;
+}
+
+function buildGraphData() {
+  const o = graphState.opts;
   const notes = visibleNotes();
-  const allow = new Set(notes.map((n) => n.slug));
-  const nodes = notes.map((n, i) => ({
-    slug: n.slug, title: n.title, type: n.type,
-    deg: n.backlinks.length + n.resolved.length,
-    x: Math.cos((i / notes.length) * Math.PI * 2) * 200 + (Math.random() - 0.5) * 40,
-    y: Math.sin((i / notes.length) * Math.PI * 2) * 200 + (Math.random() - 0.5) * 40,
-    vx: 0, vy: 0,
-  }));
-  const idx = new Map(nodes.map((n, i) => [n.slug, i]));
+  const allowed = new Set(notes.map((n) => n.slug));
+
+  const nodes = [];
   const links = [];
+
+  for (const n of notes) {
+    nodes.push({
+      id: n.slug, kind: 'note', label: n.title, type: n.type,
+      deg: 0, x: 0, y: 0, vx: 0, vy: 0,
+    });
+  }
   for (const n of notes) {
     for (const r of n.resolved) {
-      if (allow.has(r.slug)) links.push([idx.get(n.slug), idx.get(r.slug)]);
+      if (allowed.has(r.slug)) links.push({ a: n.slug, b: r.slug, kind: 'link' });
     }
   }
 
-  const COLOUR = {
-    moc: '#4a3aa7', standard: '#2a78d6', material: '#1baf7a',
-    method: '#eb6834', decision: '#e34948', reference: '#eda100',
-    template: '#898781', note: '#898781',
-  };
+  if (o.showTags) {
+    const tagged = new Map();
+    for (const n of notes) for (const t of n.tags) {
+      if (!tagged.has(t)) tagged.set(t, []);
+      tagged.get(t).push(n.slug);
+    }
+    for (const [t, members] of tagged) {
+      // A tag on a single note adds a spur and no structure — skip it.
+      if (members.length < 2) continue;
+      const id = 'tag:' + t;
+      nodes.push({ id, kind: 'tag', label: '#' + t, deg: 0, x: 0, y: 0, vx: 0, vy: 0 });
+      for (const m of members) links.push({ a: m, b: id, kind: 'tag' });
+    }
+  }
 
-  let cam = { x: 0, y: 0, k: 1 };
-  let hover = null, dragging = false, last = null;
+  for (const l of links) {
+    const A = nodes.find((n) => n.id === l.a);
+    const B = nodes.find((n) => n.id === l.b);
+    if (A) A.deg++;
+    if (B) B.deg++;
+  }
+
+  let keep = nodes;
+  const inDepth = withinDepth(nodes, links, current, o.depth);
+  if (inDepth) keep = keep.filter((n) => inDepth.has(n.id));
+  if (!o.showOrphans) keep = keep.filter((n) => n.deg > 0 || n.id === current);
+
+  const keepIds = new Set(keep.map((n) => n.id));
+  return {
+    nodes: keep,
+    links: links.filter((l) => keepIds.has(l.a) && keepIds.has(l.b)),
+  };
+}
+
+function renderGraph() {
+  view = 'graph';
+  syncViewSeg();
+
+  const o = graphState.opts;
+  $('main').innerHTML = `
+    <div class="graphwrap">
+      <canvas id="graph"></canvas>
+      <div id="gtip"></div>
+      <div class="glegend" id="glegend"></div>
+      <div class="gpanel">
+        <details open>
+          <summary>Filters</summary>
+          <label class="row"><span>Tags as nodes</span><input type="checkbox" id="g-tags" ${o.showTags ? 'checked' : ''}></label>
+          <label class="row"><span>Orphans</span><input type="checkbox" id="g-orph" ${o.showOrphans ? 'checked' : ''}></label>
+          <label class="row"><span>Depth from open note</span><input type="range" id="g-depth" min="0" max="4" step="1" value="${o.depth}"></label>
+          <div class="row dim"><span></span><span id="g-depth-l">${o.depth === 0 ? 'whole vault' : o.depth + ' hop' + (o.depth > 1 ? 's' : '')}</span></div>
+        </details>
+        <details open>
+          <summary>Display</summary>
+          <label class="row"><span>Arrows</span><input type="checkbox" id="g-arr" ${o.showArrows ? 'checked' : ''}></label>
+          <label class="row"><span>Label threshold</span><input type="range" id="g-fade" min="0.4" max="2.2" step="0.1" value="${o.textFade}"></label>
+          <label class="row"><span>Node size</span><input type="range" id="g-size" min="0.5" max="2.2" step="0.1" value="${o.nodeSize}"></label>
+        </details>
+        <details>
+          <summary>Forces</summary>
+          <label class="row"><span>Repel</span><input type="range" id="g-repel" min="0.3" max="2.5" step="0.1" value="${o.repel}"></label>
+          <label class="row"><span>Link</span><input type="range" id="g-link" min="0.2" max="2.5" step="0.1" value="${o.linkForce}"></label>
+          <label class="row"><span>Centre</span><input type="range" id="g-cent" min="0.2" max="2.5" step="0.1" value="${o.centre}"></label>
+          <button class="btn" id="g-reset">Re-layout</button>
+        </details>
+      </div>
+      <div class="graphhint">drag background to pan · drag a node to move it · scroll to zoom · click to open</div>
+    </div>`;
+
+  const cv = $('graph');
+  const ctx = cv.getContext('2d');
+  const tip = $('gtip');
+
+  function rebuild(force) {
+    const data = buildGraphData();
+    const sig = JSON.stringify([data.nodes.map((n) => n.id), data.links.length, [...activeTags]]);
+    if (!force && graphState.built === sig && graphState.nodes) {
+      // Same data — keep the positions the user is looking at.
+      const pos = new Map(graphState.nodes.map((n) => [n.id, n]));
+      data.nodes.forEach((n) => {
+        const p = pos.get(n.id);
+        if (p) { n.x = p.x; n.y = p.y; n.vx = p.vx; n.vy = p.vy; n.fixed = p.fixed; }
+        else seed(n, data.nodes.length);
+      });
+    } else {
+      data.nodes.forEach((n, i) => seed(n, data.nodes.length, i));
+    }
+    graphState.built = sig;
+    graphState.nodes = data.nodes;
+    graphState.links = data.links;
+    drawLegend();
+  }
+  function seed(n, total, i = Math.random() * total) {
+    const a = (i / Math.max(total, 1)) * Math.PI * 2;
+    const r = 150 + (n.kind === 'tag' ? 90 : 0);
+    n.x = Math.cos(a) * r + (Math.random() - 0.5) * 30;
+    n.y = Math.sin(a) * r + (Math.random() - 0.5) * 30;
+    n.vx = 0; n.vy = 0;
+  }
+  rebuild(!graphState.nodes);
+
+  const css = getComputedStyle(document.documentElement);
+  const V = (k, f) => (css.getPropertyValue(k).trim() || f);
 
   function size() {
     const r = cv.parentElement.getBoundingClientRect();
-    cv.width = r.width * devicePixelRatio;
-    cv.height = r.height * devicePixelRatio;
+    cv.width = Math.max(1, r.width * devicePixelRatio);
+    cv.height = Math.max(1, r.height * devicePixelRatio);
     cv.style.width = r.width + 'px';
     cv.style.height = r.height + 'px';
   }
@@ -431,75 +631,215 @@ function renderGraph() {
   const ro = new ResizeObserver(size);
   ro.observe(cv.parentElement);
 
-  /* Force layout: repulsion between all nodes, springs along links, gentle
-     pull to centre so disconnected notes do not drift off screen. */
+  const cam = graphState.cam;
+  let hover = null, drag = null, panning = false, last = null;
+  // A pointerup after a drag still fires click, which would open the note you
+  // were only trying to move. Swallow that one click.
+  let moved = false, downAt = null;
+
+  const radius = (n) =>
+    (n.kind === 'tag' ? 3.2 : 4.6) * o.nodeSize + Math.min(n.deg, 12) * 0.72 * o.nodeSize;
+
   function step() {
+    const nodes = graphState.nodes, links = graphState.links;
     for (let a = 0; a < nodes.length; a++) {
       for (let b = a + 1; b < nodes.length; b++) {
         const A = nodes[a], B = nodes[b];
         let dx = B.x - A.x, dy = B.y - A.y;
         let d2 = dx * dx + dy * dy || 0.01;
-        if (d2 > 90000) continue;
-        const f = 2600 / d2;
+        if (d2 > 160000) continue;
         const d = Math.sqrt(d2);
+        // Repulsion, plus a hard shove when discs overlap so labels stay legible.
+        let f = (2400 * o.repel) / d2;
+        const minD = radius(A) + radius(B) + 12;
+        if (d < minD) f += (minD - d) * 0.9;
         const fx = (dx / d) * f, fy = (dy / d) * f;
         A.vx -= fx; A.vy -= fy; B.vx += fx; B.vy += fy;
       }
     }
-    for (const [a, b] of links) {
-      const A = nodes[a], B = nodes[b];
+    const byId = new Map(nodes.map((n) => [n.id, n]));
+    for (const l of links) {
+      const A = byId.get(l.a), B = byId.get(l.b);
+      if (!A || !B) continue;
       const dx = B.x - A.x, dy = B.y - A.y;
       const d = Math.hypot(dx, dy) || 0.01;
-      const f = (d - 90) * 0.012;
+      const rest = l.kind === 'tag' ? 120 : 95;
+      const f = (d - rest) * 0.012 * o.linkForce * (l.kind === 'tag' ? 0.6 : 1);
       const fx = (dx / d) * f, fy = (dy / d) * f;
       A.vx += fx; A.vy += fy; B.vx -= fx; B.vy -= fy;
     }
+    let energy = 0;
     for (const n of nodes) {
-      n.vx -= n.x * 0.0016; n.vy -= n.y * 0.0016;
-      n.vx *= 0.86; n.vy *= 0.86;
+      if (n.fixed) { n.vx = 0; n.vy = 0; continue; }
+      /* Pull scales with degree, so hubs settle in the middle and leaves sit on
+         the rim. With a flat pull the mass of a hub's own neighbours pushes it
+         to the edge, which reads backwards — the busiest note looks peripheral. */
+      const pull = 0.0015 * o.centre * (1 + Math.sqrt(n.deg) * 0.5);
+      n.vx -= n.x * pull;
+      n.vy -= n.y * pull;
+      n.vx *= 0.87; n.vy *= 0.87;
       n.x += n.vx; n.y += n.vy;
+      energy += n.vx * n.vx + n.vy * n.vy;
     }
+    return energy / Math.max(nodes.length, 1);
   }
 
-  const css = getComputedStyle(document.documentElement);
+  /** Neighbours of the hovered node, for the highlight-and-dim pass. */
+  function neighbourhood(id) {
+    if (!id) return null;
+    const set = new Set([id]);
+    for (const l of graphState.links) {
+      if (l.a === id) set.add(l.b);
+      if (l.b === id) set.add(l.a);
+    }
+    return set;
+  }
+
   function draw() {
+    const nodes = graphState.nodes, links = graphState.links;
     const W = cv.width, H = cv.height, dpr = devicePixelRatio;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, W, H);
     ctx.setTransform(cam.k * dpr, 0, 0, cam.k * dpr, W / 2 + cam.x * dpr, H / 2 + cam.y * dpr);
 
-    ctx.strokeStyle = css.getPropertyValue('--line').trim() || '#e1e0d9';
+    const near = neighbourhood(hover?.id);
+    const byId = new Map(nodes.map((n) => [n.id, n]));
+    const lineBase = V('--line', '#e1e0d9');
+    const accent = V('--accent', '#2a78d6');
+    const ink = V('--ink', '#0b0b0b');
+
     ctx.lineWidth = 1 / cam.k;
-    for (const [a, b] of links) {
-      const A = nodes[a], B = nodes[b];
-      const lit = hover && (A.slug === hover.slug || B.slug === hover.slug);
-      ctx.globalAlpha = lit ? 1 : 0.45;
-      ctx.strokeStyle = lit ? (css.getPropertyValue('--accent').trim() || '#2a78d6') : (css.getPropertyValue('--line').trim() || '#e1e0d9');
+    for (const l of links) {
+      const A = byId.get(l.a), B = byId.get(l.b);
+      if (!A || !B) continue;
+      const lit = near && near.has(A.id) && near.has(B.id);
+      ctx.globalAlpha = near ? (lit ? 1 : 0.07) : (l.kind === 'tag' ? 0.34 : 0.62);
+      ctx.strokeStyle = lit ? accent : lineBase;
+      ctx.lineWidth = (lit ? 1.8 : 1) / cam.k;
+      if (l.kind === 'tag') ctx.setLineDash([3 / cam.k, 3 / cam.k]); else ctx.setLineDash([]);
       ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(B.x, B.y); ctx.stroke();
+
+      if (o.showArrows && l.kind === 'link' && (!near || lit)) {
+        const dx = B.x - A.x, dy = B.y - A.y;
+        const d = Math.hypot(dx, dy) || 1;
+        const ux = dx / d, uy = dy / d;
+        const tipX = B.x - ux * (radius(B) + 2 / cam.k);
+        const tipY = B.y - uy * (radius(B) + 2 / cam.k);
+        const s = 5 / cam.k;
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.moveTo(tipX, tipY);
+        ctx.lineTo(tipX - ux * s - uy * s * 0.55, tipY - uy * s + ux * s * 0.55);
+        ctx.lineTo(tipX - ux * s + uy * s * 0.55, tipY - uy * s - ux * s * 0.55);
+        ctx.closePath();
+        ctx.fillStyle = lit ? accent : lineBase;
+        ctx.fill();
+      }
     }
+    ctx.setLineDash([]);
     ctx.globalAlpha = 1;
 
-    ctx.font = `${12 / cam.k}px system-ui, sans-serif`;
     ctx.textAlign = 'center';
     for (const n of nodes) {
-      const r = 4 + Math.min(n.deg, 10) * 0.9;
-      ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-      ctx.fillStyle = COLOUR[n.type] ?? '#898781';
-      ctx.globalAlpha = hover && hover.slug !== n.slug ? 0.4 : 1;
-      ctx.fill();
-      if (n.slug === current) { ctx.lineWidth = 2.5 / cam.k; ctx.strokeStyle = css.getPropertyValue('--ink').trim() || '#0b0b0b'; ctx.stroke(); }
-      if (cam.k > 0.65 || hover?.slug === n.slug || n.deg > 4) {
-        ctx.fillStyle = css.getPropertyValue('--ink').trim() || '#0b0b0b';
-        ctx.fillText(n.title.length > 26 ? n.title.slice(0, 25) + '…' : n.title, n.x, n.y + r + 12 / cam.k);
+      const r = radius(n);
+      const dim = near && !near.has(n.id);
+      ctx.globalAlpha = dim ? 0.16 : 1;
+
+      if (!dim && (n.id === current || hover?.id === n.id)) {
+        // Soft halo marks the open note and whatever is under the cursor.
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, r + 5 / cam.k, 0, Math.PI * 2);
+        ctx.fillStyle = accent;
+        ctx.globalAlpha = 0.18;
+        ctx.fill();
+        ctx.globalAlpha = 1;
       }
+
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+      if (n.kind === 'tag') {
+        ctx.fillStyle = V('--surface', '#fcfcfb');
+        ctx.fill();
+        ctx.strokeStyle = TAG_COLOUR;
+        ctx.lineWidth = 1.6 / cam.k;
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = NODE_COLOUR[n.type] ?? '#898781';
+        ctx.fill();
+        if (n.id === current) {
+          ctx.strokeStyle = ink;
+          ctx.lineWidth = 2 / cam.k;
+          ctx.stroke();
+        }
+      }
+
       ctx.globalAlpha = 1;
+    }
+
+    /* Labels last, and only where they fit.
+       Drawing every label turns the graph into a wall of overlapping text, so
+       candidates are taken in priority order — hovered, open note, then by
+       degree — and any whose box would collide with one already placed is
+       dropped. The important nodes keep their names; the rest reveal theirs on
+       hover or as you zoom in. */
+    const placed = [];
+    const candidates = [...nodes].sort((a, b) => {
+      const rank = (n) => (n.id === hover?.id ? 3 : n.id === current ? 2 : 0);
+      return (rank(b) - rank(a)) || (b.deg - a.deg);
+    });
+    for (const n of candidates) {
+      const dim = near && !near.has(n.id);
+      if (dim) continue;
+      const forced = n.id === hover?.id || n.id === current;
+      // Tags only earn a label once you have zoomed in on them.
+      if (!forced && n.kind === 'tag' && cam.k < 1.4) continue;
+      if (!forced && cam.k < o.textFade && n.deg < 4) continue;
+
+      const fs = (n.kind === 'tag' ? 10 : 11.5) / cam.k;
+      ctx.font = `${n.kind === 'tag' ? 400 : 600} ${fs}px system-ui, sans-serif`;
+      const text = n.label.length > 28 ? n.label.slice(0, 27) + '…' : n.label;
+      const w = ctx.measureText(text).width;
+      const y = n.y + radius(n) + fs + 1 / cam.k;
+      const box = { x0: n.x - w / 2, x1: n.x + w / 2, y0: y - fs, y1: y + fs * 0.35 };
+      const clash = placed.some((b) =>
+        box.x0 < b.x1 && box.x1 > b.x0 && box.y0 < b.y1 && box.y1 > b.y0);
+      if (clash && !forced) continue;
+      placed.push(box);
+
+      ctx.lineWidth = 3.5 / cam.k;
+      ctx.strokeStyle = V('--plane', '#f2f2ef');
+      ctx.strokeText(text, n.x, y);
+      ctx.fillStyle = n.kind === 'tag' ? V('--ink2', '#52514e') : ink;
+      ctx.fillText(text, n.x, y);
     }
   }
 
-  let alive = true;
+  /* Let the simulation settle, then frame it. Without this the initial camera
+     is a guess and low-degree nodes drift off the edge where nobody sees them. */
+  function fitView() {
+    const nodes = graphState.nodes;
+    if (!nodes.length) return;
+    const xs = nodes.map((n) => n.x), ys = nodes.map((n) => n.y);
+    const w = Math.max(...xs) - Math.min(...xs);
+    const h = Math.max(...ys) - Math.min(...ys);
+    const cx = (Math.max(...xs) + Math.min(...xs)) / 2;
+    const cy = (Math.max(...ys) + Math.min(...ys)) / 2;
+    const vw = cv.width / devicePixelRatio, vh = cv.height / devicePixelRatio;
+    cam.k = Math.max(0.25, Math.min(2.2, Math.min(vw / (w + 190), vh / (h + 150))));
+    cam.x = -cx * cam.k;
+    cam.y = -cy * cam.k;
+  }
+
+  let alive = true, frames = 0, fitted = false;
   (function loop() {
     if (!alive || view !== 'graph') { ro.disconnect(); return; }
-    step(); draw();
+    const energy = step();
+    frames++;
+    /* Fit once the layout has stopped moving. A fixed frame count fires while
+       the graph is still expanding, which framed a view that immediately grew
+       out of it. The frame cap is a backstop for layouts that never settle. */
+    if (!fitted && (energy < 0.04 || frames > 400)) { fitView(); fitted = true; }
+    draw();
     requestAnimationFrame(loop);
   })();
 
@@ -512,24 +852,122 @@ function renderGraph() {
   }
   function pick(ev) {
     const p = toWorld(ev);
-    let best = null, bd = 14 / cam.k;
-    for (const n of nodes) {
+    let best = null, bd = Infinity;
+    for (const n of graphState.nodes) {
       const d = Math.hypot(n.x - p.x, n.y - p.y);
-      if (d < bd) { bd = d; best = n; }
+      if (d < Math.max(radius(n) + 6 / cam.k, 10 / cam.k) && d < bd) { bd = d; best = n; }
     }
     return best;
   }
-  cv.addEventListener('pointerdown', (e) => { dragging = true; last = e; cv.style.cursor = 'grabbing'; });
-  addEventListener('pointerup', () => { dragging = false; cv.style.cursor = 'grab'; });
-  cv.addEventListener('pointermove', (e) => {
-    if (dragging && last) { cam.x += e.clientX - last.clientX; cam.y += e.clientY - last.clientY; last = e; }
-    else { hover = pick(e); cv.style.cursor = hover ? 'pointer' : 'grab'; }
+
+  cv.addEventListener('pointerdown', (e) => {
+    const n = pick(e);
+    moved = false;
+    downAt = { x: e.clientX, y: e.clientY };
+    if (n) { drag = n; n.fixed = true; cv.setPointerCapture(e.pointerId); }
+    else { panning = true; last = e; }
+    cv.style.cursor = 'grabbing';
   });
+  addEventListener('pointerup', () => {
+    if (drag) { drag.fixed = false; drag = null; }
+    panning = false;
+    cv.style.cursor = 'grab';
+  });
+  cv.addEventListener('pointermove', (e) => {
+    if (downAt && Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) > 4) moved = true;
+    if (drag) {
+      const p = toWorld(e);
+      drag.x = p.x; drag.y = p.y; drag.vx = 0; drag.vy = 0;
+      return;
+    }
+    if (panning && last) {
+      cam.x += e.clientX - last.clientX;
+      cam.y += e.clientY - last.clientY;
+      last = e;
+      return;
+    }
+    hover = pick(e);
+    cv.style.cursor = hover ? 'pointer' : 'grab';
+    if (hover) {
+      const r = cv.getBoundingClientRect();
+      const note = hover.kind === 'note' ? bySlug()[hover.id] : null;
+      tip.style.display = 'block';
+      tip.style.left = (e.clientX - r.left + 14) + 'px';
+      tip.style.top = (e.clientY - r.top + 10) + 'px';
+      tip.innerHTML = note
+        ? `<b>${esc(note.title)}</b><div class="t2">${note.type} · ${note.backlinks.length} in · ${note.resolved.length} out</div>`
+        : `<b>${esc(hover.label)}</b><div class="t2">tag · ${hover.deg} notes</div>`;
+    } else {
+      tip.style.display = 'none';
+    }
+  });
+  cv.addEventListener('pointerleave', () => { tip.style.display = 'none'; hover = null; });
+
   cv.addEventListener('wheel', (e) => {
     e.preventDefault();
-    cam.k = Math.max(0.25, Math.min(3, cam.k * (e.deltaY > 0 ? 0.9 : 1.1)));
+    const r = cv.getBoundingClientRect();
+    const sx = e.clientX - r.left - r.width / 2;
+    const sy = e.clientY - r.top - r.height / 2;
+    const wx = (sx - cam.x) / cam.k, wy = (sy - cam.y) / cam.k;
+    cam.k = Math.max(0.2, Math.min(4, cam.k * (e.deltaY > 0 ? 0.88 : 1.12)));
+    // Keep the point under the cursor pinned while zooming.
+    cam.x = sx - wx * cam.k;
+    cam.y = sy - wy * cam.k;
   }, { passive: false });
-  cv.addEventListener('click', (e) => { const n = pick(e); if (n) { alive = false; renderNote(n.slug); } });
+
+  cv.addEventListener('click', (e) => {
+    if (moved) { moved = false; downAt = null; return; }
+    downAt = null;
+    const n = pick(e);
+    if (!n) return;
+    if (n.kind === 'tag') {
+      const t = n.label.slice(1);
+      activeTags.has(t) ? activeTags.delete(t) : activeTags.add(t);
+      renderNav();
+      rebuild(true);
+      return;
+    }
+    alive = false;
+    renderNote(n.id);
+  });
+
+  function drawLegend() {
+    const types = [...new Set((graphState.nodes ?? []).filter((n) => n.kind === 'note').map((n) => n.type))];
+    const tagCount = (graphState.nodes ?? []).filter((n) => n.kind === 'tag').length;
+    $('glegend').innerHTML =
+      types.map((t) => `<div><span class="sw" style="background:${NODE_COLOUR[t] ?? '#898781'}"></span>${t}</div>`).join('') +
+      (tagCount ? `<div><span class="sw hollow" style="border-color:${TAG_COLOUR}"></span>tag (${tagCount}) — click to filter</div>` : '') +
+      `<div class="dim">${(graphState.nodes ?? []).length} nodes · ${(graphState.links ?? []).length} edges</div>`;
+  }
+  drawLegend();
+
+  const bind = (id, key, kind) => {
+    const el = $(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      o[key] = kind === 'bool' ? el.checked : Number(el.value);
+      if (kind === 'bool' || key === 'depth') {
+        if (key === 'depth') {
+          $('g-depth-l').textContent = o.depth === 0 ? 'whole vault' : o.depth + ' hop' + (o.depth > 1 ? 's' : '');
+        }
+        rebuild(true);
+        frames = 0; fitted = false;
+      }
+    });
+  };
+  bind('g-tags', 'showTags', 'bool');
+  bind('g-orph', 'showOrphans', 'bool');
+  bind('g-arr', 'showArrows', 'bool');
+  bind('g-depth', 'depth', 'num');
+  bind('g-fade', 'textFade', 'num');
+  bind('g-size', 'nodeSize', 'num');
+  bind('g-repel', 'repel', 'num');
+  bind('g-link', 'linkForce', 'num');
+  bind('g-cent', 'centre', 'num');
+  $('g-reset').addEventListener('click', () => {
+    rebuild(true);
+    frames = 0; fitted = false; // settle again, then re-fit
+  });
 }
 
 /* --------------------------------------------------------------- capture */
