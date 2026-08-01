@@ -2,7 +2,7 @@
 title: Reference library
 type: moc
 tags: [moc, library, reference]
-updated: 2026-07-29
+updated: 2026-08-01
 ---
 
 # Reference library
@@ -25,6 +25,22 @@ Local root: `C:\Users\pored\Downloads\G materials`
 - [[Library - plate load testing]] — PLT procedure, spreadsheets and training
 - [[Library - salinity and sodic soils]] — western Sydney salinity guidance
 - [[Library - reference texts and parameter sources]] — textbooks and correlation sources
+
+## Section maps
+
+Clause-level finding aids for the standards whose text could be read. Headings
+only — no clause text is reproduced.
+
+- [[Section map - AS 1726:2017]]
+- [[Section map - AS 2159:2009]] — OCR-rebuilt; the local PDF has no text layer
+- [[Section map - AS 2870:2011]]
+- [[Section map - AS 3798:2007]]
+- [[Section map - AS 4678:2002]]
+
+## Project reports
+
+- [[Project reports]] — the 17 Core Geotech documents held alongside these
+  references, indexed one note per document
 
 ## Housekeeping notes
 

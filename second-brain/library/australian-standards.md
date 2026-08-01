@@ -2,7 +2,7 @@
 title: Library - Australian Standards
 type: reference
 tags: [library, standard]
-updated: 2026-07-29
+updated: 2026-08-01
 ---
 
 # Library - Australian Standards
@@ -15,8 +15,8 @@ Held under `G materials/Australian/` (and duplicated in
 | AS 1726:2017 | Geotechnical site investigations | [[AS 1726 soil and rock description]] |
 | AS 2159:2009 | Piling — design and installation | [[AS 2159 piling]] |
 | AS 2870:2011 | Residential slabs and footings | [[AS 2870 residential site classification]] |
-| AS 3798:2007 | Earthworks for commercial and residential developments | — |
-| AS 4678:2002 | Earth-retaining structures | — |
+| AS 3798:2007 | Earthworks for commercial and residential developments | [[Section map - AS 3798:2007]] |
+| AS 4678:2002 | Earth-retaining structures | [[Section map - AS 4678:2002]] |
 | AS 1547:2012 | On-site domestic wastewater management (scanned) | — |
 | AS 1170.2:2011 | Wind actions | — |
 | AS 1170.4:2007 | Earthquake actions in Australia | — |
