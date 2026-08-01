@@ -61,6 +61,40 @@ The `geoflow-verify-graph` skill in this repo is a diamond: independent
 read-only verifier agents fan out, a barrier collects their reports, findings
 are reduced, fixed, and re-verified. The reduce step is the checker.
 
+## Where graphs break
+
+Three failure modes, all worth designing against before you hit them.
+
+**Context collapse.** Fan out to hundreds of nodes and try to feed every raw
+output into one synthesis step, and you exhaust the context window before
+synthesis begins. Fix: layer the fan-in — group into batches, summarise each
+batch, then consolidate the summaries rather than the raw outputs.
+
+**False independence.** Two nodes look independent because neither prompt
+mentions the other, but they write to the same file or share a rate-limited
+API. That is a hidden edge. Audit for shared *resources*, not just shared data —
+a write conflict needs an edge even with no data dependency.
+
+**Silent node failure.** In a chain a failure stops everything, which is
+annoying but obvious. In a graph one dead node among two hundred disappears into
+a report that looks complete. Fix: the fan-in checks the count it received
+against the count it expected and says so when they differ, rather than quietly
+synthesising partial data. This is the same principle as
+[[Socket compliance is indeterminate by default]] — missing input produces a
+stated gap, never a confident answer.
+
+## Loops versus graphs
+
+A loop is one unit of self-improvement: try, measure, adjust, repeat. Its known
+failure is Goodhart — it optimises the metric you named and nothing else, so a
+bot tuned to close tickets fast closes them fast while satisfaction falls. A
+graph mitigates this structurally: several nodes with different jobs check each
+other, so no single metric drives the system.
+
+The shift in practice is that you stop writing the agent that does everything
+top to bottom and start designing the dependency structure. The agents fill in
+the nodes; you own the edges.
+
 ## Caution for engineering use
 
 The parallel-then-combine shape is right for review and search. It is wrong for
