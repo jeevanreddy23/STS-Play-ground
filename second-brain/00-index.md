@@ -2,7 +2,7 @@
 title: Index
 type: moc
 tags: [moc]
-updated: 2026-07-29
+updated: 2026-08-01
 ---
 
 # STS Second Brain
@@ -13,6 +13,18 @@ in its own file and links onward.
 ## Reference library
 
 - [[Reference library]] — catalogue of the standards, papers and texts held locally
+- [[Project reports]] — factual index of the 17 Core Geotech reports held locally
+
+## Section maps
+
+Clause numbers and headings only, so a clause can be found without opening the
+document.
+
+- [[Section map - AS 1726:2017]]
+- [[Section map - AS 2159:2009]]
+- [[Section map - AS 2870:2011]]
+- [[Section map - AS 3798:2007]]
+- [[Section map - AS 4678:2002]]
 
 ## Standards
 
