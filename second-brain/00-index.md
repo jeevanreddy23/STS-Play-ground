@@ -15,6 +15,11 @@ in its own file and links onward.
 - [[Reference library]] — catalogue of the standards, papers and texts held locally
 - [[Project reports]] — factual index of the 17 Core Geotech reports held locally
 
+## Skills
+
+- [[Skills]] — 116 action-based working aids mined from the practice documents,
+  specs and papers in the reference library, grouped by discipline
+
 ## Section maps
 
 Clause numbers and headings only, so a clause can be found without opening the
