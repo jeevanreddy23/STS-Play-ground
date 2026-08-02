@@ -2,7 +2,7 @@
 title: Index
 type: moc
 tags: [moc]
-updated: 2026-08-01
+updated: 2026-08-02
 ---
 
 # STS Second Brain
@@ -17,9 +17,15 @@ in its own file and links onward.
 
 ## Skills
 
-- [[Skills]] — 172 action-based working aids: mined from the reference library's
+- [[Skills]] — 184 action-based working aids: mined from the reference library's
   practice documents, from the Rock Mechanics lecture playlist, and from STS's
   own field records in Google Drive ([[Field records catalogue]])
+
+## Learning
+
+- [[Learning loop]] — the recursive cycle: drill flashcards, walk a staged
+  learning path, apply it in the field, capture what differed, refine the
+  notes, regenerate the decks
 
 ## Section maps
 
