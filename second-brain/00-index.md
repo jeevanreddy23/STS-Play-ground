@@ -17,8 +17,9 @@ in its own file and links onward.
 
 ## Skills
 
-- [[Skills]] — 116 action-based working aids mined from the practice documents,
-  specs and papers in the reference library, grouped by discipline
+- [[Skills]] — 172 action-based working aids: mined from the reference library's
+  practice documents, from the Rock Mechanics lecture playlist, and from STS's
+  own field records in Google Drive ([[Field records catalogue]])
 
 ## Section maps
 
