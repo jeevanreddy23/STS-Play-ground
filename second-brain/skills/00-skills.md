@@ -7,15 +7,19 @@ updated: 2026-08-02
 
 # Skills
 
-172 action-based skills from three source families: 116 mined from the
+184 action-based skills from three source families: 116 mined from the
 practice documents, specifications, papers and guides in the local reference
 library (`G materials`), 47 from the Rock Mechanics lecture playlist by Soil
 Mechanics and Engineering Geology on YouTube (tagged `youtube-source`, each
-linked to the exact minute of video), and 9 reconstructed from STS's own field
-records on Google Drive — completed forms, labelled photos and scans (tagged
-`field-source`, catalogued in [[Field records catalogue]]). Each note is a
-paraphrased working aid pointing back to its source — what to do, what to
-check, and where the authoritative wording lives.
+linked to the exact minute of video), and 21 reconstructed from STS's own field
+records on Google Drive — completed forms, blank templates, labelled photos
+and scans (tagged `field-source`, catalogued in
+[[Field records catalogue]]). Each note is a paraphrased working aid pointing
+back to its source — what to do, what to check, and where the authoritative
+wording lives.
+
+To *learn* the vault rather than just consult it, start at [[Learning loop]] —
+flashcard decks and staged learning paths are generated from these notes.
 
 **Ground rules.** Nothing here replaces the source document, the project
 specification or a qualified reviewer. Numeric criteria are cited by clause or
@@ -222,15 +226,27 @@ Not mined: the Australian Standards (see the section maps in
 
 ## Field records and site practice
 
+- [[Capture borehole location photos with the Solocator compass-GPS overlay]] — from `Google Drive — Site photos (Solocator)/Solocator-2026-05-07 10-22-29 (1).jpg, Solocator-2026-05-07 09-34-39 (1).jpg (plus BH1-BH4.jpg renamed copies in the same folder)`
+- [[Compile positioned core photographs into a per-borehole core-photo deliverable]] — from `Google Drive — Core Photos (MP4 compilation)/MP4 Core Photos.pdf + MP4 Core Photos.docx + MP4-BH01.jpeg; Core Photo/Positioned/ (MP4-BHxx and MP5-BHxx renamed positioned images alongside raw UUID-named originals)`
 - [[Complete a DCP and Perth penetrometer deep test field sheet (Form S26)]] — from `Google Drive — 2520E-G/Field Sheets/2427E-G.pdf (page 1)`
+- [[Complete a Report of Pile Hole Inspection form (OP GEO pile hole inspection family)]] — from `Google Drive — Field Sheets (STS blank templates + reference)/OP GEO 015  Pile Hole inspection report[29920].pdf`
+- [[Complete an STS Geotech Drilling Daily Record (drilling/coring time and production log)]] — from `Google Drive — Field Sheets (STS blank templates + reference)/STS Geotech Drilling Daily Record.pdf (with STS Geotech_Daily Log.pdf and OP GEO 003_RevD Geotech_Daily Log_EI.pdf as the companion daily-log family)`
 - [[Complete an STS Geotechnical Daily Field Form]] — from `Google Drive — 2520E-G/Field Sheets/2427E-G.pdf (pages 2-4)`
 - [[Complete an STS plate load test worksheet (Form S112)]] — from `Google Drive — Field Sheets/PLT1.jpg, PLT3.jpg, PLT5.jpg and Field Sheets (1)/PLT-1 (1).pdf`
 - [[Complete the Geotechnical Testing & Site Record Sheet for AS 3798 Level 1 supervision (Form S69)]] — from `Google Drive — 02 LEVEL1 DAILY SITE REPORT/Level 1 Daily Sheet 25-02-026.pdf and 14-02-026.pdf; Site Record 2025/05.pdf`
+- [[Keep and compile a signed STS Site Timesheet (Form A7) for the billing period]] — from `Google Drive — O4 DAILY SITE TIMESHEET/329131829E-L(30-01-2026 TO 25-02-2026).pdf`
+- [[Label core boxes using the STS printed photo-board template]] — from `Google Drive — Field Sheets (STS blank templates + reference)/Core Box Label.pptx; Core Photos (MP4 compilation)/MP4-BH01.jpeg; Photos (Nov 2021 site photo dump)/IMG20211126131944.jpg`
+- [[Log a borehole soil profile by hand on the OP GEO 007a/007b BH soil field log sheets]] — from `Google Drive — Field Sheets (STS blank templates + reference)/OP GEO 007a reva bh soil log 5m with grid line.pdf and OP GEO 007b RevB bh soil log 10m.pdf`
+- [[Log rock core by hand on the OP GEO 008a/008b BH rock log sheets]] — from `Google Drive — Field Sheets (STS blank templates + reference)/OP GEO 008a RevA BH Rock log 5m.pdf and OP GEO 008b RevB BH Rock log 10m.pdf`
+- [[Mark up field density test locations on the project drawing set]] — from `Google Drive — Field Density Test Locations Drawings/flomar_250819_071947.pdf`
 - [[Photograph a shrink-swell sample with depth labelling]] — from `Google Drive — Shrink Swell photo/BH1 0.7-1.0m.jpg`
 - [[Photograph a site or test location with a time-GPS overlay]] — from `Google Drive — 2520E-G/Site Photos/TimePhoto_20260624_100529.jpg and TimePhoto_20260624_100527.jpg`
 - [[Photograph and label a core box]] — from `Google Drive — Core Photo/IMG_0798.jpg, MP4-BH01.jpeg, IMG_0797.JPG`
+- [[Record Wenner resistivity readings from the AEMC tester onto the stored-measurements datasheet]] — from `Google Drive — Field Resistivity Test/Datasheet - blank - FRM-StoredMeasurements.pdf and Layout - Wenner.pptx`
 - [[Record nuclear gauge daily standard counts (Form K38)]] — from `Google Drive — Field standard count/density reading_250818_075031.pdf`
+- [[Reduce a plate load test in the STS PLATE LOAD TEST workbook and issue the report sheet]] — from `Google Drive — PLT calc/PLATE LOAD TEST-PLT1.xls and PLATE LOAD TEST-PLT1.pdf`
 - [[Run the AEMC soil resistivity test (Wenner method) to the STS SOP]] — from `Google Drive — Field Resistivity Test/SOP - AEMC Resistivity Test.pdf`
+- [[Use the EI logging cheat sheet and correlation charts as in-field reference aids]] — from `Google Drive — Field Sheets (STS blank templates + reference)/EI Geotech Soil Logging Cheat Sheet - rev1 Oct 19.pdf, Approx. Correlations Chart.pdf, PSP correlation.pdf`
 
 ## General practice
 
