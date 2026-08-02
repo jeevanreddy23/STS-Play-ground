@@ -2,25 +2,29 @@
 title: Skills
 type: moc
 tags: [moc, skill]
-updated: 2026-08-01
+updated: 2026-08-02
 ---
 
 # Skills
 
-163 action-based skills: 116 mined from the practice documents, specifications,
-papers and guides in the local reference library (`G materials`), and 47 from
-the Rock Mechanics lecture playlist by Soil Mechanics and Engineering Geology
-on YouTube (tagged `youtube-source`, each linked to the exact minute of video).
-Each note is a paraphrased working aid pointing back to its source — what to
-do, what to check, and where the authoritative wording lives.
+172 action-based skills from three source families: 116 mined from the
+practice documents, specifications, papers and guides in the local reference
+library (`G materials`), 47 from the Rock Mechanics lecture playlist by Soil
+Mechanics and Engineering Geology on YouTube (tagged `youtube-source`, each
+linked to the exact minute of video), and 9 reconstructed from STS's own field
+records on Google Drive — completed forms, labelled photos and scans (tagged
+`field-source`, catalogued in [[Field records catalogue]]). Each note is a
+paraphrased working aid pointing back to its source — what to do, what to
+check, and where the authoritative wording lives.
 
 **Ground rules.** Nothing here replaces the source document, the project
 specification or a qualified reviewer. Numeric criteria are cited by clause or
 page, not reproduced. Notes tagged `ocr-source` came from scanned documents
 read by OCR, and `youtube-source` notes were heard through auto-captions —
 treat both sets' numbers and equations with extra suspicion and read them off
-the source before use. Confidence is the
-extractor's, not an engineer's.
+the source before use. `field-source` notes show what the records evidence, not
+necessarily the current approved procedure. Confidence is the extractor's, not
+an engineer's.
 
 Not mined: the Australian Standards (see the section maps in
 [[Reference library]]), the Core Geotech project reports (see
@@ -215,6 +219,18 @@ Not mined: the Australian Standards (see the section maps in
 - [[Measure ground and building vibration correctly]] — from `vibrationguide0643.pdf`
 - [[Run staged monitoring and hold points for supported excavation]] — from `gtd-2020-001.pdf`
 - [[Select field density test method by oversize]] — from `b030.pdf`
+
+## Field records and site practice
+
+- [[Complete a DCP and Perth penetrometer deep test field sheet (Form S26)]] — from `Google Drive — 2520E-G/Field Sheets/2427E-G.pdf (page 1)`
+- [[Complete an STS Geotechnical Daily Field Form]] — from `Google Drive — 2520E-G/Field Sheets/2427E-G.pdf (pages 2-4)`
+- [[Complete an STS plate load test worksheet (Form S112)]] — from `Google Drive — Field Sheets/PLT1.jpg, PLT3.jpg, PLT5.jpg and Field Sheets (1)/PLT-1 (1).pdf`
+- [[Complete the Geotechnical Testing & Site Record Sheet for AS 3798 Level 1 supervision (Form S69)]] — from `Google Drive — 02 LEVEL1 DAILY SITE REPORT/Level 1 Daily Sheet 25-02-026.pdf and 14-02-026.pdf; Site Record 2025/05.pdf`
+- [[Photograph a shrink-swell sample with depth labelling]] — from `Google Drive — Shrink Swell photo/BH1 0.7-1.0m.jpg`
+- [[Photograph a site or test location with a time-GPS overlay]] — from `Google Drive — 2520E-G/Site Photos/TimePhoto_20260624_100529.jpg and TimePhoto_20260624_100527.jpg`
+- [[Photograph and label a core box]] — from `Google Drive — Core Photo/IMG_0798.jpg, MP4-BH01.jpeg, IMG_0797.JPG`
+- [[Record nuclear gauge daily standard counts (Form K38)]] — from `Google Drive — Field standard count/density reading_250818_075031.pdf`
+- [[Run the AEMC soil resistivity test (Wenner method) to the STS SOP]] — from `Google Drive — Field Resistivity Test/SOP - AEMC Resistivity Test.pdf`
 
 ## General practice
 
