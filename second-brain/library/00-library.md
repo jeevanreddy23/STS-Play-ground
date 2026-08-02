@@ -25,6 +25,7 @@ Local root: `C:\Users\pored\Downloads\G materials`
 - [[Library - plate load testing]] — PLT procedure, spreadsheets and training
 - [[Library - salinity and sodic soils]] — western Sydney salinity guidance
 - [[Library - reference texts and parameter sources]] — textbooks and correlation sources
+- [[Field records catalogue]] — STS field sheets, photos and scans in Google Drive
 
 ## Section maps
 
