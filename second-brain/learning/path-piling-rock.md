@@ -7,7 +7,7 @@ updated: 2026-08-02
 
 # Learning path - Piling and Sydney rock
 
-A suggested walk through the 13 piling and sydney rock skills, staged from
+A suggested walk through the 19 piling and sydney rock skills, staged from
 observation to judgement. The staging is heuristic (grouped by what each skill
 *does*), not a syllabus — skip what you already hold, and let a gap found in a
 later stage send you back to an earlier one. That return trip is the point:
@@ -22,9 +22,11 @@ differed — see [[Learning loop]].
 ## Core method — measure and perform
 
 - [[Inspect bored pile sockets for sidewall smear and base cleanliness before certifying design assumptions]]
+- [[Predict pile bearing capacity and screen liquefaction directly from CPT data]]
 
 ## Analysis — calculate and reduce
 
+- [[Estimate axial pile capacity and check pile group and negative skin friction effects]]
 - [[Estimate lateral response of a rock socket with the Carter and Kulhawy elastic solutions]]
 - [[Estimate pile capacity directly from SPT N values using published direct methods and reconcile them]]
 - [[Estimate socket side shear from unconfined compressive strength with roughness and mass-stiffness corrections]]
@@ -32,14 +34,18 @@ differed — see [[Learning loop]].
 
 ## Judgement — assess, check, decide
 
+- [[Apply Menard pressuremeter design rules to footings, piles and laterally loaded piles]]
 - [[Apply limit state load combinations and geotechnical reduction factors to rock foundation design]]
 - [[Check uplift sockets and anchors for piston pullout and rock cone liftout]]
 - [[Choose the load-carrying mechanism for a rock foundation before selecting design parameters]]
+- [[Design a rock foundation or rock socket - failure mode, capacity, roughness and refusal]]
 - [[Design a rock socket for sidewall slip with the Rowe and Armitage chart procedure]]
+- [[Design pile foundations in soil - capacity, installation effects, groups and lateral response]]
 - [[Design prestressed anchor bond zones in Hawkesbury Sandstone and Ashfield Shale from proof-test-based values]]
 - [[Select an axial design method for a rock socket: elastic, side-slip, or non-linear]]
 - [[Select class-based end bearing, shaft adhesion and modulus design values for Sydney sandstone and shale]]
 - [[Specify construction and supervision requirements for socketed bored piles in Sydney rock]]
+- [[Use SPT results directly for shallow foundation and pile design and for liquefaction screening]]
 
 ## Related
 

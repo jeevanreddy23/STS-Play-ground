@@ -7,7 +7,7 @@ updated: 2026-08-02
 
 # Learning path - Salinity and aggressivity
 
-A suggested walk through the 15 salinity and aggressivity skills, staged from
+A suggested walk through the 18 salinity and aggressivity skills, staged from
 observation to judgement. The staging is heuristic (grouped by what each skill
 *does*), not a syllabus — skip what you already hold, and let a gap found in a
 later stage send you back to an earlier one. That return trip is the point:
@@ -35,13 +35,16 @@ differed — see [[Learning loop]].
 ## Judgement — assess, check, decide
 
 - [[Assess sodic soils and prescribe gypsum, lime and tillage treatment]]
+- [[Assess whether a road is obstructing groundwater and driving salinity]]
 - [[Design a soil and groundwater sampling program for salinity testing]]
 - [[Design and rehabilitate road pavements in salinity-affected areas]]
+- [[Design road embankment and drainage to limit salinity impact]]
 - [[Manage salinity in subdivision and single-lot development design]]
 - [[Plan a phased site investigation for urban salinity]]
 - [[Select and interpret soil tests for water movement and corrosivity]]
 - [[Select surface treatments for pavements by salt content before sealing]]
 - [[Specify salt-resistant masonry, damp-proof courses and membranes]]
+- [[Use the Western Sydney salinity potential map in a desk study]]
 
 ## Related
 

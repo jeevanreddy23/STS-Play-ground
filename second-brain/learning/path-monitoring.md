@@ -7,7 +7,7 @@ updated: 2026-08-02
 
 # Learning path - Monitoring and vibration
 
-A suggested walk through the 6 monitoring and vibration skills, staged from
+A suggested walk through the 9 monitoring and vibration skills, staged from
 observation to judgement. The staging is heuristic (grouped by what each skill
 *does*), not a syllabus — skip what you already hold, and let a gap found in a
 later stage send you back to an earlier one. That return trip is the point:
@@ -27,12 +27,15 @@ differed — see [[Learning loop]].
 
 - [[Measure ground and building vibration correctly]]
 - [[Run staged monitoring and hold points for supported excavation]]
+- [[Set vibration limits and monitoring for work near buildings and services]]
 
 ## Judgement — assess, check, decide
 
 - [[Assess human exposure against vibration values]]
 - [[Design and monitor trenchless under road crossing]]
+- [[Screen construction works to decide simple or detailed noise and vibration assessment]]
 - [[Select field density test method by oversize]]
+- [[Verify vegetative batter cover through establishment and maintenance]]
 
 ## Related
 
