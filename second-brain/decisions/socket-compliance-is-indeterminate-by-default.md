@@ -23,9 +23,9 @@ cannot read as approved at a glance.
 
 ## What it means in practice
 
-On the Carter Street job all 18 inspected piers report as compliance-unknown,
-because the report states no required socket. That is the correct reading of the
-available information, and it makes the missing document visible.
+On a job where the inspection reports state no required socket length, every
+inspected pier reports as compliance-unknown. That is the correct reading of
+the available information, and it makes the missing document visible.
 
 ## Related
 
