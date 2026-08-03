@@ -22,9 +22,6 @@ classification and concrete durability recommendations.
 | `Sodic-soil-management.pdf` | Sodic soil management |
 | `roads-and-salinity.pdf`, `Techniques-to-use-on-roads-affected-by-salinity.pdf` | Salinity effects on pavements |
 
-Report templates using this material sit at
-`G materials/CG25-0XX-A Rev 0 SITE CLASS AND SALINITY REPORT.doc`.
-
 ## Related
 
 - [[AS 2870 residential site classification]]
