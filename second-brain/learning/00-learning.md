@@ -27,12 +27,8 @@ The vault as a *recursive* learning system, not a filing cabinet. One cycle:
    (`gen-learning.py`), so a refined note automatically becomes refined cards.
    The next Drill runs on the improved vault. That closure is the recursion.
 
-Skills whose sources are records rather than procedures (`field-source`) get
-better with every pass of this loop — each capture is new evidence.
-
 ## Learning paths
 
-- [[Learning path - Field records and site practice]]
 - [[Learning path - Field and laboratory testing]]
 - [[Learning path - Piling and Sydney rock]]
 - [[Learning path - Rock mechanics]]
@@ -48,7 +44,6 @@ better with every pass of this loop — each capture is new evidence.
 
 ## Flashcard decks
 
-- [[Flashcards - Field records and site practice]]
 - [[Flashcards - Field and laboratory testing]]
 - [[Flashcards - Piling and Sydney rock]]
 - [[Flashcards - Rock mechanics]]
@@ -65,5 +60,4 @@ better with every pass of this loop — each capture is new evidence.
 ## Related
 
 - [[Skills]]
-- [[Field records catalogue]]
 - [[Index]]
