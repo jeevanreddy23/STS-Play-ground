@@ -17,8 +17,8 @@ Residual high-plasticity silty clay, pale grey mottled red-orange, roughly
 often gradational rather than a clean surface, which is why proving it needs the
 pier base inspected rather than a depth called from a nearby borehole.
 
-*Source: STS report 26/0988, 24-26 Carter Street Lidcombe, 18 piers inspected
-27 Jul 2026 — piers founded 1.8–3.3 m below platform with sockets 0.6–2.0 m.*
+*Typical western Sydney profile, generalised from local pier inspection
+experience — depths and socket lengths vary site to site; prove them per job.*
 
 ## What to watch
 
