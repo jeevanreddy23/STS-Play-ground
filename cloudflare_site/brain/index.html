@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>STS Second Brain</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#14151a">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23fcfcfb'/%3E%3Ccircle cx='10' cy='11' r='3.5' fill='%232a78d6'/%3E%3Ccircle cx='22' cy='9' r='2.5' fill='%23eb6834'/%3E%3Ccircle cx='19' cy='22' r='3' fill='%231baf7a'/%3E%3Cpath d='M10 11 L22 9 M10 11 L19 22 M22 9 L19 22' stroke='%23898781' stroke-width='1.2' fill='none'/%3E%3C/svg%3E">
 <style>
   :root {
@@ -1258,6 +1262,14 @@ fetch('vault.json', { cache: 'no-cache' })
     $('main').innerHTML = `<div class="results"><h2>Vault not loaded</h2><p class="hint">${esc(String(err.message))}</p>
       <p class="hint">Run <code>node scripts/build-vault-index.mjs</code> to generate <code>vault.json</code> from the Markdown.</p></div>`;
   });
+</script>
+<script>
+/* Geotech Obsidian PWA: register the offline service worker. */
+if ('serviceWorker' in navigator) {
+  addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => { /* offline install can wait */ });
+  });
+}
 </script>
 </body>
 </html>
