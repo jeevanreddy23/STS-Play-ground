@@ -2,7 +2,7 @@
 title: Index
 type: moc
 tags: [moc]
-updated: 2026-08-02
+updated: 2026-08-03
 ---
 
 # STS Second Brain
@@ -13,13 +13,12 @@ in its own file and links onward.
 ## Reference library
 
 - [[Reference library]] — catalogue of the standards, papers and texts held locally
-- [[Project reports]] — factual index of the 17 Core Geotech reports held locally
 
 ## Skills
 
-- [[Skills]] — 184 action-based working aids: mined from the reference library's
-  practice documents, from the Rock Mechanics lecture playlist, and from STS's
-  own field records in Google Drive ([[Field records catalogue]])
+- [[Skills]] — 323 action-based working aids mined from the reference library's
+  practice documents, textbooks, software tutorials and calculation files, plus
+  the Rock Mechanics lecture playlist
 
 ## Learning
 
