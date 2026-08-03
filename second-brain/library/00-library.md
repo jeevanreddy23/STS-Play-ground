@@ -25,28 +25,42 @@ Local root: `C:\Users\pored\Downloads\G materials`
 - [[Library - plate load testing]] — PLT procedure, spreadsheets and training
 - [[Library - salinity and sodic soils]] — western Sydney salinity guidance
 - [[Library - reference texts and parameter sources]] — textbooks and correlation sources
-- [[Field records catalogue]] — STS field sheets, photos and scans in Google Drive
 
 ## Section maps
 
 Clause-level finding aids for the standards whose text could be read. Headings
 only — no clause text is reproduced.
 
+Investigation, description and earthworks:
+
 - [[Section map - AS 1726:2017]]
+- [[Section map - BS 5930:1999]]
+- [[Section map - AS 3798:2007]]
+- [[Section map - HB 160:2006]] — decoded from a shifted-character PDF
+
+Foundations, footings and retaining:
+
 - [[Section map - AS 2159:2009]] — OCR-rebuilt; the local PDF has no text layer
 - [[Section map - AS 2870:2011]]
-- [[Section map - AS 3798:2007]]
 - [[Section map - AS 4678:2002]]
 
-## Project reports
+Test methods:
 
-- [[Project reports]] — the 17 Core Geotech documents held alongside these
-  references, indexed one note per document
+- [[Section map - AS 1289.6.3.2:1997]] — dynamic cone penetrometer
+- [[Section map - AS 1289.6.3.3:1997]] — Perth sand penetrometer
+
+Actions and services:
+
+- [[Section map - AS/NZS 1170.2:2011]] — wind actions
+- [[Section map - AS 1170.4:2007]] — earthquake actions
+- [[Section map - AS 4055:2012]] — wind loads for housing
+- [[Section map - AS/NZS 1547:2012]] — on-site domestic wastewater; OCR-rebuilt
+
 
 ## Housekeeping notes
 
 The root folder holds several duplicates — `AS 1726 2017` and `AS1726-2017`
 are both present, `AS3798` appears twice, and `Australian and RMS Standards/`
-contains a second copy of the whole `Australian/` and `RMS/` trees. Two files
-are zero bytes (`CG24-0518-A Rev 1.pdf`, `CG25-0768-1, Site plan_BB.pdf`) and
+contains a second copy of the whole `Australian/` and `RMS/` trees. Two project
+files are zero bytes and
 will not open. Worth a tidy before this becomes the reference of record.
