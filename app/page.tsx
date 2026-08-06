@@ -1,6 +1,16 @@
 "use client";
 
-import { ChangeEvent, DragEvent, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  DragEvent,
+  KeyboardEvent,
+  MouseEvent,
+  PointerEvent as ReactPointerEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 type Plan = {
   id: string;
@@ -107,8 +117,18 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageCount, setPageCount] = useState(1);
   const [stageRatio, setStageRatio] = useState("4 / 3");
+  const [draggingPileId, setDraggingPileId] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const pdfCanvas = useRef<HTMLCanvasElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const dragState = useRef<{
+    pileId: string;
+    originalX: number;
+    originalY: number;
+    latestX: number;
+    latestY: number;
+    moved: boolean;
+  } | null>(null);
 
   const activePlan = plans.find((plan) => plan.id === activePlanId) ?? null;
   const selectedPile = piles.find((pile) => pile.id === selectedPileId) ?? null;
@@ -296,6 +316,107 @@ export default function Home() {
     }
   }
 
+  function pointerPosition(event: ReactPointerEvent<HTMLButtonElement>) {
+    const bounds = stageRef.current?.getBoundingClientRect();
+    if (!bounds) return null;
+    return {
+      xNorm: Math.min(1, Math.max(0, (event.clientX - bounds.left) / bounds.width)),
+      yNorm: Math.min(1, Math.max(0, (event.clientY - bounds.top) / bounds.height)),
+    };
+  }
+
+  async function persistPilePosition(
+    pile: Pile,
+    xNorm: number,
+    yNorm: number,
+    fallback = { xNorm: pile.xNorm, yNorm: pile.yNorm },
+  ) {
+    try {
+      const response = await fetch(`/api/piles/${pile.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ xNorm, yNorm }),
+      });
+      const data = (await response.json()) as { error?: string; pile: Pile };
+      if (!response.ok) throw new Error(data.error || "Unable to move this pile marker.");
+      setPiles((current) => current.map((item) => (item.id === data.pile.id ? data.pile : item)));
+      setNotice(`${data.pile.pileId} location updated.`);
+    } catch (reason) {
+      setPiles((current) => current.map((item) => (
+        item.id === pile.id ? { ...item, xNorm: fallback.xNorm, yNorm: fallback.yNorm } : item
+      )));
+      setError(reason instanceof Error ? reason.message : "Unable to move this pile marker.");
+    }
+  }
+
+  function startPileDrag(event: ReactPointerEvent<HTMLButtonElement>, pile: Pile) {
+    event.stopPropagation();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setSelectedPileId(pile.id);
+    setPlacing(false);
+    setDraggingPileId(pile.id);
+    dragState.current = {
+      pileId: pile.id,
+      originalX: pile.xNorm,
+      originalY: pile.yNorm,
+      latestX: pile.xNorm,
+      latestY: pile.yNorm,
+      moved: false,
+    };
+  }
+
+  function movePileDrag(event: ReactPointerEvent<HTMLButtonElement>) {
+    const drag = dragState.current;
+    if (!drag || drag.pileId !== event.currentTarget.dataset.pileId) return;
+    const position = pointerPosition(event);
+    if (!position) return;
+    event.preventDefault();
+    drag.latestX = position.xNorm;
+    drag.latestY = position.yNorm;
+    drag.moved = drag.moved
+      || Math.abs(position.xNorm - drag.originalX) > 0.001
+      || Math.abs(position.yNorm - drag.originalY) > 0.001;
+    setPiles((current) => current.map((pile) => (
+      pile.id === drag.pileId ? { ...pile, ...position } : pile
+    )));
+  }
+
+  function endPileDrag(event: ReactPointerEvent<HTMLButtonElement>, pile: Pile) {
+    event.stopPropagation();
+    const drag = dragState.current;
+    dragState.current = null;
+    setDraggingPileId(null);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (drag?.pileId === pile.id && drag.moved) {
+      void persistPilePosition(pile, drag.latestX, drag.latestY, {
+        xNorm: drag.originalX,
+        yNorm: drag.originalY,
+      });
+    }
+  }
+
+  function movePileWithKeyboard(event: KeyboardEvent<HTMLButtonElement>, pile: Pile) {
+    const directions: Record<string, [number, number]> = {
+      ArrowLeft: [-1, 0],
+      ArrowRight: [1, 0],
+      ArrowUp: [0, -1],
+      ArrowDown: [0, 1],
+    };
+    const direction = directions[event.key];
+    if (!direction) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const step = event.shiftKey ? 0.02 : 0.005;
+    const xNorm = Math.min(1, Math.max(0, pile.xNorm + direction[0] * step));
+    const yNorm = Math.min(1, Math.max(0, pile.yNorm + direction[1] * step));
+    setPiles((current) => current.map((item) => (
+      item.id === pile.id ? { ...item, xNorm, yNorm } : item
+    )));
+    void persistPilePosition(pile, xNorm, yNorm);
+  }
+
   async function deletePile() {
     if (!selectedPile || !window.confirm(`Remove ${selectedPile.pileId} from this plan?`)) return;
     const response = await fetch(`/api/piles/${selectedPile.id}`, { method: "DELETE" });
@@ -413,6 +534,7 @@ export default function Home() {
               </div>
             ) : (
               <div
+                ref={stageRef}
                 className={`plan-stage ${placing ? "is-placing" : ""}`}
                 style={{ aspectRatio: stageRatio }}
                 onClick={placePile}
@@ -435,10 +557,17 @@ export default function Home() {
                     <button
                       type="button"
                       key={pile.id}
-                      className={`pile-marker status-${pile.status.toLowerCase()} ${pile.id === selectedPileId ? "selected" : ""}`}
+                      data-pile-id={pile.id}
+                      className={`pile-marker status-${pile.status.toLowerCase()} ${pile.id === selectedPileId ? "selected" : ""} ${pile.id === draggingPileId ? "dragging" : ""}`}
                       style={{ left: `${pile.xNorm * 100}%`, top: `${pile.yNorm * 100}%` }}
                       onClick={(event) => { event.stopPropagation(); setSelectedPileId(pile.id); setPlacing(false); }}
-                      aria-label={`Open ${pile.pileId}`}
+                      onPointerDown={(event) => startPileDrag(event, pile)}
+                      onPointerMove={movePileDrag}
+                      onPointerUp={(event) => endPileDrag(event, pile)}
+                      onPointerCancel={(event) => endPileDrag(event, pile)}
+                      onKeyDown={(event) => movePileWithKeyboard(event, pile)}
+                      aria-label={`${pile.pileId}. Drag to reposition, or use arrow keys for precise movement.`}
+                      title={`Drag ${pile.pileId} to reposition`}
                     >
                       <span>{pile.pileId}</span>
                     </button>
@@ -453,7 +582,7 @@ export default function Home() {
             <span><i className="legend-dot approved" /> Approved</span>
             <span><i className="legend-dot conditional" /> Conditional</span>
             <span><i className="legend-dot rejected" /> Rejected</span>
-            <span className="legend-note">Pins are stored as page-relative coordinates.</span>
+            <span className="legend-note">Drag any pin to reposition it. Location saves automatically.</span>
           </div>
         </section>
 

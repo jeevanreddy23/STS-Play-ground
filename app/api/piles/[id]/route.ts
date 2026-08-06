@@ -17,6 +17,22 @@ export async function PATCH(
     await ensureSchema();
     const { id } = await params;
     const payload = (await request.json()) as Record<string, unknown>;
+
+    if ("xNorm" in payload || "yNorm" in payload) {
+      const xNorm = Number(payload.xNorm);
+      const yNorm = Number(payload.yNorm);
+      if (![xNorm, yNorm].every((value) => Number.isFinite(value) && value >= 0 && value <= 1)) {
+        return Response.json({ error: "Pile coordinates must remain within the plan." }, { status: 400 });
+      }
+      const result = await getD1()
+        .prepare("UPDATE piles SET x_norm = ?, y_norm = ?, updated_at = ? WHERE id = ?")
+        .bind(xNorm, yNorm, new Date().toISOString(), id)
+        .run();
+      if (!result.meta.changes) return Response.json({ error: "Pile marker not found." }, { status: 404 });
+      const row = await getD1().prepare("SELECT * FROM piles WHERE id = ?").bind(id).first<PileRow>();
+      return Response.json({ pile: presentPile(row!) });
+    }
+
     const pileId = String(payload.pileId ?? "").trim().toUpperCase();
     const status = String(payload.status ?? "DRAFT").trim().toUpperCase();
     if (!pileId) return Response.json({ error: "Pile ID is required." }, { status: 400 });

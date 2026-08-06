@@ -85,9 +85,11 @@ h3 { margin-bottom: 8px; }
 .plan-stage.is-placing { cursor: crosshair; outline: 3px solid var(--amber); outline-offset: 4px; }
 .plan-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 .marker-layer { position: absolute; inset: 0; pointer-events: none; }
-.pile-marker { position: absolute; z-index: 3; min-width: 36px; height: 30px; padding: 0 8px; border: 3px solid white; border-radius: 999px; background: #78847d; color: white; font-size: 10px; font-weight: 900; box-shadow: 0 5px 12px rgba(0,0,0,.26); transform: translate(-50%, -50%); pointer-events: auto; }
-.pile-marker::after { content: ""; position: absolute; left: 50%; bottom: -7px; width: 6px; height: 6px; border-radius: 50%; background: inherit; transform: translateX(-50%); }
-.pile-marker.selected { outline: 3px solid var(--lime); outline-offset: 2px; }
+.pile-marker { position: absolute; z-index: 3; min-width: 28px; height: 21px; padding: 0 5px; border: 2px solid white; border-radius: 999px; background: #78847d; color: white; font-size: 8px; font-weight: 900; line-height: 1; box-shadow: 0 3px 8px rgba(0,0,0,.25); transform: translate(-50%, -50%); pointer-events: auto; touch-action: none; cursor: grab; user-select: none; }
+.pile-marker::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 4px; height: 4px; border-radius: 50%; background: inherit; transform: translateX(-50%); }
+.pile-marker:hover { z-index: 5; transform: translate(-50%, -50%) scale(1.08); }
+.pile-marker.selected { outline: 2px solid var(--lime); outline-offset: 2px; }
+.pile-marker.dragging { z-index: 6; cursor: grabbing; transform: translate(-50%, -50%) scale(1.08); box-shadow: 0 5px 14px rgba(0,0,0,.34); }
 .status-approved { background: var(--forest); }
 .status-conditional { background: var(--amber); }
 .status-rejected { background: var(--red); }

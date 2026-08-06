@@ -12,6 +12,8 @@ test("contains the complete STS pile inspection workflow", async () => {
   assert.match(page, /STS Playground/);
   assert.match(page, /Upload site plan/);
   assert.match(page, /Add pile marker/);
+  assert.match(page, /Drag any pin to reposition it/);
+  assert.match(page, /onPointerMove/);
   assert.match(page, /Socket achieved/);
   assert.match(page, /Save pile record/);
   assert.match(css, /\.pile-marker/);
