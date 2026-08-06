@@ -1,53 +1,21 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
-const projectRoot = new URL("../", import.meta.url);
+test("contains the complete STS pile inspection workflow", async () => {
+  const [page, css, migration] = await Promise.all([
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+    readFile(new URL("../drizzle/0000_skinny_praxagora.sql", import.meta.url), "utf8"),
+  ]);
 
-async function loadWorker() {
-  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
-  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
-  const { default: worker } = await import(workerUrl.href);
-  return worker;
-}
-
-test("redirects the root to the exact supplied visualization", async () => {
-  const worker = await loadWorker();
-  const source = await readFile(
-    new URL("public/pile-inspection-3d.html", projectRoot),
-  );
-  const assets = {
-    fetch: async (request) => {
-      const url = new URL(request.url);
-      if (url.pathname === "/pile-inspection-3d.html") {
-        return new Response(source, {
-          headers: { "content-type": "text/html; charset=utf-8" },
-        });
-      }
-      return new Response("Not found", { status: 404 });
-    },
-  };
-  const context = {
-    waitUntil() {},
-    passThroughOnException() {},
-  };
-
-  const rootResponse = await worker.fetch(
-    new Request("http://localhost/", { redirect: "manual" }),
-    { ASSETS: assets },
-    context,
-  );
-  assert.ok([307, 308].includes(rootResponse.status));
-  assert.equal(
-    new URL(rootResponse.headers.get("location")).pathname,
-    "/pile-inspection-3d.html",
-  );
-
-  const assetResponse = await worker.fetch(
-    new Request("http://localhost/pile-inspection-3d.html"),
-    { ASSETS: assets },
-    context,
-  );
-  assert.equal(assetResponse.status, 200);
-  assert.deepEqual(Buffer.from(await assetResponse.arrayBuffer()), source);
+  assert.match(page, /STS Playground/);
+  assert.match(page, /Upload site plan/);
+  assert.match(page, /Add pile marker/);
+  assert.match(page, /Socket achieved/);
+  assert.match(page, /Save pile record/);
+  assert.match(css, /\.pile-marker/);
+  assert.match(migration, /CREATE TABLE `plans`/);
+  assert.match(migration, /CREATE TABLE `piles`/);
+  await access(new URL("../dist/server/index.js", import.meta.url));
 });
