@@ -20,6 +20,7 @@ export const piles = sqliteTable(
     planPage: integer("plan_page").notNull().default(1),
     xNorm: real("x_norm").notNull(),
     yNorm: real("y_norm").notNull(),
+    markerSizePx: integer("marker_size_px").notNull().default(24),
     status: text("status").notNull().default("DRAFT"),
     diameterMm: integer("diameter_mm"),
     groundRlM: real("ground_rl_m"),

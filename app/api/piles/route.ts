@@ -7,6 +7,7 @@ type PileRow = {
   plan_page: number;
   x_norm: number;
   y_norm: number;
+  marker_size_px: number;
   status: string;
   diameter_mm: number | null;
   ground_rl_m: number | null;
@@ -31,6 +32,7 @@ export function presentPile(row: PileRow) {
     planPage: row.plan_page,
     xNorm: row.x_norm,
     yNorm: row.y_norm,
+    markerSizePx: row.marker_size_px ?? 24,
     status: row.status,
     diameterMm: row.diameter_mm,
     groundRlM: row.ground_rl_m,

@@ -33,6 +33,20 @@ export async function PATCH(
       return Response.json({ pile: presentPile(row!) });
     }
 
+    if ("markerSizePx" in payload) {
+      const markerSizePx = Math.round(Number(payload.markerSizePx));
+      if (!Number.isFinite(markerSizePx) || markerSizePx < 16 || markerSizePx > 56) {
+        return Response.json({ error: "Marker size must be between 16 and 56 pixels." }, { status: 400 });
+      }
+      const result = await getD1()
+        .prepare("UPDATE piles SET marker_size_px = ?, updated_at = ? WHERE id = ?")
+        .bind(markerSizePx, new Date().toISOString(), id)
+        .run();
+      if (!result.meta.changes) return Response.json({ error: "Pile marker not found." }, { status: 404 });
+      const row = await getD1().prepare("SELECT * FROM piles WHERE id = ?").bind(id).first<PileRow>();
+      return Response.json({ pile: presentPile(row!) });
+    }
+
     const pileId = String(payload.pileId ?? "").trim().toUpperCase();
     const status = String(payload.status ?? "DRAFT").trim().toUpperCase();
     if (!pileId) return Response.json({ error: "Pile ID is required." }, { status: 400 });

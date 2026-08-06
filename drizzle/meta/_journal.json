@@ -8,6 +8,13 @@
       "when": 1786017809046,
       "tag": "0000_skinny_praxagora",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1786019439102,
+      "tag": "0001_empty_shotgun",
+      "breakpoints": true
     }
   ]
 }

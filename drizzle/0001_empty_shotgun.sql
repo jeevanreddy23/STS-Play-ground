@@ -1,0 +1,1 @@
+ALTER TABLE `piles` ADD `marker_size_px` integer DEFAULT 24 NOT NULL;

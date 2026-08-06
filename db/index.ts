@@ -49,6 +49,7 @@ export async function ensureSchema() {
       plan_page INTEGER NOT NULL DEFAULT 1,
       x_norm REAL NOT NULL,
       y_norm REAL NOT NULL,
+      marker_size_px INTEGER NOT NULL DEFAULT 24,
       status TEXT NOT NULL DEFAULT 'DRAFT',
       diameter_mm INTEGER,
       ground_rl_m REAL,
@@ -67,4 +68,11 @@ export async function ensureSchema() {
     database.prepare("CREATE UNIQUE INDEX IF NOT EXISTS uq_piles_plan_pile_id ON piles(plan_id, pile_id)"),
     database.prepare("CREATE INDEX IF NOT EXISTS idx_piles_plan_id ON piles(plan_id)"),
   ]);
+
+  const columns = await database.prepare("PRAGMA table_info(piles)").all<{ name: string }>();
+  if (!(columns.results ?? []).some((column) => column.name === "marker_size_px")) {
+    await database
+      .prepare("ALTER TABLE piles ADD COLUMN marker_size_px INTEGER NOT NULL DEFAULT 24")
+      .run();
+  }
 }

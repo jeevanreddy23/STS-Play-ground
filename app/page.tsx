@@ -28,6 +28,7 @@ type Pile = {
   planPage: number;
   xNorm: number;
   yNorm: number;
+  markerSizePx: number;
   status: string;
   diameterMm: number | null;
   groundRlM: number | null;
@@ -102,6 +103,11 @@ function numberOrNull(value: string) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function markerLabel(pileId: string) {
+  const numericSuffix = pileId.match(/(\d+)$/)?.[1];
+  return numericSuffix?.slice(-3) ?? pileId.slice(0, 3);
+}
+
 export default function Home() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [activePlanId, setActivePlanId] = useState<string | null>(null);
@@ -118,6 +124,7 @@ export default function Home() {
   const [pageCount, setPageCount] = useState(1);
   const [stageRatio, setStageRatio] = useState("4 / 3");
   const [draggingPileId, setDraggingPileId] = useState<string | null>(null);
+  const [resizingPileId, setResizingPileId] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const pdfCanvas = useRef<HTMLCanvasElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -128,6 +135,13 @@ export default function Home() {
     latestX: number;
     latestY: number;
     moved: boolean;
+  } | null>(null);
+  const resizeState = useRef<{
+    pileId: string;
+    originalSize: number;
+    latestSize: number;
+    startX: number;
+    startY: number;
   } | null>(null);
 
   const activePlan = plans.find((plan) => plan.id === activePlanId) ?? null;
@@ -349,6 +363,25 @@ export default function Home() {
     }
   }
 
+  async function persistMarkerSize(pile: Pile, markerSizePx: number, fallbackSize = pile.markerSizePx) {
+    try {
+      const response = await fetch(`/api/piles/${pile.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ markerSizePx }),
+      });
+      const data = (await response.json()) as { error?: string; pile: Pile };
+      if (!response.ok) throw new Error(data.error || "Unable to resize this pile marker.");
+      setPiles((current) => current.map((item) => (item.id === data.pile.id ? data.pile : item)));
+      setNotice(`${data.pile.pileId} marker size updated.`);
+    } catch (reason) {
+      setPiles((current) => current.map((item) => (
+        item.id === pile.id ? { ...item, markerSizePx: fallbackSize } : item
+      )));
+      setError(reason instanceof Error ? reason.message : "Unable to resize this pile marker.");
+    }
+  }
+
   function startPileDrag(event: ReactPointerEvent<HTMLButtonElement>, pile: Pile) {
     event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -415,6 +448,61 @@ export default function Home() {
       item.id === pile.id ? { ...item, xNorm, yNorm } : item
     )));
     void persistPilePosition(pile, xNorm, yNorm);
+  }
+
+  function startPileResize(event: ReactPointerEvent<HTMLButtonElement>, pile: Pile) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setSelectedPileId(pile.id);
+    setResizingPileId(pile.id);
+    const size = pile.markerSizePx ?? 24;
+    resizeState.current = {
+      pileId: pile.id,
+      originalSize: size,
+      latestSize: size,
+      startX: event.clientX,
+      startY: event.clientY,
+    };
+  }
+
+  function resizePileMarker(event: ReactPointerEvent<HTMLButtonElement>) {
+    const resize = resizeState.current;
+    if (!resize || resize.pileId !== event.currentTarget.dataset.pileId) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const delta = ((event.clientX - resize.startX) + (event.clientY - resize.startY)) / 2;
+    resize.latestSize = Math.min(56, Math.max(16, Math.round(resize.originalSize + delta)));
+    setPiles((current) => current.map((pile) => (
+      pile.id === resize.pileId ? { ...pile, markerSizePx: resize.latestSize } : pile
+    )));
+  }
+
+  function endPileResize(event: ReactPointerEvent<HTMLButtonElement>, pile: Pile) {
+    event.preventDefault();
+    event.stopPropagation();
+    const resize = resizeState.current;
+    resizeState.current = null;
+    setResizingPileId(null);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (resize?.pileId === pile.id && resize.latestSize !== resize.originalSize) {
+      void persistMarkerSize(pile, resize.latestSize, resize.originalSize);
+    }
+  }
+
+  function resizePileWithKeyboard(event: KeyboardEvent<HTMLButtonElement>, pile: Pile) {
+    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const grow = event.key === "ArrowRight" || event.key === "ArrowDown";
+    const step = event.shiftKey ? 4 : 1;
+    const markerSizePx = Math.min(56, Math.max(16, (pile.markerSizePx ?? 24) + (grow ? step : -step)));
+    setPiles((current) => current.map((item) => (
+      item.id === pile.id ? { ...item, markerSizePx } : item
+    )));
+    void persistMarkerSize(pile, markerSizePx);
   }
 
   async function deletePile() {
@@ -553,36 +641,55 @@ export default function Home() {
                   />
                 )}
                 <div className="marker-layer">
-                  {visiblePiles.map((pile) => (
-                    <button
-                      type="button"
-                      key={pile.id}
-                      data-pile-id={pile.id}
-                      className={`pile-marker status-${pile.status.toLowerCase()} ${pile.id === selectedPileId ? "selected" : ""} ${pile.id === draggingPileId ? "dragging" : ""}`}
-                      style={{ left: `${pile.xNorm * 100}%`, top: `${pile.yNorm * 100}%` }}
-                      onClick={(event) => { event.stopPropagation(); setSelectedPileId(pile.id); setPlacing(false); }}
-                      onPointerDown={(event) => startPileDrag(event, pile)}
-                      onPointerMove={movePileDrag}
-                      onPointerUp={(event) => endPileDrag(event, pile)}
-                      onPointerCancel={(event) => endPileDrag(event, pile)}
-                      onKeyDown={(event) => movePileWithKeyboard(event, pile)}
-                      aria-label={`${pile.pileId}. Drag to reposition, or use arrow keys for precise movement.`}
-                      title={`Drag ${pile.pileId} to reposition`}
-                    >
-                      <span>{pile.pileId}</span>
-                    </button>
-                  ))}
+                  {visiblePiles.map((pile) => {
+                    const size = pile.markerSizePx ?? 24;
+                    return (
+                      <div
+                        key={pile.id}
+                        className={`pile-marker-wrap ${pile.id === selectedPileId ? "selected" : ""} ${pile.id === draggingPileId ? "dragging" : ""} ${pile.id === resizingPileId ? "resizing" : ""}`}
+                        style={{ left: `${pile.xNorm * 100}%`, top: `${pile.yNorm * 100}%` }}
+                      >
+                        <button
+                          type="button"
+                          data-pile-id={pile.id}
+                          className="pile-marker"
+                          style={{ width: `${size}px`, height: `${size}px`, fontSize: `${Math.max(6, Math.min(10, size * 0.3))}px` }}
+                          onClick={(event) => { event.stopPropagation(); setSelectedPileId(pile.id); setPlacing(false); }}
+                          onPointerDown={(event) => startPileDrag(event, pile)}
+                          onPointerMove={movePileDrag}
+                          onPointerUp={(event) => endPileDrag(event, pile)}
+                          onPointerCancel={(event) => endPileDrag(event, pile)}
+                          onKeyDown={(event) => movePileWithKeyboard(event, pile)}
+                          aria-label={`${pile.pileId}. Drag to reposition, or use arrow keys for precise movement.`}
+                          title={`Drag ${pile.pileId} to reposition`}
+                        >
+                          <span>{markerLabel(pile.pileId)}</span>
+                        </button>
+                        {pile.id === selectedPileId && (
+                          <button
+                            type="button"
+                            data-pile-id={pile.id}
+                            className="marker-resize-handle"
+                            onPointerDown={(event) => startPileResize(event, pile)}
+                            onPointerMove={resizePileMarker}
+                            onPointerUp={(event) => endPileResize(event, pile)}
+                            onPointerCancel={(event) => endPileResize(event, pile)}
+                            onKeyDown={(event) => resizePileWithKeyboard(event, pile)}
+                            aria-label={`Resize ${pile.pileId}. Drag the handle or use arrow keys.`}
+                            title="Drag to resize marker"
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
                 {placing && <div className="placing-hint">Select the centre of the pile</div>}
               </div>
             )}
           </div>
           <div className="plan-legend">
-            <span><i className="legend-dot draft" /> Draft</span>
-            <span><i className="legend-dot approved" /> Approved</span>
-            <span><i className="legend-dot conditional" /> Conditional</span>
-            <span><i className="legend-dot rejected" /> Rejected</span>
-            <span className="legend-note">Drag any pin to reposition it. Location saves automatically.</span>
+            <span><i className="legend-dot approved" /> Pile inspection location</span>
+            <span className="legend-note">Select a green circle, then drag it to move or use its square handle to resize.</span>
           </div>
         </section>
 
@@ -594,7 +701,7 @@ export default function Home() {
 
           {!selectedPile ? (
             <div className="inspection-empty">
-              <div className="marker-example">P-001</div>
+              <div className="marker-example">001</div>
               <h3>Select a pile marker</h3>
               <p>Design controls, field measurements and sign-off status will appear here.</p>
             </div>
