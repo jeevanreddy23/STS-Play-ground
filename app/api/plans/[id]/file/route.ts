@@ -1,4 +1,4 @@
-import { ensureSchema, getD1, getPlanBucket } from "../../../../../db";
+import { ensureSchema, getD1, getPlanFile } from "../../../../../db";
 
 type PlanFileRow = {
   name: string;
@@ -19,15 +19,14 @@ export async function GET(
       .first<PlanFileRow>();
     if (!row) return new Response("Plan not found", { status: 404 });
 
-    const object = await getPlanBucket().get(row.file_key);
+    const object = await getPlanFile(row.file_key);
     if (!object) return new Response("Plan file not found", { status: 404 });
 
     const headers = new Headers();
-    object.writeHttpMetadata(headers);
     headers.set("content-type", row.content_type);
     headers.set("content-disposition", `inline; filename*=UTF-8''${encodeURIComponent(row.name)}`);
     headers.set("cache-control", "private, max-age=300");
-    headers.set("etag", object.httpEtag);
+    if (object.etag) headers.set("etag", object.etag);
     return new Response(object.body, { headers });
   } catch (error) {
     return Response.json(

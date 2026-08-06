@@ -1,4 +1,4 @@
-import { ensureSchema, getD1, getPlanBucket } from "../../../db";
+import { deletePlanFile, ensureSchema, getD1, putPlanFile } from "../../../db";
 
 const allowedTypes = new Set([
   "application/pdf",
@@ -61,11 +61,7 @@ export async function POST(request: Request) {
     const createdAt = new Date().toISOString();
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/^-+|-+$/g, "") || "site-plan";
     const fileKey = `plans/${id}/${safeName}`;
-    const bucket = getPlanBucket();
-    await bucket.put(fileKey, file.stream(), {
-      httpMetadata: { contentType: file.type },
-      customMetadata: { originalName: file.name },
-    });
+    await putPlanFile(fileKey, file);
 
     try {
       await getD1()
@@ -73,7 +69,7 @@ export async function POST(request: Request) {
         .bind(id, file.name, fileKey, file.type, file.size, createdAt)
         .run();
     } catch (error) {
-      await bucket.delete(fileKey);
+      await deletePlanFile(fileKey);
       throw error;
     }
 

@@ -4,7 +4,7 @@ import * as schema from "./schema";
 
 type RuntimeEnv = {
   DB?: D1Database;
-  PLANS?: R2Bucket;
+  PLANS?: R2Bucket | KVNamespace;
 };
 
 function runtimeEnv() {
@@ -19,12 +19,44 @@ export function getD1() {
   return database;
 }
 
-export function getPlanBucket() {
-  const bucket = runtimeEnv().PLANS;
-  if (!bucket) {
+function getPlanStore() {
+  const store = runtimeEnv().PLANS;
+  if (!store) {
     throw new Error("The site-plan upload store is unavailable.");
   }
-  return bucket;
+  return store;
+}
+
+function isR2Bucket(store: R2Bucket | KVNamespace): store is R2Bucket {
+  return "createMultipartUpload" in store;
+}
+
+export async function putPlanFile(fileKey: string, file: File) {
+  const store = getPlanStore();
+  if (isR2Bucket(store)) {
+    await store.put(fileKey, file.stream(), {
+      httpMetadata: { contentType: file.type },
+      customMetadata: { originalName: file.name },
+    });
+    return;
+  }
+  await store.put(fileKey, await file.arrayBuffer(), {
+    metadata: { contentType: file.type, originalName: file.name },
+  });
+}
+
+export async function getPlanFile(fileKey: string) {
+  const store = getPlanStore();
+  if (isR2Bucket(store)) {
+    const object = await store.get(fileKey);
+    return object ? { body: object.body as BodyInit, etag: object.httpEtag } : null;
+  }
+  const value = await store.get(fileKey, "arrayBuffer");
+  return value ? { body: value as BodyInit, etag: null } : null;
+}
+
+export async function deletePlanFile(fileKey: string) {
+  await getPlanStore().delete(fileKey);
 }
 
 export function getDb() {
